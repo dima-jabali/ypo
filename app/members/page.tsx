@@ -35,6 +35,7 @@ export default function MembersPage() {
 	const [globalFilter, setGlobalFilter] = useState("");
 
 	const timeoutToChangeSearchStringRef = useRef<NodeJS.Timeout>(undefined);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const members = useMemo(
 		() => data?.pages?.flatMap((page) => page.results) || [],
@@ -128,6 +129,10 @@ export default function MembersPage() {
 	const clearAllFilters = () => {
 		setGlobalFilter("");
 		setColumnFilters([]);
+
+		if (inputRef.current) {
+			inputRef.current.value = "";
+		}
 	};
 
 	const filteredMembers = table.getRowModel().rows.map((row) => row.original);
@@ -191,8 +196,8 @@ export default function MembersPage() {
 								<Input
 									placeholder="Search by name, company, expertise, or industry..."
 									onChange={handleChangeLocalSearch}
-                  key={globalFilter === "" ? 0 : 1}
 									className="pl-9"
+									ref={inputRef}
 								/>
 							</div>
 

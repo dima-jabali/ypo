@@ -2,541 +2,605 @@
 
 import type React from "react";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useStore, useMembers, type Member } from "@/lib/store";
-import { Search, Users, TrendingUp, MapPin, Briefcase, Filter } from "lucide-react";
-import Link from "next/link";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useYpoProfiles } from "@/lib/hooks/use-ypo-profiles";
+import { TrendingUp, Filter } from "lucide-react";
+import type { YpoProfile } from "@/lib/types/ypo-profile";
 
 interface NetworkNode {
-  id: string;
-  member: Member;
-  x: number;
-  y: number;
-  z: number;
-  radius: number;
-  connections: string[];
-  cluster: string;
-  color: string;
+	id: string;
+	profile: YpoProfile;
+	x: number;
+	y: number;
+	vx: number;
+	vy: number;
+	fx?: number | null; // Fixed position when dragged
+	fy?: number | null;
+	radius: number;
+	color: string;
+	image?: HTMLImageElement | null;
 }
 
 interface NetworkLink {
-  source: string;
-  target: string;
-  strength: number;
-  type: string;
+	source: string;
+	target: string;
+	isBidirectional: boolean;
 }
 
 const COLORS = {
-  technology: "#3b82f6",
-  finance: "#10b981",
-  healthcare: "#8b5cf6",
-  retail: "#f59e0b",
-  manufacturing: "#ef4444",
-  services: "#ec4899",
-  default: "#6366f1",
+	technology: "#3b82f6",
+	finance: "#10b981",
+	healthcare: "#8b5cf6",
+	retail: "#f59e0b",
+	manufacturing: "#ef4444",
+	services: "#ec4899",
+	default: "#6366f1",
 };
 
 export function NetworkGraph() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [nodes, setNodes] = useState<NetworkNode[]>([]);
-  const [links, setLinks] = useState<NetworkLink[]>([]);
-  const [selectedNode, setSelectedNode] = useState<NetworkNode | null>(null);
-  const [hoveredNode, setHoveredNode] = useState<NetworkNode | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState<string>("all");
-  const [rotation, setRotation] = useState(0);
-  const animationRef = useRef<number>();
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const [nodes, setNodes] = useState<NetworkNode[]>([]);
+	const [links, setLinks] = useState<NetworkLink[]>([]);
+	const [hoveredNode, setHoveredNode] = useState<NetworkNode | null>(null);
+	const [draggedNode, setDraggedNode] = useState<NetworkNode | null>(null);
+	const animationRef = useRef<number>(undefined);
+	const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-  const members = useStore(useMembers);
+	const { data, isLoading } = useYpoProfiles();
 
-  // Build network graph
-  useEffect(() => {
-    if (members.length === 0) return;
+	const profiles = data?.pages.flatMap((page) => page.results) ?? [];
 
-    // Create nodes with clustering by industry
-    const networkNodes: NetworkNode[] = members.map((member, index) => {
-      const angle = (index / members.length) * Math.PI * 2;
-      const radius = 250;
-      const cluster = member.industry.toLowerCase();
+	useEffect(() => {
+		if (!profiles.length || !containerRef.current) return;
 
-      return {
-        id: member.id,
-        member,
-        x: Math.cos(angle) * radius,
-        y: Math.sin(angle) * radius,
-        z: (Math.random() - 0.5) * 100,
-        radius: 8 + (member.socialScore || 0) / 10,
-        connections: [],
-        cluster,
-        color: COLORS[cluster as keyof typeof COLORS] || COLORS.default,
-      };
-    });
+		const container = containerRef.current;
+		const width = container.clientWidth;
+		const height = 600;
 
-    // Build connections
-    const networkLinks: NetworkLink[] = [];
+		setCanvasSize({ width, height });
 
-    for (let i = 0; i < members.length; i++) {
-      for (let j = i + 1; j < members.length; j++) {
-        const m1 = members[i];
-        const m2 = members[j];
-        let strength = 0;
-        const types: string[] = [];
+		const networkNodes: NetworkNode[] = profiles.map((profile, index) => {
+			const angle = (index / profiles.length) * Math.PI * 2;
+			const radius = Math.min(width, height) * 0.35;
 
-        // Calculate connection strength
-        if (m1.industry === m2.industry) {
-          strength += 3;
-          types.push("industry");
-        }
-        if (m1.location === m2.location) {
-          strength += 2;
-          types.push("location");
-        }
-        const sharedInterests = m1.interests.filter((i) => m2.interests.includes(i));
-        if (sharedInterests.length > 0) {
-          strength += sharedInterests.length;
-          types.push("interests");
-        }
-        const sharedNetworks = m1.networkMemberships.filter((n) =>
-          m2.networkMemberships.includes(n),
-        );
-        if (sharedNetworks.length > 0) {
-          strength += sharedNetworks.length * 2;
-          types.push("network");
-        }
+			const img = new Image();
+			img.crossOrigin = "anonymous";
+			if (profile.avatar) {
+				img.src = profile.avatar;
+			}
 
-        // Only create link if connection strength is significant
-        if (strength >= 3) {
-          networkLinks.push({
-            source: m1.id,
-            target: m2.id,
-            strength,
-            type: types[0],
-          });
+			return {
+				id: profile.id,
+				profile,
+				x: width / 2 + Math.cos(angle) * radius,
+				y: height / 2 + Math.sin(angle) * radius,
+				vx: 0,
+				vy: 0,
+				fx: null,
+				fy: null,
+				radius: 20,
+				color:
+					COLORS[
+						profile.current_company_industry?.toLowerCase() as keyof typeof COLORS
+					] || COLORS.default,
+				image: profile.avatar ? img : null,
+			};
+		});
 
-          networkNodes[i].connections.push(m2.id);
-          networkNodes[j].connections.push(m1.id);
-        }
-      }
-    }
+		const networkLinks: NetworkLink[] = [];
+		const linkMap = new Map<string, NetworkLink>();
 
-    setNodes(networkNodes);
-    setLinks(networkLinks);
-  }, [members]);
+		for (let i = 0; i < networkNodes.length; i++) {
+			for (let j = i + 1; j < networkNodes.length; j++) {
+				const p1 = networkNodes[i].profile;
+				const p2 = networkNodes[j].profile;
 
-  // Animation loop
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || nodes.length === 0) return;
+				let hasConnection = false;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+				if (p1.ypo_chapter === p2.ypo_chapter && p1.ypo_chapter)
+					hasConnection = true;
+				if (
+					p1.current_company_industry === p2.current_company_industry &&
+					p1.current_company_industry
+				)
+					hasConnection = true;
+				if (p1.location === p2.location && p1.location) hasConnection = true;
 
-    const width = canvas.width;
-    const height = canvas.height;
-    const centerX = width / 2;
-    const centerY = height / 2;
+				if (hasConnection) {
+					const key1 = `${p1.id}-${p2.id}`;
+					const key2 = `${p2.id}-${p1.id}`;
 
-    const animate = () => {
-      ctx.clearRect(0, 0, width, height);
+					if (!linkMap.has(key1) && !linkMap.has(key2)) {
+						networkLinks.push({
+							source: p1.id,
+							target: p2.id,
+							isBidirectional: true,
+						});
+						linkMap.set(key1, networkLinks[networkLinks.length - 1]);
+					}
+				}
+			}
+		}
 
-      // Auto-rotate
-      setRotation((r) => r + 0.003);
+		setNodes(networkNodes);
+		setLinks(networkLinks);
+	}, [profiles]);
 
-      // Apply 3D rotation
-      const cos = Math.cos(rotation);
-      const sin = Math.sin(rotation);
+	useEffect(() => {
+		if (nodes.length === 0) return;
 
-      // Sort nodes by z-depth for proper rendering
-      const sortedNodes = [...nodes].sort((a, b) => {
-        const az = a.z * cos - a.x * sin;
-        const bz = b.z * cos - b.x * sin;
-        return az - bz;
-      });
+		const simulate = () => {
+			setNodes((prevNodes) => {
+				const newNodes = prevNodes.map((node) => ({ ...node }));
 
-      // Draw links
-      links.forEach((link) => {
-        const source = nodes.find((n) => n.id === link.source);
-        const target = nodes.find((n) => n.id === link.target);
+				for (let i = 0; i < newNodes.length; i++) {
+					const node = newNodes[i];
 
-        if (source && target) {
-          // Apply 3D rotation
-          const sx = source.x * cos - source.z * sin;
-          const sy = source.y;
-          const tx = target.x * cos - target.z * sin;
-          const ty = target.y;
+					if (node.fx !== null && node.fy !== null) {
+						node.x = node.fx;
+						node.y = node.fy;
+						continue;
+					}
 
-          ctx.beginPath();
-          ctx.moveTo(centerX + sx, centerY + sy);
-          ctx.lineTo(centerX + tx, centerY + ty);
+					// biome-ignore lint/complexity/noForEach: <explanation>
+					links.forEach((link) => {
+						const other =
+							link.source === node.id
+								? newNodes.find((n) => n.id === link.target)
+								: link.target === node.id
+									? newNodes.find((n) => n.id === link.source)
+									: null;
 
-          const alpha = Math.max(0.05, link.strength / 10);
-          ctx.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
-          ctx.lineWidth = Math.sqrt(link.strength) * 0.5;
-          ctx.stroke();
-        }
-      });
+						if (other) {
+							const dx = other.x - node.x;
+							const dy = other.y - node.y;
+							const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+							const force = (distance - 100) * 0.01;
 
-      // Draw nodes
-      sortedNodes.forEach((node) => {
-        const x = node.x * cos - node.z * sin;
-        const y = node.y;
-        const z = node.z * cos + node.x * sin;
+							node.vx += (dx / distance) * force;
+							node.vy += (dy / distance) * force;
+						}
+					});
 
-        // Scale based on depth
-        const scale = 1 - z / 1000;
-        const radius = node.radius * scale;
+					for (let j = 0; j < newNodes.length; j++) {
+						if (i === j) continue;
+						const other = newNodes[j];
 
-        const isSelected = selectedNode?.id === node.id;
-        const isHovered = hoveredNode?.id === node.id;
-        const isHighlighted =
-          selectedNode &&
-          (selectedNode.id === node.id || selectedNode.connections.includes(node.id));
+						const dx = other.x - node.x;
+						const dy = other.y - node.y;
+						const distance = Math.sqrt(dx * dx + dy * dy) || 1;
 
-        // Apply search filter
-        const matchesSearch =
-          searchQuery === "" ||
-          node.member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          node.member.company.toLowerCase().includes(searchQuery.toLowerCase());
+						if (distance < 150) {
+							const force = 50 / (distance * distance);
+							node.vx -= (dx / distance) * force;
+							node.vy -= (dy / distance) * force;
+						}
+					}
 
-        const matchesFilter = filterType === "all" || node.cluster === filterType.toLowerCase();
+					const centerX = canvasSize.width / 2;
+					const centerY = canvasSize.height / 2;
+					node.vx += (centerX - node.x) * 0.001;
+					node.vy += (centerY - node.y) * 0.001;
 
-        if (!matchesSearch || !matchesFilter) {
-          ctx.globalAlpha = 0.1;
-        } else {
-          ctx.globalAlpha = 1;
-        }
+					node.vx *= 0.9;
+					node.vy *= 0.9;
+					node.x += node.vx;
+					node.y += node.vy;
 
-        // Glow effect for selected/hovered
-        if (isSelected || isHovered) {
-          ctx.beginPath();
-          ctx.arc(centerX + x, centerY + y, radius + 8, 0, Math.PI * 2);
-          const gradient = ctx.createRadialGradient(
-            centerX + x,
-            centerY + y,
-            radius,
-            centerX + x,
-            centerY + y,
-            radius + 8,
-          );
-          gradient.addColorStop(0, `${node.color}60`);
-          gradient.addColorStop(1, `${node.color}00`);
-          ctx.fillStyle = gradient;
-          ctx.fill();
-        }
+					node.x = Math.max(
+						node.radius,
+						Math.min(canvasSize.width - node.radius, node.x),
+					);
+					node.y = Math.max(
+						node.radius,
+						Math.min(canvasSize.height - node.radius, node.y),
+					);
+				}
 
-        // Draw node
-        ctx.beginPath();
-        ctx.arc(centerX + x, centerY + y, radius, 0, Math.PI * 2);
+				return newNodes;
+			});
 
-        // Gradient fill
-        const nodeGradient = ctx.createRadialGradient(
-          centerX + x - radius / 3,
-          centerY + y - radius / 3,
-          0,
-          centerX + x,
-          centerY + y,
-          radius,
-        );
-        nodeGradient.addColorStop(0, `${node.color}ff`);
-        nodeGradient.addColorStop(1, `${node.color}cc`);
-        ctx.fillStyle = nodeGradient;
-        ctx.fill();
+			animationRef.current = requestAnimationFrame(simulate);
+		};
 
-        // Border
-        ctx.strokeStyle = isSelected || isHovered ? "#ffffff" : `${node.color}ff`;
-        ctx.lineWidth = isSelected ? 3 : isHovered ? 2 : 1;
-        ctx.stroke();
+		animationRef.current = requestAnimationFrame(simulate);
 
-        // Reset alpha
-        ctx.globalAlpha = 1;
+		return () => {
+			if (animationRef.current) {
+				cancelAnimationFrame(animationRef.current);
+			}
+		};
+	}, [nodes.length, links, canvasSize]);
 
-        // Draw name for selected/hovered
-        if ((isSelected || isHovered) && matchesSearch && matchesFilter) {
-          ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 12px system-ui";
-          ctx.textAlign = "center";
-          ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-          ctx.shadowBlur = 4;
-          ctx.fillText(node.member.name, centerX + x, centerY + y - radius - 10);
-          ctx.shadowBlur = 0;
-        }
-      });
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas || nodes.length === 0) return;
 
-      animationRef.current = requestAnimationFrame(animate);
-    };
+		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
 
-    animationRef.current = requestAnimationFrame(animate);
+		ctx.fillStyle = "#ffffff";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [nodes, links, rotation, selectedNode, hoveredNode, searchQuery, filterType]);
+		// biome-ignore lint/complexity/noForEach: <explanation>
+		links.forEach((link) => {
+			const source = nodes.find((n) => n.id === link.source);
+			const target = nodes.find((n) => n.id === link.target);
 
-  // Mouse interaction
-  const handleCanvasClick = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+			if (source && target) {
+				const dx = target.x - source.x;
+				const dy = target.y - source.y;
+				const distance = Math.sqrt(dx * dx + dy * dy);
 
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left - canvas.width / 2;
-      const mouseY = e.clientY - rect.top - canvas.height / 2;
+				if (distance < 1) return;
 
-      const cos = Math.cos(rotation);
-      const sin = Math.sin(rotation);
+				const ux = dx / distance;
+				const uy = dy / distance;
 
-      // Find clicked node
-      const clickedNode = nodes.find((node) => {
-        const x = node.x * cos - node.z * sin;
-        const y = node.y;
-        const z = node.z * cos + node.x * sin;
-        const scale = 1 - z / 1000;
-        const radius = node.radius * scale;
+				if (link.isBidirectional) {
+					const midX = (source.x + target.x) / 2;
+					const midY = (source.y + target.y) / 2;
 
-        const dx = x - mouseX;
-        const dy = y - mouseY;
-        return Math.sqrt(dx * dx + dy * dy) < radius;
-      });
+					ctx.beginPath();
+					ctx.moveTo(source.x, source.y);
+					ctx.lineTo(midX, midY);
+					ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+					ctx.lineWidth = 1;
+					ctx.stroke();
 
-      setSelectedNode(clickedNode || null);
-    },
-    [nodes, rotation],
-  );
+					const arrowSize = 8;
+					ctx.beginPath();
+					ctx.moveTo(midX, midY);
+					ctx.lineTo(
+						midX - ux * arrowSize - uy * arrowSize * 0.5,
+						midY - uy * arrowSize + ux * arrowSize * 0.5,
+					);
+					ctx.lineTo(
+						midX - ux * arrowSize + uy * arrowSize * 0.5,
+						midY - uy * arrowSize - ux * arrowSize * 0.5,
+					);
+					ctx.closePath();
+					ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+					ctx.fill();
 
-  const handleCanvasHover = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+					ctx.beginPath();
+					ctx.moveTo(target.x, target.y);
+					ctx.lineTo(midX, midY);
+					ctx.stroke();
 
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left - canvas.width / 2;
-      const mouseY = e.clientY - rect.top - canvas.height / 2;
+					ctx.beginPath();
+					ctx.moveTo(midX, midY);
+					ctx.lineTo(
+						midX + ux * arrowSize - uy * arrowSize * 0.5,
+						midY + uy * arrowSize + ux * arrowSize * 0.5,
+					);
+					ctx.lineTo(
+						midX + ux * arrowSize + uy * arrowSize * 0.5,
+						midY + uy * arrowSize - ux * arrowSize * 0.5,
+					);
+					ctx.closePath();
+					ctx.fill();
+				} else {
+					const endX = target.x - ux * (target.radius + 2);
+					const endY = target.y - uy * (target.radius + 2);
 
-      const cos = Math.cos(rotation);
-      const sin = Math.sin(rotation);
+					ctx.beginPath();
+					ctx.moveTo(source.x, source.y);
+					ctx.lineTo(endX, endY);
+					ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+					ctx.lineWidth = 1;
+					ctx.stroke();
 
-      const hoveredNode = nodes.find((node) => {
-        const x = node.x * cos - node.z * sin;
-        const y = node.y;
-        const z = node.z * cos + node.x * sin;
-        const scale = 1 - z / 1000;
-        const radius = node.radius * scale;
+					const arrowSize = 8;
+					ctx.beginPath();
+					ctx.moveTo(endX, endY);
+					ctx.lineTo(
+						endX - ux * arrowSize - uy * arrowSize * 0.5,
+						endY - uy * arrowSize + ux * arrowSize * 0.5,
+					);
+					ctx.lineTo(
+						endX - ux * arrowSize + uy * arrowSize * 0.5,
+						endY - uy * arrowSize - ux * arrowSize * 0.5,
+					);
+					ctx.closePath();
+					ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+					ctx.fill();
+				}
+			}
+		});
 
-        const dx = x - mouseX;
-        const dy = y - mouseY;
-        return Math.sqrt(dx * dx + dy * dy) < radius;
-      });
+		// biome-ignore lint/complexity/noForEach: <explanation>
+		nodes.forEach((node) => {
+			const isHovered = hoveredNode?.id === node.id;
 
-      setHoveredNode(hoveredNode || null);
-    },
-    [nodes, rotation],
-  );
+			ctx.save();
 
-  // Get unique industries
-  const industries = Array.from(new Set(members.map((m) => m.industry)));
+			ctx.beginPath();
+			ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+			ctx.closePath();
+			ctx.clip();
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-balance">Member Network Graph</h1>
-          <p className="text-muted-foreground mt-1">
-            Explore connections across the YPO global network
-          </p>
-        </div>
-      </div>
+			if (node.image?.complete && node.image.naturalHeight !== 0) {
+				ctx.drawImage(
+					node.image,
+					node.x - node.radius,
+					node.y - node.radius,
+					node.radius * 2,
+					node.radius * 2,
+				);
+			} else {
+				ctx.fillStyle = node.color;
+				ctx.fill();
 
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search members by name or company..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="Filter by industry" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Industries</SelectItem>
-                {industries.map((industry) => (
-                  <SelectItem key={industry} value={industry.toLowerCase()}>
-                    {industry}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+				ctx.fillStyle = "#ffffff";
+				ctx.font = `${node.radius * 0.6}px sans-serif`;
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				const initials =
+					node.profile.name
+						?.split(" ")
+						.map((n) => n[0])
+						.join("")
+						.toUpperCase()
+						.slice(0, 2) || "?";
+				ctx.fillText(initials, node.x, node.y);
+			}
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Main Graph */}
-        <Card className="lg:col-span-3 border-2">
-          <CardContent className="p-6">
-            <canvas
-              ref={canvasRef}
-              width={900}
-              height={600}
-              className="w-full h-[600px] rounded-lg bg-gradient-to-br from-slate-950 to-slate-900 cursor-pointer"
-              onClick={handleCanvasClick}
-              onMouseMove={handleCanvasHover}
-            />
-          </CardContent>
-        </Card>
+			ctx.restore();
 
-        {/* Sidebar */}
-        <div className="space-y-4">
-          {/* Network Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Network Statistics
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Total Members</span>
-                <Badge variant="secondary">{nodes.length}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Connections</span>
-                <Badge variant="secondary">{links.length}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Avg Connections</span>
-                <Badge variant="secondary">
-                  {nodes.length > 0 ? ((links.length * 2) / nodes.length).toFixed(1) : 0}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Industries</span>
-                <Badge variant="secondary">{industries.length}</Badge>
-              </div>
-            </CardContent>
-          </Card>
+			ctx.beginPath();
+			ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+			ctx.strokeStyle = isHovered ? "#ffffff" : "#ffffff80";
+			ctx.lineWidth = isHovered ? 3 : 2;
+			ctx.stroke();
 
-          {/* Legend */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Industry Clusters
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {Object.entries(COLORS)
-                .filter(([key]) => key !== "default")
-                .map(([industry, color]) => (
-                  <div key={industry} className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
-                    <span className="text-xs capitalize">{industry}</span>
-                  </div>
-                ))}
-            </CardContent>
-          </Card>
+			if (isHovered) {
+				ctx.beginPath();
+				ctx.arc(node.x, node.y, node.radius + 4, 0, Math.PI * 2);
+				ctx.strokeStyle = `${node.color}80`;
+				ctx.lineWidth = 2;
+				ctx.stroke();
+			}
+		});
+	}, [nodes, links, hoveredNode]);
 
-          {/* Selected Member */}
-          {selectedNode && (
-            <Card className="border-primary">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Selected Member
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-12 w-12 border-2 border-primary">
-                    <AvatarImage
-                      src={selectedNode.member.avatar || "/placeholder.svg"}
-                      alt={selectedNode.member.name}
-                    />
-                    <AvatarFallback className="bg-primary/10">
-                      {selectedNode.member.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm">{selectedNode.member.name}</p>
-                    <p className="text-xs text-muted-foreground">{selectedNode.member.title}</p>
-                    <p className="text-xs text-muted-foreground">{selectedNode.member.company}</p>
-                  </div>
-                </div>
+	const getNodeAtPosition = useCallback(
+		(x: number, y: number): NetworkNode | null => {
+			return (
+				nodes.find((node) => {
+					const dx = x - node.x;
+					const dy = y - node.y;
+					return Math.sqrt(dx * dx + dy * dy) <= node.radius;
+				}) || null
+			);
+		},
+		[nodes],
+	);
 
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs">
-                    <Briefcase className="h-3 w-3 text-muted-foreground" />
-                    <span>{selectedNode.member.industry}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <MapPin className="h-3 w-3 text-muted-foreground" />
-                    <span>{selectedNode.member.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <Users className="h-3 w-3 text-muted-foreground" />
-                    <span>{selectedNode.connections.length} connections</span>
-                  </div>
-                </div>
+	const handleMouseDown = useCallback(
+		(e: React.MouseEvent<HTMLCanvasElement>) => {
+			const canvas = canvasRef.current;
+			if (!canvas) return;
 
-                <div className="flex flex-wrap gap-1">
-                  {selectedNode.member.interests.slice(0, 3).map((interest) => (
-                    <Badge key={interest} variant="outline" className="text-xs">
-                      {interest}
-                    </Badge>
-                  ))}
-                </div>
+			const rect = canvas.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
 
-                <Link href={`/members/${selectedNode.member.id}`}>
-                  <Button size="sm" className="w-full">
-                    View Full Profile
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
+			const node = getNodeAtPosition(x, y);
+			if (node) {
+				setDraggedNode(node);
+				setNodes((prev) =>
+					prev.map((n) =>
+						n.id === node.id ? { ...n, fx: x, fy: y, vx: 0, vy: 0 } : n,
+					),
+				);
+			}
+		},
+		[getNodeAtPosition],
+	);
 
-          {/* Instructions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">How to Navigate</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-xs text-muted-foreground space-y-1.5">
-                <li>• Click on any node to view member details</li>
-                <li>• Use search to find specific members</li>
-                <li>• Filter by industry to focus on sectors</li>
-                <li>• Node size indicates social influence</li>
-                <li>• Lines show connection strength</li>
-                <li>• Graph rotates automatically for 3D effect</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
+	const handleMouseMove = useCallback(
+		(e: React.MouseEvent<HTMLCanvasElement>) => {
+			const canvas = canvasRef.current;
+			if (!canvas) return;
+
+			const rect = canvas.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
+
+			if (draggedNode) {
+				setNodes((prev) =>
+					prev.map((n) =>
+						n.id === draggedNode.id ? { ...n, fx: x, fy: y, x, y } : n,
+					),
+				);
+			} else {
+				const node = getNodeAtPosition(x, y);
+				setHoveredNode(node);
+			}
+		},
+		[draggedNode, getNodeAtPosition],
+	);
+
+	const handleMouseUp = useCallback(() => {
+		setDraggedNode(null);
+	}, []);
+
+	const handleMouseLeave = useCallback(() => {
+		setDraggedNode(null);
+		setHoveredNode(null);
+	}, []);
+
+	useEffect(() => {
+		const handleResize = () => {
+			if (containerRef.current) {
+				setCanvasSize({
+					width: containerRef.current.clientWidth,
+					height: 600,
+				});
+			}
+		};
+
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
+
+	if (isLoading) {
+		return (
+			<div className="flex items-center justify-center h-[600px]">
+				<div className="text-muted-foreground">Loading network graph...</div>
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-6">
+			<div className="flex items-center justify-between">
+				<div>
+					<h1 className="text-3xl font-bold text-balance">
+						Member Network Graph
+					</h1>
+					<p className="text-muted-foreground mt-1">
+						Explore connections across the YPO global network
+					</p>
+				</div>
+			</div>
+
+			<div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+				<Card className="lg:col-span-3 border-2">
+					<CardContent className="p-0" ref={containerRef}>
+						<div className="relative">
+							<canvas
+								ref={canvasRef}
+								width={canvasSize.width}
+								height={canvasSize.height}
+								className="w-full rounded-lg bg-white cursor-move"
+								onMouseDown={handleMouseDown}
+								onMouseMove={handleMouseMove}
+								onMouseUp={handleMouseUp}
+								onMouseLeave={handleMouseLeave}
+							/>
+
+							{hoveredNode && (
+								<div
+									className="absolute bg-popover border border-border rounded-lg shadow-lg p-3 pointer-events-none z-10"
+									style={{
+										left: hoveredNode.x + 15,
+										top: hoveredNode.y - 50,
+									}}
+								>
+									<div className="flex items-start gap-3 min-w-[200px]">
+										<Avatar className="h-10 w-10 border">
+											<AvatarImage
+												src={hoveredNode.profile.avatar || undefined}
+												alt={hoveredNode.profile.name || "Member"}
+											/>
+
+											<AvatarFallback>
+												{hoveredNode.profile.name
+													?.split(" ")
+													.map((n) => n[0])
+													.join("") || "?"}
+											</AvatarFallback>
+										</Avatar>
+
+										<div className="flex-1 min-w-0">
+											<p className="font-semibold text-sm">
+												{hoveredNode.profile.name}
+											</p>
+
+											<p className="text-xs text-muted-foreground truncate">
+												{hoveredNode.profile.position}
+											</p>
+
+											<p className="text-xs text-muted-foreground truncate">
+												{hoveredNode.profile.current_company_name}
+											</p>
+										</div>
+									</div>
+								</div>
+							)}
+						</div>
+					</CardContent>
+				</Card>
+
+				<div className="space-y-4">
+					<Card>
+						<CardHeader>
+							<CardTitle className="text-base flex items-center gap-2">
+								<TrendingUp className="h-4 w-4" />
+								Network Statistics
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-3">
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-muted-foreground">
+									Total Members
+								</span>
+								<Badge variant="secondary">{nodes.length}</Badge>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-muted-foreground">
+									Connections
+								</span>
+								<Badge variant="secondary">{links.length}</Badge>
+							</div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm text-muted-foreground">
+									Avg Connections
+								</span>
+								<Badge variant="secondary">
+									{nodes.length > 0
+										? ((links.length * 2) / nodes.length).toFixed(1)
+										: 0}
+								</Badge>
+							</div>
+						</CardContent>
+					</Card>
+
+					<Card>
+						<CardHeader>
+							<CardTitle className="text-base flex items-center gap-2">
+								<Filter className="h-4 w-4" />
+								Industry Colors
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-2">
+							{Object.entries(COLORS)
+								.filter(([key]) => key !== "default")
+								.map(([industry, color]) => (
+									<div key={industry} className="flex items-center gap-2">
+										<div
+											className="h-3 w-3 rounded-full"
+											style={{ backgroundColor: color }}
+										/>
+										<span className="text-xs capitalize">{industry}</span>
+									</div>
+								))}
+						</CardContent>
+					</Card>
+
+					<Card>
+						<CardHeader>
+							<CardTitle className="text-base">How to Use</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<ul className="text-xs text-muted-foreground space-y-1.5">
+								<li>• Hover over nodes to see member details</li>
+								<li>• Drag nodes to reposition them</li>
+								<li>• Arrows show relationship direction</li>
+								<li>• Two arrows = bidirectional relationship</li>
+								<li>• Node colors represent industries</li>
+								<li>• Graph automatically organizes connections</li>
+							</ul>
+						</CardContent>
+					</Card>
+				</div>
+			</div>
+		</div>
+	);
 }
