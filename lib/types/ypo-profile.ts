@@ -9,10 +9,6 @@ export interface YpoProfilesResponse {
   limit: string;
 }
 
-export interface YpoProfileResponse {
-  profile: YpoProfile;
-}
-
 /////////////
 
 export interface YPOProfileResponse {

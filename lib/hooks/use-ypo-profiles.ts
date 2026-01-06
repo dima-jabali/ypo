@@ -4,6 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { axiosClient } from "../axios-client";
 import type {
+	YpoProfile,
   YpoProfileId,
   YpoProfileResponse,
   YpoProfilesResponse
@@ -72,7 +73,7 @@ export function useYpoProfile(id: YpoProfileId) {
 	return useQuery({
 		queryKey: ypoQueryKeys.profile(id),
 		queryFn: async () => {
-			const response = await axiosClient.get<YpoProfileResponse>(
+			const response = await axiosClient.get<YpoProfile>(
 				`/api/v1/ypo/profile?ypo_profile_id=${id}`,
 			);
 

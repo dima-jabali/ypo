@@ -1,14 +1,24 @@
 "use client";
 
-import { Building2, Globe, Loader2, MapPin, Search } from "lucide-react";
-import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Search, MapPin, Building2, Globe, Loader2, X } from "lucide-react";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useYpoProfiles } from "@/lib/hooks/use-ypo-profiles";
+import {
+	useReactTable,
+	getCoreRowModel,
+	getFilteredRowModel,
+	getSortedRowModel,
+	type ColumnFiltersState,
+	type SortingState,
+	type Row,
+} from "@tanstack/react-table";
+import type { YpoProfile } from "@/lib/types/ypo-profile";
 import {
 	Select,
 	SelectContent,
@@ -16,37 +26,111 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useYpoProfiles } from "@/lib/hooks/use-ypo-profiles";
-import { useCurrentLocation, useSelectedFilters, useStore } from "@/lib/store";
 
 export default function MembersPage() {
-	const [localSearch, setLocalSearch] = useState("");
+	const { data, isLoading, error } = useYpoProfiles();
+
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+	const [sorting, setSorting] = useState<SortingState>([]);
+	const [globalFilter, setGlobalFilter] = useState("");
 
 	const timeoutToChangeSearchStringRef = useRef<NodeJS.Timeout>(undefined);
 
-	const selectedFilters = useStore(useSelectedFilters);
-	const currentLocation = useStore(useCurrentLocation);
-	const { data, isLoading, error } = useYpoProfiles();
-	const { setSelectedFilters } = useStore();
+	const members = useMemo(
+		() => data?.pages?.flatMap((page) => page.results) || [],
+		[data],
+	);
 
-	const { members, uniqueChapters, uniqueCities, uniqueIndustries } =
-		useMemo(() => {
-			const members = data?.pages.flatMap((m) => m.results) || [];
-			const uniqueIndustries = Array.from(
-				new Set(members.map((m) => m.ypo_industry)),
-			);
-			const uniqueChapters = Array.from(
-				new Set(members.map((m) => m.ypo_chapter)),
-			);
-			const uniqueCities = Array.from(new Set(members.flatMap((m) => m.city)));
+	const uniqueIndustries = useMemo(
+		() =>
+			Array.from(
+				new Set(members.map((m) => m.ypo_industry).filter(Boolean)),
+			).sort(),
+		[members],
+	);
+	const uniqueChapters = useMemo(
+		() =>
+			Array.from(
+				new Set(members.map((m) => m.ypo_chapter).filter(Boolean)),
+			).sort(),
+		[members],
+	);
+	const uniqueCountries = useMemo(
+		() =>
+			Array.from(
+				new Set(members.map((m) => m.country_code).filter(Boolean)),
+			).sort(),
+		[members],
+	);
 
-			return {
-				uniqueIndustries,
-				uniqueChapters,
-				uniqueCities,
-				members,
-			};
-		}, [data]);
+	const industryFilter = columnFilters.find((f) => f.id === "ypo_industry")
+		?.value as string | undefined;
+	const chapterFilter = columnFilters.find((f) => f.id === "ypo_chapter")
+		?.value as string | undefined;
+	const countryFilter = columnFilters.find((f) => f.id === "country_code")
+		?.value as string | undefined;
+
+	const globalFilterFn = (
+		row: Row<YpoProfile>,
+		columnId: string,
+		filterValue: string,
+	) => {
+		const search = filterValue.toLowerCase();
+		const member = row.original;
+
+		return Boolean(
+			member.name?.toLowerCase().includes(search) ||
+				member.current_company_name?.toLowerCase().includes(search) ||
+				member.about?.toLowerCase().includes(search) ||
+				member.ypo_industry?.toLowerCase().includes(search) ||
+				member.location?.toLowerCase().includes(search) ||
+				member.ypo_chapter?.toLowerCase().includes(search) ||
+				member.experience?.some((e) =>
+					e.company?.toLowerCase().includes(search),
+				) ||
+				member.interests?.some((i) => i.toLowerCase().includes(search)),
+		);
+	};
+
+	const table = useReactTable({
+		data: members,
+		columns: [
+			{ accessorKey: "name", id: "name" },
+			{ accessorKey: "current_company_name", id: "current_company_name" },
+			{ accessorKey: "ypo_industry", id: "ypo_industry" },
+			{ accessorKey: "ypo_chapter", id: "ypo_chapter" },
+			{ accessorKey: "country_code", id: "country_code" },
+		],
+		state: {
+			columnFilters,
+			globalFilter,
+			sorting,
+		},
+		getFilteredRowModel: getFilteredRowModel(),
+		onColumnFiltersChange: setColumnFilters,
+		getSortedRowModel: getSortedRowModel(),
+		onGlobalFilterChange: setGlobalFilter,
+		getCoreRowModel: getCoreRowModel(),
+		onSortingChange: setSorting,
+		globalFilterFn,
+	});
+
+	const setColumnFilter = (columnId: string, value: string | undefined) => {
+		setColumnFilters((prev) => {
+			const filtered = prev.filter((f) => f.id !== columnId);
+			if (value) {
+				return [...filtered, { id: columnId, value }];
+			}
+			return filtered;
+		});
+	};
+
+	const clearAllFilters = () => {
+		setGlobalFilter("");
+		setColumnFilters([]);
+	};
+
+	const filteredMembers = table.getRowModel().rows.map((row) => row.original);
 
 	if (isLoading) {
 		return (
@@ -54,7 +138,6 @@ export default function MembersPage() {
 				<Card>
 					<CardContent className="py-12 flex flex-col items-center gap-3">
 						<Loader2 className="h-8 w-8 animate-spin text-primary" />
-
 						<p className="text-muted-foreground">Loading members from API...</p>
 					</CardContent>
 				</Card>
@@ -83,7 +166,7 @@ export default function MembersPage() {
 		clearTimeout(timeoutToChangeSearchStringRef.current);
 
 		timeoutToChangeSearchStringRef.current = setTimeout(() => {
-			setLocalSearch(e.target.value);
+			setGlobalFilter(e.target.value);
 		}, 500);
 	}
 
@@ -92,32 +175,12 @@ export default function MembersPage() {
 			<div className="flex flex-col gap-4">
 				<div>
 					<h1 className="text-3xl font-bold mb-2">Member Directory</h1>
+
 					<p className="text-muted-foreground">
-						Search and connect with {members.length}+ YPO members worldwide
+						Search and connect with {filteredMembers.length}+ YPO members
+						worldwide
 					</p>
 				</div>
-
-				{currentLocation && (
-					<Card className="bg-primary/5 border-primary/20">
-						<CardContent className="flex items-center gap-2 py-3">
-							<MapPin className="h-4 w-4 text-primary" />
-							<span className="text-sm">
-								Showing members in or traveling to{" "}
-								<strong>{currentLocation}</strong>
-							</span>
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={() =>
-									useStore.getState().setCurrentLocation(undefined)
-								}
-								className="ml-auto"
-							>
-								Clear
-							</Button>
-						</CardContent>
-					</Card>
-				)}
 
 				{/* Search and Filters */}
 				<Card>
@@ -128,18 +191,16 @@ export default function MembersPage() {
 								<Input
 									placeholder="Search by name, company, expertise, or industry..."
 									onChange={handleChangeLocalSearch}
+                  key={globalFilter === "" ? 0 : 1}
 									className="pl-9"
 								/>
 							</div>
 
 							<div className="grid grid-cols-1 md:grid-cols-4 gap-3">
 								<Select
-									value={selectedFilters.industry || ""}
+									value={industryFilter || ""}
 									onValueChange={(value) =>
-										setSelectedFilters({
-											...selectedFilters,
-											industry: value || undefined,
-										})
+										setColumnFilter("ypo_industry", value || undefined)
 									}
 								>
 									<SelectTrigger>
@@ -162,12 +223,9 @@ export default function MembersPage() {
 								</Select>
 
 								<Select
-									value={selectedFilters.chapter || ""}
+									value={chapterFilter || ""}
 									onValueChange={(value) =>
-										setSelectedFilters({
-											...selectedFilters,
-											chapter: value || undefined,
-										})
+										setColumnFilter("ypo_chapter", value || undefined)
 									}
 								>
 									<SelectTrigger>
@@ -187,21 +245,20 @@ export default function MembersPage() {
 								</Select>
 
 								<Select
-									value={selectedFilters.location || ""}
+									value={countryFilter || ""}
 									onValueChange={(value) =>
-										setSelectedFilters({
-											...selectedFilters,
-											location: value || undefined,
-										})
+										setColumnFilter("country_code", value || undefined)
 									}
 								>
 									<SelectTrigger>
 										<MapPin className="h-4 w-4 mr-2" />
+
 										<SelectValue placeholder="Location" />
 									</SelectTrigger>
+
 									<SelectContent>
 										<SelectItem value="all">All Locations</SelectItem>
-										{uniqueCities.map((city) =>
+										{uniqueCountries.map((city) =>
 											city ? (
 												<SelectItem key={city} value={city}>
 													{city}
@@ -211,16 +268,35 @@ export default function MembersPage() {
 									</SelectContent>
 								</Select>
 
-								<Button
-									variant="outline"
-									onClick={() => {
-										setSelectedFilters({});
-										setLocalSearch("");
-									}}
-								>
-									Clear Filters
-								</Button>
+								{/* Clear Filters Button */}
+								{(globalFilter || columnFilters.length > 0) && (
+									<Button variant="outline" onClick={clearAllFilters}>
+										Clear Filters
+									</Button>
+								)}
 							</div>
+
+							{/* Active Filters Display */}
+							{columnFilters.length > 0 && (
+								<div className="flex flex-wrap gap-2">
+									{columnFilters.map((filter) => (
+										<Badge
+											key={filter.id}
+											variant="secondary"
+											className="gap-1"
+										>
+											{filter.id}: {filter.value as string}
+											<button
+												onClick={() => setColumnFilter(filter.id, undefined)}
+												className="ml-1 hover:text-destructive"
+												type="button"
+											>
+												<X className="h-3 w-3" />
+											</button>
+										</Badge>
+									))}
+								</div>
+							)}
 						</div>
 					</CardContent>
 				</Card>
@@ -228,15 +304,19 @@ export default function MembersPage() {
 				{/* Results Count */}
 				<div className="flex items-center justify-between">
 					<p className="text-sm text-muted-foreground">
-						Showing <strong>{members.length}</strong> members
+						Showing <strong>{filteredMembers.length}</strong> members
 					</p>
 				</div>
 
 				{/* Members Grid */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					{members.map((member) => (
-						<Link key={member.id} href={`/members/${member.id}`}>
-							<Card className="h-full hover:border-primary transition-colors cursor-pointer grid grid-rows-2 gap-2">
+					{filteredMembers.map((member) => (
+						<Link
+							href={`/members/${member.id}`}
+							prefetch={false}
+							key={member.id}
+						>
+							<Card className="h-full hover:border-primary transition-colors cursor-pointer grid grid-rows-[auto,auto] gap-6">
 								<CardHeader className="flex items-start gap-3 h-fit">
 									<Avatar className="size-16">
 										<AvatarImage
@@ -257,7 +337,7 @@ export default function MembersPage() {
 											{member.name}
 										</CardTitle>
 
-										<p className="text-sm text-muted-foreground">
+										<p className="text-sm text-muted-foreground line-clamp-5">
 											{member.about}
 										</p>
 
@@ -288,10 +368,21 @@ export default function MembersPage() {
 
 									<div className="flex flex-wrap gap-1">
 										{member.experience?.slice(0, 3).map((exp, idx) => (
-											<Badge key={idx} variant="secondary" className="text-xs whitespace-pre-wrap">
+											<Badge
+												// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+												key={idx}
+												variant="secondary"
+												className="text-xs whitespace-pre-wrap"
+											>
 												{exp.company}
 											</Badge>
 										))}
+
+										{member.experience && member.experience.length > 3 && (
+											<Badge variant="outline" className="text-xs">
+												+{member.experience.length - 3}
+											</Badge>
+										)}
 									</div>
 								</CardContent>
 							</Card>
@@ -299,21 +390,14 @@ export default function MembersPage() {
 					))}
 				</div>
 
-				{members.length === 0 && (
+				{filteredMembers.length === 0 && (
 					<Card>
 						<CardContent className="py-12 text-center">
-							<p className="text-muted-foreground">
+							<p className="text-muted-foreground mb-2">
 								No members found matching your criteria.
 							</p>
 
-							<Button
-								className="mt-2"
-								variant="link"
-								onClick={() => {
-									setSelectedFilters({});
-									setLocalSearch("");
-								}}
-							>
+							<Button variant="link" onClick={clearAllFilters} className="mt-2">
 								Clear all filters
 							</Button>
 						</CardContent>
