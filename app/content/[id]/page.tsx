@@ -1,20 +1,21 @@
-"use client";
+"use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useStore, useContent, useMembers } from "@/lib/store";
-import { Eye, Clock, Share2, Bookmark, Video, FileText, Mic, ThumbsUp } from "lucide-react";
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { use } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { useStore, useContent, useMembers } from "@/lib/store"
+import { Eye, Clock, Share2, Bookmark, Video, FileText, Mic, ThumbsUp } from "lucide-react"
+import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Separator } from "@/components/ui/separator"
 
-export default function ContentDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
-  const content = useStore(useContent);
-  const members = useStore(useMembers);
-  const item = content.find((c) => c.id === id);
-  const author = item ? members.find((m) => m.id === item.authorId) : undefined;
+export default function ContentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const content = useStore(useContent)
+  const members = useStore(useMembers)
+  const item = content.find((c) => c.id === id)
+  const author = item ? members.find((m) => m.id === item.authorId) : undefined
 
   if (!item) {
     return (
@@ -30,27 +31,27 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
           </CardContent>
         </Card>
       </main>
-    );
+    )
   }
 
   const relatedContent = content
     .filter((c) => c.id !== item.id && c.tags.some((tag) => item.tags.includes(tag)))
-    .slice(0, 3);
+    .slice(0, 3)
 
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "Talk":
-        return <Video className="h-5 w-5" />;
+        return <Video className="h-5 w-5" />
       case "Article":
-        return <FileText className="h-5 w-5" />;
+        return <FileText className="h-5 w-5" />
       case "Podcast":
-        return <Mic className="h-5 w-5" />;
+        return <Mic className="h-5 w-5" />
       case "Video":
-        return <Video className="h-5 w-5" />;
+        return <Video className="h-5 w-5" />
       default:
-        return <FileText className="h-5 w-5" />;
+        return <FileText className="h-5 w-5" />
     }
-  };
+  }
 
   return (
     <main className="container mx-auto p-6 space-y-6">
@@ -121,9 +122,7 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
               <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
                 <div className="text-center space-y-3">
                   {getTypeIcon(item.type)}
-                  <p className="text-sm text-muted-foreground">
-                    {item.type} content would be displayed here
-                  </p>
+                  <p className="text-sm text-muted-foreground">{item.type} content would be displayed here</p>
                 </div>
               </div>
 
@@ -132,11 +131,11 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
                   <ThumbsUp className="h-4 w-4" />
                   Like
                 </Button>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 bg-transparent">
                   <Share2 className="h-4 w-4" />
                   Share
                 </Button>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 bg-transparent">
                   <Bookmark className="h-4 w-4" />
                   Save
                 </Button>
@@ -189,7 +188,7 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
                     <p className="text-sm text-muted-foreground text-center">{author.bio}</p>
                   </div>
                 </Link>
-                <Button className="w-full" variant="outline">
+                <Button className="w-full bg-transparent" variant="outline">
                   View Profile
                 </Button>
               </CardContent>
@@ -203,7 +202,7 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
               </CardHeader>
               <CardContent className="space-y-4">
                 {relatedContent.map((related) => {
-                  const relatedAuthor = members.find((m) => m.id === related.authorId);
+                  const relatedAuthor = members.find((m) => m.id === related.authorId)
                   return (
                     <Link key={related.id} href={`/content/${related.id}`}>
                       <div className="p-3 rounded-lg border border-border hover:border-primary hover:bg-accent/50 transition-colors cursor-pointer">
@@ -213,10 +212,7 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
                         <h4 className="font-semibold text-sm mb-2 line-clamp-2">{related.title}</h4>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-6 w-6">
-                            <AvatarImage
-                              src={relatedAuthor?.avatar || "/placeholder.svg"}
-                              alt={related.author}
-                            />
+                            <AvatarImage src={relatedAuthor?.avatar || "/placeholder.svg"} alt={related.author} />
                             <AvatarFallback className="text-xs">
                               {related.author
                                 .split(" ")
@@ -228,7 +224,7 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
                         </div>
                       </div>
                     </Link>
-                  );
+                  )
                 })}
                 <Button variant="link" className="w-full">
                   View More
@@ -245,7 +241,7 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
               <p className="text-sm text-muted-foreground mb-3">
                 Get content recommendations based on your interests and connections
               </p>
-              <Button variant="outline" className="w-full" size="sm">
+              <Button variant="outline" className="w-full bg-transparent" size="sm">
                 Explore Your Feed
               </Button>
             </CardContent>
@@ -253,5 +249,5 @@ export default function ContentDetailPage({ params }: { params: { id: string } }
         </div>
       </div>
     </main>
-  );
+  )
 }
