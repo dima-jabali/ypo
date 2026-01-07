@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useYpoProfiles } from "@/lib/hooks/use-ypo-profiles"
-import { TrendingUp, Filter } from "lucide-react"
+import { TrendingUp } from "lucide-react"
 import type { YpoProfile } from "@/lib/types/ypo-profile"
 import { NetworkGraphClient } from "./network-graph-client"
 
@@ -11,23 +11,12 @@ interface GraphNode {
   id: string
   name: string
   profile: YpoProfile
-  color: string
   avatar?: string
 }
 
 interface GraphLink {
   source: string
   target: string
-}
-
-const COLORS = {
-  technology: "#3b82f6",
-  finance: "#10b981",
-  healthcare: "#8b5cf6",
-  retail: "#f59e0b",
-  manufacturing: "#ef4444",
-  services: "#ec4899",
-  default: "#6366f1",
 }
 
 export function NetworkGraph() {
@@ -42,7 +31,6 @@ export function NetworkGraph() {
       id: profile.id,
       name: profile.name || "Unknown",
       profile,
-      color: COLORS[profile.current_company_industry?.toLowerCase() as keyof typeof COLORS] || COLORS.default,
       avatar: profile.avatar || undefined,
     }))
 
@@ -146,25 +134,6 @@ export function NetworkGraph() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Industry Colors
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {Object.entries(COLORS)
-                .filter(([key]) => key !== "default")
-                .map(([industry, color]) => (
-                  <div key={industry} className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
-                    <span className="text-xs capitalize">{industry}</span>
-                  </div>
-                ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
               <CardTitle className="text-base">How to Use</CardTitle>
             </CardHeader>
             <CardContent>
@@ -173,7 +142,6 @@ export function NetworkGraph() {
                 <li>• Drag nodes to reposition them</li>
                 <li>• Single arrow = one-way connection</li>
                 <li>• Double arrow = two-way connection</li>
-                <li>• Node colors represent industries</li>
                 <li>• Dragged nodes stay in new position</li>
               </ul>
             </CardContent>

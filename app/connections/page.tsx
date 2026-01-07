@@ -1,44 +1,60 @@
-"use client";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useStore, useMembers, useEvents } from "@/lib/store";
-import { Users, Sparkles, TrendingUp, MapPin, Calendar, Heart } from "lucide-react";
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { generateRecommendations, type Recommendation } from "@/lib/recommendations";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+"use client"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { useYpoProfiles } from "@/lib/hooks/use-ypo-profiles"
+import { ypoProfilesToMembers } from "@/lib/ypo-to-member-adapter"
+import { useStore, useEvents } from "@/lib/store"
+import { Users, Sparkles, TrendingUp, MapPin, Calendar, Heart } from "lucide-react"
+import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { generateRecommendations, type Recommendation } from "@/lib/recommendations"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useMemo } from "react"
 
 export default function ConnectionsPage() {
-  const members = useStore(useMembers);
-  const events = useStore(useEvents);
+  const { data: ypoData, isLoading } = useYpoProfiles()
+  const events = useStore(useEvents)
 
-  const currentUser = members[0];
+  const members = useMemo(() => {
+    if (!ypoData?.pages) return []
+    const allProfiles = ypoData.pages.flatMap((page) => page.results)
+    return ypoProfilesToMembers(allProfiles)
+  }, [ypoData])
 
-  const allRecommendations = generateRecommendations(currentUser, members, 20);
+  const currentUser = members[0]
 
-  const topRecommendations = allRecommendations.slice(0, 6);
-  const interestBased = allRecommendations
-    .filter((r) =>
-      r.reasons.some((reason) => reason.type === "interest" || reason.type === "expertise"),
+  if (isLoading || members.length === 0) {
+    return (
+      <main className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading connections...</p>
+          </div>
+        </div>
+      </main>
     )
-    .slice(0, 4);
+  }
+
+  const allRecommendations = generateRecommendations(currentUser, members, 20)
+
+  const topRecommendations = allRecommendations.slice(0, 6)
+  const interestBased = allRecommendations
+    .filter((r) => r.reasons.some((reason) => reason.type === "interest" || reason.type === "expertise"))
+    .slice(0, 4)
   const industryBased = allRecommendations
     .filter((r) => r.reasons.some((reason) => reason.type === "industry"))
-    .slice(0, 4);
+    .slice(0, 4)
   const locationBased = allRecommendations
-    .filter((r) =>
-      r.reasons.some((reason) => reason.type === "location" || reason.type === "travel"),
-    )
-    .slice(0, 4);
+    .filter((r) => r.reasons.some((reason) => reason.type === "location" || reason.type === "travel"))
+    .slice(0, 4)
   const lifestyleBased = allRecommendations
-    .filter((r) =>
-      r.reasons.some((reason) => reason.type === "ceoDNA" || reason.type === "leadership"),
-    )
-    .slice(0, 4);
+    .filter((r) => r.reasons.some((reason) => reason.type === "ceoDNA" || reason.type === "leadership"))
+    .slice(0, 4)
 
   const ConnectionCard = ({ recommendation }: { recommendation: Recommendation }) => {
-    const { member, score, reasons, sharedAttributes } = recommendation;
+    const { member, score, reasons, sharedAttributes } = recommendation
 
     return (
       <Link href={`/members/${member.id}`}>
@@ -99,8 +115,8 @@ export default function ConnectionsPage() {
           </CardContent>
         </Card>
       </Link>
-    );
-  };
+    )
+  }
 
   return (
     <main className="container mx-auto p-6 space-y-8">
@@ -119,8 +135,8 @@ export default function ConnectionsPage() {
             <CardTitle>AI-Powered Connections</CardTitle>
           </div>
           <CardDescription>
-            Our unified member brain analyzes your profile, interests, expertise, and activity to
-            surface the most valuable connections for you.
+            Our unified member brain analyzes your profile, interests, expertise, and activity to surface the most
+            valuable connections for you.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -131,9 +147,7 @@ export default function ConnectionsPage() {
               </div>
               <div>
                 <p className="font-semibold text-sm mb-1">Similar Leadership DNA</p>
-                <p className="text-xs text-muted-foreground">
-                  Members who share your leadership traits
-                </p>
+                <p className="text-xs text-muted-foreground">Members who share your leadership traits</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -151,9 +165,7 @@ export default function ConnectionsPage() {
               </div>
               <div>
                 <p className="font-semibold text-sm mb-1">Proximity-Based</p>
-                <p className="text-xs text-muted-foreground">
-                  Members in your area or destinations
-                </p>
+                <p className="text-xs text-muted-foreground">Members in your area or destinations</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -173,9 +185,7 @@ export default function ConnectionsPage() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold">Top Recommendations For You</h2>
-            <p className="text-sm text-muted-foreground">
-              Highest match scores based on multiple factors
-            </p>
+            <p className="text-sm text-muted-foreground">Highest match scores based on multiple factors</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -188,9 +198,7 @@ export default function ConnectionsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Browse by Connection Type</CardTitle>
-          <CardDescription>
-            Explore recommendations categorized by what you have in common
-          </CardDescription>
+          <CardDescription>Explore recommendations categorized by what you have in common</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="interests" className="w-full">
@@ -250,7 +258,7 @@ export default function ConnectionsPage() {
             {events.slice(0, 3).map((event) => {
               const eventRecommendations = allRecommendations
                 .filter((r) => r.reasons.some((reason) => reason.type === "event"))
-                .slice(0, 3);
+                .slice(0, 3)
 
               return (
                 <div key={event.id} className="p-4 rounded-lg border border-border">
@@ -264,8 +272,7 @@ export default function ConnectionsPage() {
                     <Badge>{event.attendees.toLocaleString()} attending</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">
-                    You have {eventRecommendations.length} recommended connections attending this
-                    event
+                    You have {eventRecommendations.length} recommended connections attending this event
                   </p>
                   <Link href={`/events/${event.id}`}>
                     <Button variant="outline" size="sm">
@@ -273,11 +280,11 @@ export default function ConnectionsPage() {
                     </Button>
                   </Link>
                 </div>
-              );
+              )
             })}
           </div>
         </CardContent>
       </Card>
     </main>
-  );
+  )
 }

@@ -1,17 +1,18 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Search, Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Search, Bell } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useStore } from "@/lib/store"
+import { cn } from "@/lib/utils"
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
+import { ProfileSelector } from "@/components/profile-selector"
 
 export function Header() {
-  const pathname = usePathname();
-  const { setSearchQuery } = useStore();
+  const pathname = usePathname()
+  const { setSearchQuery } = useStore()
 
   const navItems = [
     { href: "/", label: "Dashboard" },
@@ -21,7 +22,7 @@ export function Header() {
     { href: "/events", label: "Events" },
     { href: "/content", label: "Content" },
     { href: "/connections", label: "Connections" },
-  ];
+  ]
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -69,10 +70,11 @@ export function Header() {
             </SignInButton>
           </SignedOut>
           <SignedIn>
+            <ProfileSelector />
             <UserButton afterSignOutUrl="/" />
           </SignedIn>
         </div>
       </div>
     </header>
-  );
+  )
 }

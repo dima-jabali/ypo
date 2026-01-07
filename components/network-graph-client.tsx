@@ -8,7 +8,6 @@ interface GraphNode {
   id: string
   name: string
   profile: YpoProfile
-  color: string
   avatar?: string
 }
 
@@ -27,6 +26,7 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
   const networkRef = useRef<any>(null)
+  const connectedNodesRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     if (!containerRef.current || typeof window === "undefined") return
@@ -45,10 +45,10 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
           color: node.avatar
             ? undefined
             : {
-                background: node.color,
+                background: "#6366f1", // Single default color for all nodes
                 border: "#ffffff",
                 highlight: {
-                  background: node.color,
+                  background: "#6366f1",
                   border: "#ffffff",
                 },
               },
@@ -68,6 +68,7 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
           shapeProperties: {
             useBorderWithImage: true,
           },
+          opacity: 1,
           data: node,
         })),
       )
@@ -94,7 +95,7 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
               id: idx,
               from: edge.from,
               to: edge.to,
-              color: { color: "rgba(0, 0, 0, 0.3)" },
+              color: { color: "rgba(0, 0, 0, 0.3)", opacity: 1 },
               width: 2,
               arrows: {
                 to: { enabled: true, scaleFactor: 0.5 },
@@ -104,6 +105,7 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
               smooth: {
                 type: "continuous",
               },
+              opacity: 1,
             }
           } else {
             // Unidirectional: single arrow from source to target
@@ -111,7 +113,7 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
               id: idx,
               from: edge.from,
               to: edge.to,
-              color: { color: "rgba(0, 0, 0, 0.25)" },
+              color: { color: "rgba(0, 0, 0, 0.25)", opacity: 1 },
               width: 1.5,
               arrows: {
                 to: { enabled: true, scaleFactor: 0.6 },
@@ -119,6 +121,7 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
               smooth: {
                 type: "continuous",
               },
+              opacity: 1,
             }
           }
         }),
@@ -153,19 +156,20 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
             fit: true,
           },
           barnesHut: {
-            gravitationalConstant: -3000,
-            centralGravity: 0.15,
-            springLength: 200,
-            springConstant: 0.04,
-            damping: 0.1,
-            avoidOverlap: 0.2,
+            gravitationalConstant: -15000, // Much stronger repulsion to push nodes far apart
+            centralGravity: 0.01, // Very low central gravity to allow maximum spread
+            springLength: 350, // Much longer spring length for more distance between connected nodes
+            springConstant: 0.01, // Very weak springs to allow nodes to spread out
+            damping: 0.2, // Higher damping for smoother settling
+            avoidOverlap: 1, // Maximum overlap prevention
           },
         },
         interaction: {
           hover: true,
           dragNodes: true,
-          dragView: false,
-          zoomView: false,
+          dragView: true, // Enable panning by dragging the canvas
+          zoomView: true, // Enable zoom with scroll wheel
+          zoomSpeed: 0.5, // Moderate zoom speed
           selectable: true,
         },
         height: "600px",
@@ -187,11 +191,43 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
           const canvasPosition = network.getPositions([nodeId])[nodeId]
           const DOMPosition = network.canvasToDOM(canvasPosition)
           setHoverPosition({ x: DOMPosition.x, y: DOMPosition.y })
+
+          // Get connected nodes efficiently
+          const connectedNodes = network.getConnectedNodes(nodeId)
+          const connectedNodeSet = new Set([nodeId, ...connectedNodes])
+          connectedNodesRef.current = connectedNodeSet
+
+          // Get connected edges
+          const connectedEdges = network.getConnectedEdges(nodeId)
+          const connectedEdgeSet = new Set(connectedEdges)
+
+          // Batch update nodes - only update opacity property
+          const nodeUpdates = graphData.nodes.map((n) => ({
+            id: n.id,
+            opacity: connectedNodeSet.has(n.id) ? 1 : 0.15,
+          }))
+          nodes.update(nodeUpdates)
+
+          // Batch update edges - only update opacity property
+          const allEdgeIds = edges.getIds()
+          const edgeUpdates = allEdgeIds.map((edgeId) => ({
+            id: edgeId,
+            opacity: connectedEdgeSet.has(edgeId as string) ? 1 : 0.1,
+          }))
+          edges.update(edgeUpdates)
         }
       })
 
       network.on("blurNode", () => {
         setHoveredNode(null)
+        connectedNodesRef.current.clear()
+
+        const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
+        nodes.update(nodeUpdates)
+
+        const allEdgeIds = edges.getIds()
+        const edgeUpdates = allEdgeIds.map((edgeId) => ({ id: edgeId, opacity: 1 }))
+        edges.update(edgeUpdates)
       })
 
       network.on("stabilizationIterationsDone", () => {
