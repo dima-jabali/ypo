@@ -1,135 +1,135 @@
-import { create } from "zustand";
+import { create } from "zustand"
 
 export interface Member {
-  id: string;
-  name: string;
-  title: string;
-  company: string;
-  chapter: string;
-  region: string;
-  location: string;
-  industry: string;
-  expertise: string[];
-  interests: string[];
-  leadershipDNA: string[];
-  avatar: string;
-  bio: string;
-  linkedinBio?: string;
-  yearsInYPO: number;
-  forumName?: string;
-  networkMemberships: string[];
-  recentEvents: string[];
-  languages: string[];
-  travelPattern: string[];
-  exitHistory?: string;
-  socialScore: number;
+  id: string
+  name: string
+  title: string
+  company: string
+  chapter: string
+  region: string
+  location: string
+  industry: string
+  expertise: string[]
+  interests: string[]
+  leadershipDNA: string[]
+  avatar: string
+  bio: string
+  linkedinBio?: string
+  yearsInYPO: number
+  forumName?: string
+  networkMemberships: string[]
+  recentEvents: string[]
+  languages: string[]
+  travelPattern: string[]
+  exitHistory?: string
+  socialScore: number
   ceoDNA?: {
-    health?: string[];
-    wellness?: string[];
-    sports?: string[];
-    hobbies?: string[];
-  };
-  personalGoals?: string[];
-  connectionStrength?: number;
+    health?: string[]
+    wellness?: string[]
+    sports?: string[]
+    hobbies?: string[]
+  }
+  personalGoals?: string[]
+  connectionStrength?: number
 }
 
 export interface Event {
-  id: string;
-  title: string;
-  type: string;
-  date: string;
-  location: string;
-  city: string;
-  description: string;
-  tags: string[];
-  attendees: number;
-  capacity: number;
-  image: string;
-  timeZone?: string;
-  locationType?: string;
-  audience?: string[];
-  programFormat?: string;
-  status?: string;
-  focus?: string[];
-  url?: string;
-  networks?: string[];
+  id: string
+  title: string
+  type: string
+  date: string
+  location: string
+  city: string
+  description: string
+  tags: string[]
+  attendees: number
+  capacity: number
+  image: string
+  timeZone?: string
+  locationType?: string
+  audience?: string[]
+  programFormat?: string
+  status?: string
+  focus?: string[]
+  url?: string
+  networks?: string[]
 }
 
 export interface Content {
-  id: string;
-  title: string;
-  type: "Talk" | "Article" | "Podcast" | "Video";
-  author: string;
-  authorId: string;
-  date: string;
-  tags: string[];
-  description: string;
-  duration?: string;
-  views: number;
+  id: string
+  title: string
+  type: "Talk" | "Article" | "Podcast" | "Video"
+  author: string
+  authorId: string
+  date: string
+  tags: string[]
+  description: string
+  duration?: string
+  views: number
 }
 
 interface AppState {
-  members: Member[];
-  events: Event[];
-  content: Content[];
-  searchQuery: string;
+  members: Member[]
+  events: Event[]
+  content: Content[]
+  searchQuery: string
   selectedFilters: {
-    location?: string;
-    industry?: string;
-    expertise?: string;
-    chapter?: string;
-  };
-  currentLocation?: string;
-  searchHistory: SearchHistoryItem[];
-  recommendations: Recommendation[];
-  chatMessages: ChatMessage[];
-  selectedYpoProfileId: number | null;
-  setSearchQuery: (query: string) => void;
-  setSelectedFilters: (filters: AppState["selectedFilters"]) => void;
-  setCurrentLocation: (location: string | undefined) => void;
-  addSearchHistory: (item: SearchHistoryItem) => void;
-  addChatMessage: (message: ChatMessage) => void;
-  clearChat: () => void;
-  setSelectedYpoProfileId: (id: number | null) => void;
+    location?: string
+    industry?: string
+    expertise?: string
+    chapter?: string
+  }
+  currentLocation?: string
+  searchHistory: SearchHistoryItem[]
+  recommendations: Recommendation[]
+  chatMessages: ChatMessage[]
+  selectedYpoProfileId: number | null
+  setSearchQuery: (query: string) => void
+  setSelectedFilters: (filters: AppState["selectedFilters"]) => void
+  setCurrentLocation: (location: string | undefined) => void
+  addSearchHistory: (item: SearchHistoryItem) => void
+  addChatMessage: (message: ChatMessage) => void
+  clearChat: () => void
+  setSelectedYpoProfileId: (id: number | null) => void
 }
 
 export interface SearchHistoryItem {
-  id: string;
-  query: string;
-  timestamp: Date;
-  results: number;
+  id: string
+  query: string
+  timestamp: Date
+  results: number
 }
 
 export interface Recommendation {
-  member: Member;
-  reason: string;
-  score: number;
-  sharedAttributes: string[];
+  member: Member
+  reason: string
+  score: number
+  sharedAttributes: string[]
 }
 
 export interface ChatMessage {
-  id: string;
-  type: "user" | "assistant";
-  content: string;
-  timestamp: Date;
+  id: string
+  type: "user" | "assistant"
+  content: string
+  timestamp: Date
   results?: {
-    members?: Member[];
-    events?: Event[];
-    content?: Content[];
-  };
+    members?: Member[]
+    events?: Event[]
+    content?: Content[]
+  }
 }
 
 // Selectors
-export const useSearchQuery = (state: AppState) => state.searchQuery;
-export const useSelectedFilters = (state: AppState) => state.selectedFilters;
-export const useMembers = (state: AppState) => state.members;
-export const useEvents = (state: AppState) => state.events;
-export const useContent = (state: AppState) => state.content;
-export const useCurrentLocation = (state: AppState) => state.currentLocation;
-export const useSearchHistory = (state: AppState) => state.searchHistory;
-export const useRecommendations = (state: AppState) => state.recommendations;
-export const useChatMessages = (state: AppState) => state.chatMessages;
-export const useSelectedYpoProfileId = (state: AppState) => state.selectedYpoProfileId;
+export const useSearchQuery = (state: AppState) => state.searchQuery
+export const useSelectedFilters = (state: AppState) => state.selectedFilters
+export const useMembers = (state: AppState) => state.members
+export const useEvents = (state: AppState) => state.events
+export const useContent = (state: AppState) => state.content
+export const useCurrentLocation = (state: AppState) => state.currentLocation
+export const useSearchHistory = (state: AppState) => state.searchHistory
+export const useRecommendations = (state: AppState) => state.recommendations
+export const useChatMessages = (state: AppState) => state.chatMessages
+export const useSelectedYpoProfileId = (state: AppState) => state.selectedYpoProfileId
 
 // Fake realistic data
 const generateMembers = (): Member[] => [
@@ -145,7 +145,7 @@ const generateMembers = (): Member[] => [
     expertise: ["AI/ML", "SaaS", "Enterprise Software", "Scaling"],
     interests: ["Quantum Computing", "Climate Tech", "Education"],
     leadershipDNA: ["Visionary", "Strategic", "Empathetic"],
-    avatar: "/professional-woman-ceo.png",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
     bio: "Serial entrepreneur with 2 successful exits in enterprise AI. Passionate about using technology to solve global challenges.",
     linkedinBio:
       "CEO at TechVenture AI | 2x Founder | Forbes 40 Under 40 | Passionate about democratizing AI for enterprise",
@@ -178,10 +178,9 @@ const generateMembers = (): Member[] => [
     expertise: ["Sustainable Manufacturing", "Supply Chain", "Operations", "Robotics"],
     interests: ["Sustainability", "Automation", "Family Business"],
     leadershipDNA: ["Resilient", "Innovative", "Results-Driven"],
-    avatar: "/professional-entrepreneur.png",
+    avatar: "https://images.unsplash.com/photo-1560250097063-178a50c2df8a?w=400&h=400&fit=crop",
     bio: "Third-generation manufacturer transforming traditional manufacturing with sustainable practices and automation.",
-    linkedinBio:
-      "CEO & 3rd Gen Owner at GreenScale Manufacturing | Sustainable Manufacturing Pioneer | TEDx Speaker",
+    linkedinBio: "CEO & 3rd Gen Owner at GreenScale Manufacturing | Sustainable Manufacturing Pioneer | TEDx Speaker",
     yearsInYPO: 6,
     forumName: "Legacy Builders",
     networkMemberships: ["Sustainable Business Network", "Manufacturing Excellence"],
@@ -195,11 +194,7 @@ const generateMembers = (): Member[] => [
       sports: ["Soccer", "Golf"],
       hobbies: ["Woodworking", "Craft Beer Brewing"],
     },
-    personalGoals: [
-      "Carbon neutral by 2026",
-      "Double revenue sustainably",
-      "Pass business to next gen",
-    ],
+    personalGoals: ["Carbon neutral by 2026", "Double revenue sustainably", "Pass business to next gen"],
     connectionStrength: 85,
   },
   {
@@ -214,7 +209,7 @@ const generateMembers = (): Member[] => [
     expertise: ["Digital Health", "Telemedicine", "Healthcare IT", "Patient Experience"],
     interests: ["Mental Health", "Preventive Care", "Health Equity"],
     leadershipDNA: ["Compassionate", "Data-Driven", "Disruptive"],
-    avatar: "/professional-woman-doctor.png",
+    avatar: "https://images.unsplash.com/photo-1594824476967-0a1dd7228f2d?w=400&h=400&fit=crop",
     bio: "Pioneering digital health solutions that make quality healthcare accessible to underserved communities.",
     linkedinBio:
       "Co-Founder & CEO at HealthBridge | Digital Health Innovator | Stanford Medicine Alum | Serving 2M+ patients",
@@ -246,7 +241,7 @@ const generateMembers = (): Member[] => [
     expertise: ["Brand Strategy", "Market Expansion", "Retail", "E-commerce"],
     interests: ["African Markets", "Youth Entrepreneurship", "Sports"],
     leadershipDNA: ["Bold", "Culturally Aware", "Growth-Oriented"],
-    avatar: "/professional-man-business.png",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
     bio: "Building pan-African consumer brands with global reach. Advocate for entrepreneurship in emerging markets.",
     linkedinBio:
       "Managing Director at Okonkwo Brands | Pan-African Brand Builder | Oxford MBA | Empowering African Entrepreneurs",
@@ -263,11 +258,7 @@ const generateMembers = (): Member[] => [
       sports: ["Football (Soccer)", "Basketball"],
       hobbies: ["DJ-ing", "Photography", "African Art Collecting"],
     },
-    personalGoals: [
-      "Expand to 20 African countries",
-      "Launch US market",
-      "Youth entrepreneurship fund",
-    ],
+    personalGoals: ["Expand to 20 African countries", "Launch US market", "Youth entrepreneurship fund"],
     connectionStrength: 83,
   },
   {
@@ -282,7 +273,7 @@ const generateMembers = (): Member[] => [
     expertise: ["Robotics", "AI", "Industrial Automation", "R&D"],
     interests: ["Space Tech", "STEM Education", "Innovation Policy"],
     leadershipDNA: ["Pioneering", "Technical", "Collaborative"],
-    avatar: "/professional-woman-engineer.png",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop",
     bio: "Leading robotics innovation in the Middle East. Former aerospace engineer turned entrepreneur.",
     linkedinBio:
       "CEO at Quantum Robotics | Ex-Aerospace Engineer | MIT PhD | Building the future of automation in MENA",
@@ -299,11 +290,7 @@ const generateMembers = (): Member[] => [
       sports: ["Ice Skating", "Kitesurfing"],
       hobbies: ["Astrophotography", "Classical Music", "Coding for Fun"],
     },
-    personalGoals: [
-      "First MENA robotics unicorn",
-      "Space robotics division",
-      "STEM programs for girls",
-    ],
+    personalGoals: ["First MENA robotics unicorn", "Space robotics division", "STEM programs for girls"],
     connectionStrength: 87,
   },
   {
@@ -318,7 +305,7 @@ const generateMembers = (): Member[] => [
     expertise: ["Private Equity", "M&A", "Investment Strategy", "Risk Management"],
     interests: ["Impact Investing", "Philanthropy", "Education Reform"],
     leadershipDNA: ["Analytical", "Principled", "Mentorship-Focused"],
-    avatar: "/professional-man-finance.png",
+    avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop",
     bio: "Managing partner focused on impact investing and sustainable business growth. Board member of multiple education nonprofits.",
     linkedinBio:
       "President at Mitchell Financial Group | Impact Investor | Harvard MBA | Board Member at Education First",
@@ -350,10 +337,9 @@ const generateMembers = (): Member[] => [
     expertise: ["Electric Vehicles", "Autonomous Systems", "Manufacturing", "Innovation"],
     interests: ["Clean Energy", "Urban Mobility", "Design"],
     leadershipDNA: ["Perfectionist", "Customer-Centric", "Forward-Thinking"],
-    avatar: "/professional-man-automotive.jpg",
+    avatar: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop",
     bio: "Transforming the automotive industry with next-generation electric and autonomous vehicles.",
-    linkedinBio:
-      "CEO at NextGen Automotive | EV Pioneer | Tokyo University Engineering | Redefining urban mobility",
+    linkedinBio: "CEO at NextGen Automotive | EV Pioneer | Tokyo University Engineering | Redefining urban mobility",
     yearsInYPO: 4,
     forumName: "Mobility Innovators",
     networkMemberships: ["Automotive Leaders", "Clean Tech Network"],
@@ -382,7 +368,7 @@ const generateMembers = (): Member[] => [
     expertise: ["EdTech", "Digital Learning", "Scale-ups", "Emerging Markets"],
     interests: ["Education Access", "Social Impact", "Youth Development"],
     leadershipDNA: ["Passionate", "Mission-Driven", "Adaptive"],
-    avatar: "/professional-woman-education.jpg",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
     bio: "Building accessible education technology for Latin America. Impacting 5M+ students across 12 countries.",
     linkedinBio:
       "Founder & CEO at EduTech Global | EdTech Pioneer in LATAM | 5M+ Students Reached | Social Entrepreneur",
@@ -414,7 +400,7 @@ const generateMembers = (): Member[] => [
     expertise: ["Energy", "Renewable Transition", "Strategic Planning", "Innovation"],
     interests: ["Clean Energy", "Innovation", "Regional Development"],
     leadershipDNA: ["Transformational", "Strategic", "Visionary"],
-    avatar: "/placeholder.svg?height=100&width=100",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
     bio: "Leading traditional energy company through renewable transition. Champion of sustainable energy in the Middle East.",
     linkedinBio:
       "CEO at Al-Rashid Energy | Energy Transition Leader | Wharton MBA | Transforming MENA Energy Landscape",
@@ -431,11 +417,7 @@ const generateMembers = (): Member[] => [
       sports: ["Falconry", "Golf"],
       hobbies: ["Horses", "Architecture", "Heritage Preservation"],
     },
-    personalGoals: [
-      "50% renewable portfolio by 2030",
-      "Regional clean energy hub",
-      "Innovation center",
-    ],
+    personalGoals: ["50% renewable portfolio by 2030", "Regional clean energy hub", "Innovation center"],
     connectionStrength: 84,
   },
   {
@@ -450,10 +432,9 @@ const generateMembers = (): Member[] => [
     expertise: ["Corporate Wellness", "Health Tech", "Behavioral Science", "Scaling"],
     interests: ["Holistic Health", "Mental Wellness", "Work-Life Balance"],
     leadershipDNA: ["Empathetic", "Innovative", "Purpose-Driven"],
-    avatar: "/placeholder.svg?height=100&width=100",
+    avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop",
     bio: "Pioneer in corporate wellness programs. Helping Fortune 500 companies create healthier workplace cultures.",
-    linkedinBio:
-      "CEO at WellnessFirst | Corporate Wellness Pioneer | Behavioral Scientist | 500+ Corporate Clients",
+    linkedinBio: "CEO at WellnessFirst | Corporate Wellness Pioneer | Behavioral Scientist | 500+ Corporate Clients",
     yearsInYPO: 5,
     forumName: "Health & Wellness",
     networkMemberships: ["Women's Network", "Healthcare Leaders", "Wellness Network"],
@@ -470,7 +451,7 @@ const generateMembers = (): Member[] => [
     personalGoals: ["1M employees reached", "Global expansion", "Wellness certification program"],
     connectionStrength: 91,
   },
-];
+]
 
 const generateEvents = (): Event[] => [
   {
@@ -485,7 +466,7 @@ const generateEvents = (): Event[] => [
     tags: ["Leadership", "Global", "Networking", "Innovation"],
     attendees: 2847,
     capacity: 3000,
-    image: "/singapore-conference-center.jpg",
+    image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&h=600&fit=crop",
     timeZone: "Asia/Singapore",
     locationType: "Venue",
     audience: ["YPO Members", "Guests"],
@@ -502,12 +483,11 @@ const generateEvents = (): Event[] => [
     date: "2025-01-20",
     location: "Silicon Valley",
     city: "San Francisco",
-    description:
-      "Exclusive forum exploring AI transformation and its impact on business leadership.",
+    description: "Exclusive forum exploring AI transformation and its impact on business leadership.",
     tags: ["AI", "Technology", "Future of Work", "Innovation"],
     attendees: 87,
     capacity: 100,
-    image: "/tech-conference-ai.jpg",
+    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600&fit=crop",
     timeZone: "America/Los_Angeles",
     locationType: "Online",
     audience: ["Tech Leaders"],
@@ -528,7 +508,7 @@ const generateEvents = (): Event[] => [
     tags: ["Sustainability", "ESG", "Climate", "Leadership"],
     attendees: 234,
     capacity: 300,
-    image: "/dubai-business-conference.jpg",
+    image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&h=600&fit=crop",
     timeZone: "Asia/Dubai",
     locationType: "Venue",
     audience: ["Business Leaders"],
@@ -536,116 +516,114 @@ const generateEvents = (): Event[] => [
     status: "Confirmed",
     focus: ["Sustainability Practices", "ESG Leadership"],
     url: "https://www.ypointernational.org/sustainability-summit",
-    networks: ["Middle East Network"],
+    networks: ["Sustainable Business Network"],
   },
   {
     id: "4",
-    title: "Women's Network Annual Retreat",
+    title: "Women Leaders Network Retreat",
     type: "Network",
-    date: "2025-02-25",
+    date: "2025-01-25",
     location: "Napa Valley Resort",
     city: "San Francisco",
-    description:
-      "Empowering retreat for women leaders with workshops on leadership, balance, and growth.",
-    tags: ["Women Leaders", "Leadership", "Personal Growth", "Networking"],
-    attendees: 156,
-    capacity: 200,
-    image: "/women-leadership-retreat.jpg",
+    description: "Intimate retreat for women CEOs focused on authentic leadership and peer mentorship.",
+    tags: ["Women Leaders", "Leadership", "Mentorship", "Wellness"],
+    attendees: 42,
+    capacity: 50,
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
     timeZone: "America/Los_Angeles",
     locationType: "Venue",
-    audience: ["Women Entrepreneurs"],
+    audience: ["Women CEOs"],
     programFormat: "Retreat",
     status: "Confirmed",
-    focus: ["Women in Leadership", "Personal Development"],
-    url: "https://www.ypointernational.org/womens-retreat",
+    focus: ["Women Leadership", "Personal Development"],
+    url: "https://www.ypointernational.org/women-retreat",
     networks: ["Women's Network"],
   },
   {
     id: "5",
-    title: "Manufacturing Excellence Forum",
-    type: "Forum",
-    date: "2025-01-28",
-    location: "Industry Hub, Los Angeles",
-    city: "Los Angeles",
-    description: "Forum exploring advanced manufacturing, automation, and supply chain innovation.",
-    tags: ["Manufacturing", "Innovation", "Operations", "Automation"],
-    attendees: 64,
-    capacity: 80,
-    image: "/modern-manufacturing-facility.png",
-    timeZone: "America/Los_Angeles",
+    title: "New York Metro Chapter Forum",
+    type: "Chapter",
+    date: "2025-02-05",
+    location: "Manhattan Conference Center",
+    city: "New York",
+    description: "Monthly chapter forum for New York Metro members featuring expert speakers.",
+    tags: ["Chapter", "Networking", "Local", "Business"],
+    attendees: 156,
+    capacity: 200,
+    image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&h=600&fit=crop",
+    timeZone: "America/New_York",
     locationType: "Venue",
-    audience: ["Manufacturing Leaders"],
+    audience: ["Chapter Members"],
     programFormat: "Forum",
     status: "Confirmed",
-    focus: ["Manufacturing Excellence", "Supply Chain Innovation"],
-    url: "https://www.ypointernational.org/manufacturing-forum",
-    networks: ["Manufacturing Excellence Network"],
+    focus: ["Local Networking", "Chapter Building"],
+    url: "https://www.ypointernational.org/ny-forum",
+    networks: ["New York Metro Chapter"],
   },
   {
     id: "6",
-    title: "Paris Chapter Networking Evening",
-    type: "Chapter",
-    date: "2025-01-22",
-    location: "Le Marais District, Paris",
-    city: "Paris",
-    description: "Informal networking evening with Paris chapter members and visiting YPO leaders.",
-    tags: ["Networking", "Social", "Paris", "Chapter Event"],
-    attendees: 42,
-    capacity: 60,
-    image: "/paris-evening-event.jpg",
-    timeZone: "Europe/Paris",
+    title: "Tech Leaders Summit Tokyo",
+    type: "Regional",
+    date: "2025-03-01",
+    location: "Tokyo International Forum",
+    city: "Tokyo",
+    description: "Asia Pacific technology leadership summit focused on innovation and digital transformation.",
+    tags: ["Technology", "Innovation", "Asia Pacific", "Digital"],
+    attendees: 312,
+    capacity: 400,
+    image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop",
+    timeZone: "Asia/Tokyo",
     locationType: "Venue",
-    audience: ["Paris Chapter Members"],
-    programFormat: "Networking Evening",
+    audience: ["Tech Leaders", "Innovators"],
+    programFormat: "Summit",
     status: "Confirmed",
-    focus: ["Paris Networking"],
-    url: "https://www.ypointernational.org/paris-networking-evening",
-    networks: ["Europe Network"],
+    focus: ["Technology Innovation", "Digital Transformation"],
+    url: "https://www.ypointernational.org/tokyo-tech",
+    networks: ["Tech Leaders Network", "Asia Pacific Network"],
   },
   {
     id: "7",
-    title: "Scale-Up Strategy Workshop",
-    type: "Network",
-    date: "2025-02-05",
-    location: "Tech Quarter, London",
-    city: "London",
-    description: "Interactive workshop on scaling strategies for high-growth companies.",
-    tags: ["Growth", "Strategy", "Scale-Up", "Workshop"],
-    attendees: 78,
-    capacity: 100,
-    image: "/london-business-workshop.jpg",
-    timeZone: "Europe/London",
+    title: "Family Business Forum",
+    type: "Forum",
+    date: "2025-02-15",
+    location: "Los Angeles Convention Center",
+    city: "Los Angeles",
+    description: "Forum dedicated to family business succession, governance, and generational transitions.",
+    tags: ["Family Business", "Succession", "Governance", "Legacy"],
+    attendees: 189,
+    capacity: 250,
+    image: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&h=600&fit=crop",
+    timeZone: "America/Los_Angeles",
     locationType: "Venue",
-    audience: ["Entrepreneurs"],
-    programFormat: "Workshop",
+    audience: ["Family Business Owners"],
+    programFormat: "Forum",
     status: "Confirmed",
-    focus: ["Scaling Strategies", "Entrepreneurship"],
-    url: "https://www.ypointernational.org/scale-up-workshop",
-    networks: ["Global Network"],
+    focus: ["Family Business", "Succession Planning"],
+    url: "https://www.ypointernational.org/family-business",
+    networks: ["Family Business Network"],
   },
   {
     id: "8",
-    title: "Healthcare Innovation Summit",
+    title: "Impact Investing Conference",
     type: "Network",
-    date: "2025-03-01",
-    location: "Medical District, New York",
-    city: "New York",
-    description:
-      "Summit focused on digital health innovations and the future of healthcare delivery.",
-    tags: ["Healthcare", "Innovation", "Digital Health", "Future"],
-    attendees: 112,
-    capacity: 150,
-    image: "/healthcare-innovation-conference.jpg",
-    timeZone: "America/New_York",
+    date: "2025-03-20",
+    location: "London Impact Hub",
+    city: "London",
+    description: "Conference exploring social impact investing and sustainable finance strategies.",
+    tags: ["Impact", "Investing", "Sustainability", "Finance"],
+    attendees: 167,
+    capacity: 200,
+    image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&h=600&fit=crop",
+    timeZone: "Europe/London",
     locationType: "Venue",
-    audience: ["Healthcare Leaders"],
-    programFormat: "Summit",
+    audience: ["Investors", "Social Entrepreneurs"],
+    programFormat: "Conference",
     status: "Confirmed",
-    focus: ["Digital Health", "Healthcare Innovation"],
-    url: "https://www.ypointernational.org/healthcare-summit",
-    networks: ["Healthcare Leaders Network"],
+    focus: ["Impact Investing", "Sustainable Finance"],
+    url: "https://www.ypointernational.org/impact-investing",
+    networks: ["Impact Investment Forum"],
   },
-];
+]
 
 const generateContent = (): Content[] => [
   {
@@ -694,8 +672,7 @@ const generateContent = (): Content[] => [
     authorId: "4",
     date: "2024-11-08",
     tags: ["Branding", "Africa", "Global Markets", "Growth"],
-    description:
-      "David shares his journey building consumer brands that bridge African markets with global consumers.",
+    description: "David shares his journey building consumer brands that bridge African markets with global consumers.",
     duration: "35 min",
     views: 2641,
   },
@@ -745,12 +722,11 @@ const generateContent = (): Content[] => [
     authorId: "8",
     date: "2024-10-05",
     tags: ["Education", "EdTech", "Emerging Markets", "Social Impact"],
-    description:
-      "Isabella shares insights on scaling education technology in resource-constrained environments.",
+    description: "Isabella shares insights on scaling education technology in resource-constrained environments.",
     duration: "44 min",
     views: 2087,
   },
-];
+]
 
 export const useStore = create<AppState>((set) => ({
   members: generateMembers(),
@@ -776,4 +752,4 @@ export const useStore = create<AppState>((set) => ({
     })),
   clearChat: () => set({ chatMessages: [] }),
   setSelectedYpoProfileId: (id) => set({ selectedYpoProfileId: id }),
-}));
+}))

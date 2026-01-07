@@ -1,22 +1,23 @@
-"use client";
+"use client"
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useStore, useEvents, useMembers } from "@/lib/store";
-import { MapPin, Calendar, Users, Sparkles, UserCheck, Target } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
-import { generateRecommendations } from "@/lib/recommendations";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { useStore, useEvents, useMembers } from "@/lib/store"
+import { MapPin, Calendar, Users, Sparkles, UserCheck, Target } from "lucide-react"
+import Link from "next/link"
+import Image from "next/image"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Progress } from "@/components/ui/progress"
+import { generateRecommendations } from "@/lib/recommendations"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { use } from "react"
 
-export default function EventDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
-  const events = useStore(useEvents);
-  const members = useStore(useMembers);
-  const event = events.find((e) => e.id === id);
+export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const events = useStore(useEvents)
+  const members = useStore(useMembers)
+  const event = events.find((e) => e.id === id)
 
   if (!event) {
     return (
@@ -32,43 +33,32 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
           </CardContent>
         </Card>
       </main>
-    );
+    )
   }
 
-  const attendancePercentage = (event.attendees / event.capacity) * 100;
+  const attendancePercentage = (event.attendees / event.capacity) * 100
 
-  const currentUser = members[0];
+  const currentUser = members[0]
 
   const eventAttendees = members.filter(
     (m) =>
       m.recentEvents.some((e) => e.includes(event.city)) ||
       m.interests.some((i) => event.tags.includes(i)) ||
-      m.expertise.some((e) =>
-        event.tags.some((tag) => tag.toLowerCase().includes(e.toLowerCase())),
-      ),
-  );
+      m.expertise.some((e) => event.tags.some((tag) => tag.toLowerCase().includes(e.toLowerCase()))),
+  )
 
-  const recommendations = generateRecommendations(currentUser, eventAttendees, 12);
-  const topRecommendations = recommendations.slice(0, 6);
+  const recommendations = generateRecommendations(currentUser, eventAttendees, 12)
+  const topRecommendations = recommendations.slice(0, 6)
 
   const previouslyMet = members
-    .filter(
-      (m) =>
-        m.recentEvents.some((e) => currentUser.recentEvents.includes(e)) && m.id !== currentUser.id,
-    )
-    .slice(0, 4);
+    .filter((m) => m.recentEvents.some((e) => currentUser.recentEvents.includes(e)) && m.id !== currentUser.id)
+    .slice(0, 4)
 
-  const newConnections = recommendations
-    .filter((r) => !previouslyMet.some((p) => p.id === r.member.id))
-    .slice(0, 4);
+  const newConnections = recommendations.filter((r) => !previouslyMet.some((p) => p.id === r.member.id)).slice(0, 4)
 
   const similarEvents = events
-    .filter(
-      (e) =>
-        e.id !== event.id &&
-        (e.type === event.type || e.tags.some((tag) => event.tags.includes(tag))),
-    )
-    .slice(0, 3);
+    .filter((e) => e.id !== event.id && (e.type === event.type || e.tags.some((tag) => event.tags.includes(tag))))
+    .slice(0, 3)
 
   return (
     <main className="container mx-auto p-6 space-y-6">
@@ -82,12 +72,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
         <div className="lg:col-span-2 space-y-6">
           <Card className="overflow-hidden">
             <div className="relative h-64 md:h-96 w-full bg-muted">
-              <Image
-                src={event.image || "/placeholder.svg"}
-                alt={event.title}
-                fill
-                className="object-cover"
-              />
+              <Image src={event.image || "/placeholder.svg"} alt={event.title} fill className="object-cover" />
             </div>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3 mb-4">
@@ -142,8 +127,8 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                   <div className="space-y-2">
                     <Progress value={attendancePercentage} className="h-2" />
                     <p className="text-sm text-muted-foreground">
-                      {event.attendees.toLocaleString()} of {event.capacity.toLocaleString()}{" "}
-                      registered ({Math.round(attendancePercentage)}% capacity)
+                      {event.attendees.toLocaleString()} of {event.capacity.toLocaleString()} registered (
+                      {Math.round(attendancePercentage)}% capacity)
                     </p>
                   </div>
                 </div>
@@ -172,9 +157,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                 <Sparkles className="h-5 w-5 text-primary" />
                 <CardTitle>Event Intelligence</CardTitle>
               </div>
-              <CardDescription>
-                Smart insights to maximize your networking at this event
-              </CardDescription>
+              <CardDescription>Smart insights to maximize your networking at this event</CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="recommended" className="w-full">
@@ -196,10 +179,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                         <Link key={rec.member.id} href={`/members/${rec.member.id}`}>
                           <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage
-                                src={rec.member.avatar || "/placeholder.svg"}
-                                alt={rec.member.name}
-                              />
+                              <AvatarImage src={rec.member.avatar || "/placeholder.svg"} alt={rec.member.name} />
                               <AvatarFallback>
                                 {rec.member.name
                                   .split(" ")
@@ -246,10 +226,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                         <Link key={member.id} href={`/members/${member.id}`}>
                           <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer">
                             <Avatar className="h-10 w-10">
-                              <AvatarImage
-                                src={member.avatar || "/placeholder.svg"}
-                                alt={member.name}
-                              />
+                              <AvatarImage src={member.avatar || "/placeholder.svg"} alt={member.name} />
                               <AvatarFallback>
                                 {member.name
                                   .split(" ")
@@ -264,9 +241,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
                                 Previously met at:{" "}
-                                {member.recentEvents.find((e) =>
-                                  currentUser.recentEvents.includes(e),
-                                )}
+                                {member.recentEvents.find((e) => currentUser.recentEvents.includes(e))}
                               </p>
                             </div>
                           </div>
@@ -328,10 +303,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                 <Link key={rec.member.id} href={`/members/${rec.member.id}`}>
                   <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage
-                        src={rec.member.avatar || "/placeholder.svg"}
-                        alt={rec.member.name}
-                      />
+                      <AvatarImage src={rec.member.avatar || "/placeholder.svg"} alt={rec.member.name} />
                       <AvatarFallback>
                         {rec.member.name
                           .split(" ")
@@ -368,9 +340,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                   <Link key={similarEvent.id} href={`/events/${similarEvent.id}`}>
                     <div className="p-3 rounded-lg border hover:border-primary transition-colors cursor-pointer">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <h4 className="font-semibold text-sm leading-tight">
-                          {similarEvent.title}
-                        </h4>
+                        <h4 className="font-semibold text-sm leading-tight">{similarEvent.title}</h4>
                         <Badge variant="secondary" className="text-xs flex-shrink-0">
                           {similarEvent.type}
                         </Badge>
@@ -391,5 +361,5 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
         </div>
       </div>
     </main>
-  );
+  )
 }
