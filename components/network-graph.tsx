@@ -2,100 +2,114 @@
 import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { useYpoProfiles } from "@/lib/hooks/use-ypo-profiles"
 import { TrendingUp } from "lucide-react"
-import type { YpoProfile } from "@/lib/types/ypo-profile"
 import { NetworkGraphClient } from "./network-graph-client"
+import similarNodesData from "@/data/similar-nodes.json"
+
+interface Profile {
+  id: number
+  name: string
+  position: string | null
+  current_company_name: string | null
+  avatar: string | null
+  ypo_chapter: string | null
+  similar_neighbors: Array<{
+    id: number
+    name: string
+    similarity: number
+  }>
+}
 
 interface GraphNode {
   id: string
   name: string
-  profile: YpoProfile
+  profile: Profile
   avatar?: string
+  depth: number
 }
 
 interface GraphLink {
   source: string
   target: string
+  similarity: number
 }
 
-export function NetworkGraph() {
-  const { data, isLoading } = useYpoProfiles()
+function buildDepthLimitedGraph(profiles: Profile[], startUserId: number, maxDepth: number) {
+  const profilesMap = new Map(profiles.map((p) => [p.id, p]))
+  const visitedNodes = new Map<number, number>() // id -> depth
+  const nodes: GraphNode[] = []
+  const links: GraphLink[] = []
+  const processedPairs = new Set<string>()
 
-  const profiles = data?.pages.flatMap((page) => page.results) ?? []
+  // Start from user 2416
+  const startProfile = profilesMap.get(startUserId)
+  if (!startProfile) {
+    console.log(`[v0] Start user ${startUserId} not found in data`)
+    return { nodes, links }
+  }
 
-  const graphData = useMemo(() => {
-    if (!profiles.length) return { nodes: [], links: [] }
+  // BFS to traverse the graph with depth limit
+  const queue: Array<{ id: number; depth: number }> = [{ id: startUserId, depth: 0 }]
+  visitedNodes.set(startUserId, 0)
 
-    const nodes: GraphNode[] = profiles.map((profile) => ({
-      id: profile.id,
-      name: profile.name || "Unknown",
-      profile,
-      avatar: profile.avatar || undefined,
-    }))
+  while (queue.length > 0) {
+    const current = queue.shift()!
+    const currentProfile = profilesMap.get(current.id)
 
-    const relationshipMap = new Map<string, Set<string>>()
+    if (!currentProfile) continue
 
-    for (let i = 0; i < profiles.length; i++) {
-      const p1 = profiles[i]
-      if (!relationshipMap.has(p1.id)) {
-        relationshipMap.set(p1.id, new Set())
-      }
+    // Add current node
+    nodes.push({
+      id: String(current.id),
+      name: currentProfile.name || "Unknown",
+      profile: currentProfile,
+      avatar: currentProfile.avatar || undefined,
+      depth: current.depth,
+    })
 
-      for (let j = i + 1; j < profiles.length; j++) {
-        const p2 = profiles[j]
+    // If we haven't reached max depth, explore neighbors
+    if (current.depth < maxDepth && currentProfile.similar_neighbors) {
+      currentProfile.similar_neighbors.forEach((neighbor) => {
+        const neighborProfile = profilesMap.get(neighbor.id)
+        if (!neighborProfile) return
 
-        let hasConnection = false
-
-        if (p1.ypo_chapter === p2.ypo_chapter && p1.ypo_chapter) hasConnection = true
-        if (p1.current_company_industry === p2.current_company_industry && p1.current_company_industry)
-          hasConnection = true
-        if (p1.location === p2.location && p1.location) hasConnection = true
-
-        if (hasConnection) {
-          relationshipMap.get(p1.id)!.add(p2.id)
-          if (!relationshipMap.has(p2.id)) {
-            relationshipMap.set(p2.id, new Set())
-          }
-          relationshipMap.get(p2.id)!.add(p1.id)
-        }
-      }
-    }
-
-    const links: GraphLink[] = []
-    const processedPairs = new Set<string>()
-
-    relationshipMap.forEach((targets, source) => {
-      targets.forEach((target) => {
-        const pairKey = [source, target].sort().join("-")
+        // Add edge
+        const pairKey = [String(current.id), String(neighbor.id)].sort().join("-")
         if (!processedPairs.has(pairKey)) {
-          const isBidirectional = relationshipMap.get(target)?.has(source)
           links.push({
-            source,
-            target,
+            source: String(current.id),
+            target: String(neighbor.id),
+            similarity: neighbor.similarity,
           })
           processedPairs.add(pairKey)
         }
+
+        // Add neighbor to queue if not visited or found at a deeper level
+        if (!visitedNodes.has(neighbor.id)) {
+          visitedNodes.set(neighbor.id, current.depth + 1)
+          queue.push({ id: neighbor.id, depth: current.depth + 1 })
+        }
       })
-    })
-
-    return { nodes, links }
-  }, [profiles])
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[600px]">
-        <div className="text-muted-foreground">Loading network graph...</div>
-      </div>
-    )
+    }
   }
+
+  console.log(`[v0] Graph built: ${nodes.length} nodes, ${links.length} links`)
+  return { nodes, links }
+}
+
+export function NetworkGraph() {
+  const graphData = useMemo(() => {
+    const profiles = similarNodesData as Profile[]
+    console.log(`[v0] Building depth-3 graph from user 2416`)
+    return buildDepthLimitedGraph(profiles, 2416, 3)
+  }, [])
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-balance">Member Network Graph</h1>
-          <p className="text-muted-foreground mt-1">Explore connections across the YPO global network</p>
+          <h1 className="text-3xl font-bold text-balance">My Network (User 2416)</h1>
+          <p className="text-muted-foreground mt-1">Showing connections up to 3 degrees of separation</p>
         </div>
       </div>
 
@@ -124,10 +138,8 @@ export function NetworkGraph() {
                 <Badge variant="secondary">{graphData.links.length}</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Avg Connections</span>
-                <Badge variant="secondary">
-                  {graphData.nodes.length > 0 ? ((graphData.links.length * 2) / graphData.nodes.length).toFixed(1) : 0}
-                </Badge>
+                <span className="text-sm text-muted-foreground">Depth Levels</span>
+                <Badge variant="secondary">0-3</Badge>
               </div>
             </CardContent>
           </Card>
@@ -138,11 +150,11 @@ export function NetworkGraph() {
             </CardHeader>
             <CardContent>
               <ul className="text-xs text-muted-foreground space-y-1.5">
-                <li>• Hover over nodes to see member details</li>
-                <li>• Drag nodes to reposition them</li>
-                <li>• Single arrow = one-way connection</li>
-                <li>• Double arrow = two-way connection</li>
-                <li>• Dragged nodes stay in new position</li>
+                <li>• You are at the center (User 2416)</li>
+                <li>• Depth 1: Your direct connections</li>
+                <li>• Depth 2-3: Extended network</li>
+                <li>• Hover over nodes for details</li>
+                <li>• Drag nodes to reposition</li>
               </ul>
             </CardContent>
           </Card>

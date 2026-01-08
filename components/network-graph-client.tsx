@@ -2,19 +2,33 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import type { YpoProfile } from "@/lib/types/ypo-profile"
+
+interface OptimizedProfile {
+  id: number
+  name: string
+  position: string | null
+  company: string | null
+  avatar: string | null
+  chapter: string | null
+  industry: string | null
+  location: string | null
+  neighbors: Array<{
+    id: number
+    similarity: number
+  }>
+}
 
 interface GraphNode {
   id: string
   name: string
-  profile: YpoProfile
+  profile: OptimizedProfile
   avatar?: string
 }
 
 interface GraphLink {
   source: string
   target: string
-  bidirectional?: boolean
+  similarity: number
 }
 
 interface NetworkGraphClientProps {
@@ -38,14 +52,14 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
       const nodes = new DataSet(
         graphData.nodes.map((node) => ({
           id: node.id,
-          label: `${node.name}\n${node.profile.ypo_chapter || ""}`,
+          label: `${node.name}\n${node.profile.chapter || ""}`,
           title: node.name,
           shape: node.avatar ? "circularImage" : "circle",
           image: node.avatar || undefined,
           color: node.avatar
             ? undefined
             : {
-                background: "#6366f1", // Single default color for all nodes
+                background: "#6366f1",
                 border: "#ffffff",
                 highlight: {
                   background: "#6366f1",
@@ -73,56 +87,29 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
         })),
       )
 
-      const edgeMap = new Map<string, { from: string; to: string; count: number }>()
-
-      graphData.links.forEach((link) => {
-        const key1 = `${link.source}-${link.target}`
-        const key2 = `${link.target}-${link.source}`
-
-        if (edgeMap.has(key2)) {
-          const existing = edgeMap.get(key2)!
-          existing.count = 2
-        } else {
-          edgeMap.set(key1, { from: link.source, to: link.target, count: 1 })
-        }
-      })
-
       const edges = new DataSet(
-        Array.from(edgeMap.values()).map((edge, idx) => {
-          if (edge.count === 2) {
-            // Bidirectional: arrows meet in the middle
-            return {
-              id: idx,
-              from: edge.from,
-              to: edge.to,
-              color: { color: "rgba(0, 0, 0, 0.3)", opacity: 1 },
-              width: 2,
-              arrows: {
-                to: { enabled: true, scaleFactor: 0.5 },
-                middle: { enabled: false },
-                from: { enabled: false },
-              },
-              smooth: {
-                type: "continuous",
-              },
-              opacity: 1,
-            }
-          } else {
-            // Unidirectional: single arrow from source to target
-            return {
-              id: idx,
-              from: edge.from,
-              to: edge.to,
-              color: { color: "rgba(0, 0, 0, 0.25)", opacity: 1 },
-              width: 1.5,
-              arrows: {
-                to: { enabled: true, scaleFactor: 0.6 },
-              },
-              smooth: {
-                type: "continuous",
-              },
-              opacity: 1,
-            }
+        graphData.links.map((link, idx) => {
+          const similarity = link.similarity || 0.5
+          const width = 1 + (similarity - 0.7) * 10
+          const opacity = 0.3 + (similarity - 0.7) * 1.67
+
+          return {
+            id: idx,
+            from: link.source,
+            to: link.target,
+            color: {
+              color: `rgba(99, 102, 241, ${Math.min(opacity, 0.8)})`,
+              opacity: Math.min(opacity, 0.8),
+            },
+            width: Math.max(1, Math.min(width, 4)),
+            arrows: {
+              to: { enabled: false },
+            },
+            smooth: {
+              type: "continuous",
+            },
+            opacity: Math.min(opacity, 0.8),
+            title: `Similarity: ${(similarity * 100).toFixed(1)}%`,
           }
         }),
       )
@@ -151,25 +138,25 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
           enabled: true,
           stabilization: {
             enabled: true,
-            iterations: 300,
+            iterations: 1000,
             updateInterval: 25,
             fit: true,
           },
           barnesHut: {
-            gravitationalConstant: -15000, // Much stronger repulsion to push nodes far apart
-            centralGravity: 0.01, // Very low central gravity to allow maximum spread
-            springLength: 350, // Much longer spring length for more distance between connected nodes
-            springConstant: 0.01, // Very weak springs to allow nodes to spread out
-            damping: 0.2, // Higher damping for smoother settling
-            avoidOverlap: 1, // Maximum overlap prevention
+            gravitationalConstant: -80000,
+            centralGravity: 0.05,
+            springLength: 800,
+            springConstant: 0.004,
+            damping: 0.3,
+            avoidOverlap: 1,
           },
         },
         interaction: {
           hover: true,
           dragNodes: true,
-          dragView: true, // Enable panning by dragging the canvas
-          zoomView: true, // Enable zoom with scroll wheel
-          zoomSpeed: 0.5, // Moderate zoom speed
+          dragView: true,
+          zoomView: true,
+          zoomSpeed: 0.5,
           selectable: true,
         },
         height: "600px",
@@ -192,23 +179,19 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
           const DOMPosition = network.canvasToDOM(canvasPosition)
           setHoverPosition({ x: DOMPosition.x, y: DOMPosition.y })
 
-          // Get connected nodes efficiently
           const connectedNodes = network.getConnectedNodes(nodeId)
           const connectedNodeSet = new Set([nodeId, ...connectedNodes])
           connectedNodesRef.current = connectedNodeSet
 
-          // Get connected edges
           const connectedEdges = network.getConnectedEdges(nodeId)
           const connectedEdgeSet = new Set(connectedEdges)
 
-          // Batch update nodes - only update opacity property
           const nodeUpdates = graphData.nodes.map((n) => ({
             id: n.id,
             opacity: connectedNodeSet.has(n.id) ? 1 : 0.15,
           }))
           nodes.update(nodeUpdates)
 
-          // Batch update edges - only update opacity property
           const allEdgeIds = edges.getIds()
           const edgeUpdates = allEdgeIds.map((edgeId) => ({
             id: edgeId,
@@ -280,7 +263,7 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm mb-0.5">{hoveredNode.profile.name}</p>
               <p className="text-xs text-muted-foreground truncate">{hoveredNode.profile.position}</p>
-              <p className="text-xs text-muted-foreground truncate">{hoveredNode.profile.current_company_name}</p>
+              <p className="text-xs text-muted-foreground truncate">{hoveredNode.profile.company}</p>
             </div>
           </div>
         </div>
