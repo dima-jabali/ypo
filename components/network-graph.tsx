@@ -1,7 +1,8 @@
 "use client"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Slider } from "@/components/ui/slider"
 import { TrendingUp } from "lucide-react"
 import { NetworkGraphClient } from "./network-graph-client"
 import similarNodesData from "@/data/similar-nodes.json"
@@ -98,18 +99,35 @@ function buildDepthLimitedGraph(profiles: Profile[], startUserId: number, maxDep
 }
 
 export function NetworkGraph() {
+  const [selectedDepth, setSelectedDepth] = useState(3)
+
   const graphData = useMemo(() => {
     const profiles = similarNodesData as Profile[]
-    console.log(`[v0] Building depth-3 graph from user 2416`)
-    return buildDepthLimitedGraph(profiles, 2416, 3)
-  }, [])
+    return buildDepthLimitedGraph(profiles, 2416, selectedDepth)
+  }, [selectedDepth])
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-balance">My Network (User 2416)</h1>
-          <p className="text-muted-foreground mt-1">Showing connections up to 3 degrees of separation</p>
+          <p className="text-muted-foreground mt-1">Showing connections up to {selectedDepth} degrees of separation</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground">Depth:</span>
+          <div className="flex items-center gap-3 w-48">
+            <Slider
+              value={[selectedDepth]}
+              onValueChange={(value) => setSelectedDepth(value[0])}
+              min={1}
+              max={4}
+              step={1}
+              className="flex-1"
+            />
+            <Badge variant="secondary" className="w-8 justify-center">
+              {selectedDepth}
+            </Badge>
+          </div>
         </div>
       </div>
 
@@ -139,7 +157,7 @@ export function NetworkGraph() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Depth Levels</span>
-                <Badge variant="secondary">0-3</Badge>
+                <Badge variant="secondary">0-{selectedDepth}</Badge>
               </div>
             </CardContent>
           </Card>
@@ -155,6 +173,7 @@ export function NetworkGraph() {
                 <li>• Depth 2-3: Extended network</li>
                 <li>• Hover over nodes for details</li>
                 <li>• Drag nodes to reposition</li>
+                <li>• Click "Focus on Me" to center view</li>
               </ul>
             </CardContent>
           </Card>

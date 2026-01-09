@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Focus } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface OptimizedProfile {
   id: number
@@ -41,6 +44,24 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const networkRef = useRef<any>(null)
   const connectedNodesRef = useRef<Set<string>>(new Set())
+  const router = useRouter()
+
+  const focusOnCurrentUser = () => {
+    if (!networkRef.current) return
+
+    const currentUserId = "2416"
+    networkRef.current.focus(currentUserId, {
+      scale: 1.5,
+      animation: {
+        duration: 1000,
+        easingFunction: "easeInOutQuad",
+      },
+    })
+  }
+
+  const handleProfileClick = (profileId: number) => {
+    router.push(`/members/${profileId}`)
+  }
 
   useEffect(() => {
     if (!containerRef.current || typeof window === "undefined") return
@@ -91,16 +112,12 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
         graphData.links.map((link, idx) => {
           const similarity = link.similarity || 0.5
           const width = 1 + (similarity - 0.7) * 10
-          const opacity = 0.3 + (similarity - 0.7) * 1.67
 
           return {
             id: idx,
             from: link.source,
             to: link.target,
-            color: {
-              color: `rgba(99, 102, 241, ${Math.min(opacity, 0.8)})`,
-              opacity: Math.min(opacity, 0.8),
-            },
+            color: "#9ca3af80",
             width: Math.max(1, Math.min(width, 4)),
             arrows: {
               to: { enabled: false },
@@ -108,7 +125,6 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
             smooth: {
               type: "continuous",
             },
-            opacity: Math.min(opacity, 0.8),
             title: `Similarity: ${(similarity * 100).toFixed(1)}%`,
           }
         }),
@@ -193,10 +209,13 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
           nodes.update(nodeUpdates)
 
           const allEdgeIds = edges.getIds()
-          const edgeUpdates = allEdgeIds.map((edgeId) => ({
-            id: edgeId,
-            opacity: connectedEdgeSet.has(edgeId as string) ? 1 : 0.1,
-          }))
+          const edgeUpdates = allEdgeIds.map((edgeId) => {
+            const isConnected = connectedEdgeSet.has(edgeId as string)
+            return {
+              id: edgeId,
+              color: isConnected ? "#3b82f6cc" : "#9ca3af0d",
+            }
+          })
           edges.update(edgeUpdates)
         }
       })
@@ -209,7 +228,10 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
         nodes.update(nodeUpdates)
 
         const allEdgeIds = edges.getIds()
-        const edgeUpdates = allEdgeIds.map((edgeId) => ({ id: edgeId, opacity: 1 }))
+        const edgeUpdates = allEdgeIds.map((edgeId) => ({
+          id: edgeId,
+          color: "#9ca3af80",
+        }))
         edges.update(edgeUpdates)
       })
 
@@ -238,16 +260,24 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
 
   return (
     <div className="relative bg-white rounded-lg">
+      <div className="absolute top-4 right-4 z-20">
+        <Button onClick={focusOnCurrentUser} size="sm" variant="secondary" className="shadow-lg">
+          <Focus className="h-4 w-4 mr-2" />
+          Focus on Me
+        </Button>
+      </div>
+
       <div ref={containerRef} className="w-full" />
 
       {hoveredNode && (
         <div
-          className="absolute bg-popover border border-border rounded-lg shadow-xl p-3 pointer-events-none z-10"
+          className="absolute bg-popover border border-border rounded-lg shadow-xl p-3 z-10 cursor-pointer hover:bg-accent transition-colors"
           style={{
             left: hoverPosition.x,
             top: hoverPosition.y - 80,
             transform: "translateX(-50%)",
           }}
+          onClick={() => handleProfileClick(hoveredNode.profile.id)}
         >
           <div className="flex items-start gap-3 min-w-[240px]">
             <Avatar className="h-12 w-12 border-2">
