@@ -36,9 +36,10 @@ interface GraphLink {
 
 interface NetworkGraphClientProps {
   graphData: { nodes: GraphNode[]; links: GraphLink[] }
+  currentUserId: number
 }
 
-export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
+export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphClientProps) {
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null)
   const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
@@ -49,8 +50,8 @@ export function NetworkGraphClient({ graphData }: NetworkGraphClientProps) {
   const focusOnCurrentUser = () => {
     if (!networkRef.current) return
 
-    const currentUserId = "2416"
-    networkRef.current.focus(currentUserId, {
+    const currentUserIdString = String(currentUserId)
+    networkRef.current.focus(currentUserIdString, {
       scale: 1.5,
       animation: {
         duration: 1000,

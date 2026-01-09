@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Slider } from "@/components/ui/slider"
 import { TrendingUp } from "lucide-react"
 import { NetworkGraphClient } from "./network-graph-client"
+import { useStore } from "@/lib/store"
 import similarNodesData from "@/data/similar-nodes.json"
 
 interface Profile {
@@ -100,17 +101,27 @@ function buildDepthLimitedGraph(profiles: Profile[], startUserId: number, maxDep
 
 export function NetworkGraph() {
   const [selectedDepth, setSelectedDepth] = useState(3)
+  const impersonatedProfileId = useStore((state) => state.impersonatedProfileId)
 
   const graphData = useMemo(() => {
     const profiles = similarNodesData as Profile[]
-    return buildDepthLimitedGraph(profiles, 2416, selectedDepth)
-  }, [selectedDepth])
+    const userId = impersonatedProfileId || 2416
+    console.log(`[v0] Building depth-${selectedDepth} graph from user ${userId}`)
+    return buildDepthLimitedGraph(profiles, userId, selectedDepth)
+  }, [selectedDepth, impersonatedProfileId])
+
+  const currentUserProfile = useMemo(() => {
+    const profiles = similarNodesData as Profile[]
+    return profiles.find((p) => p.id === (impersonatedProfileId || 2416))
+  }, [impersonatedProfileId])
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-balance">My Network (User 2416)</h1>
+          <h1 className="text-3xl font-bold text-balance">
+            My Network {currentUserProfile?.name && `- ${currentUserProfile.name}`}
+          </h1>
           <p className="text-muted-foreground mt-1">Showing connections up to {selectedDepth} degrees of separation</p>
         </div>
         <div className="flex items-center gap-4">
@@ -134,7 +145,7 @@ export function NetworkGraph() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <Card className="lg:col-span-3 border-2">
           <CardContent className="p-0">
-            <NetworkGraphClient graphData={graphData} />
+            <NetworkGraphClient graphData={graphData} currentUserId={impersonatedProfileId || 2416} />
           </CardContent>
         </Card>
 
@@ -168,7 +179,7 @@ export function NetworkGraph() {
             </CardHeader>
             <CardContent>
               <ul className="text-xs text-muted-foreground space-y-1.5">
-                <li>• You are at the center (User 2416)</li>
+                <li>• You are at the center</li>
                 <li>• Depth 1: Your direct connections</li>
                 <li>• Depth 2-3: Extended network</li>
                 <li>• Hover over nodes for details</li>

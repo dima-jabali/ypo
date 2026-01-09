@@ -11,46 +11,16 @@ import { useStore, useEvents, useContent } from "@/lib/store"
 import { Search, Users, Calendar, BookOpen, MapPin, TrendingUp, Award, Sparkles } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-import { getCoreRowModel, getFilteredRowModel, useReactTable } from "@tanstack/react-table"
-import { useYpoProfiles } from "@/lib/hooks/use-ypo-profiles"
-import { useAwsBase64File, type AwsBucket, type AwsKey } from "@/hooks/use-aws-base64-file"
+import similarNodesData from "@/data/similar-nodes.json"
 
 export default function HomePage() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
 
-  const { data, isLoading, error } = useYpoProfiles()
+  const members = useMemo(() => similarNodesData.slice(0, 100), [])
+
   const content = useStore(useContent)
   const events = useStore(useEvents)
   const router = useRouter()
-
-  const members = useMemo(() => data?.pages?.flatMap((page) => page.results) || [], [data])
-
-  const table = useReactTable({
-    columns: [
-      { accessorKey: "name", id: "name" },
-      { accessorKey: "current_company_name", id: "current_company_name" },
-      { accessorKey: "ypo_industry", id: "ypo_industry" },
-      { accessorKey: "ypo_chapter", id: "ypo_chapter" },
-      { accessorKey: "country_code", id: "country_code" },
-    ],
-    data: members,
-    state: {
-      globalFilter: selectedLocations,
-    },
-    // Custom filter logic to match selected locations against profile fields
-    globalFilterFn: (row, columnId, filterValue: string[]) => {
-      if (!filterValue.length) return true
-      const profile = row.original
-      return filterValue.some(
-        (loc) =>
-          profile.location?.toLowerCase().includes(loc.toLowerCase()) ||
-          profile.city?.toLowerCase().includes(loc.toLowerCase()) ||
-          profile.ypo_chapter?.toLowerCase().includes(loc.toLowerCase()),
-      )
-    },
-    getFilteredRowModel: getFilteredRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-  })
 
   const upcomingEvents = events.slice(0, 3)
 
@@ -70,24 +40,6 @@ export default function HomePage() {
   const toggleLocation = (location: string) => {
     setSelectedLocations((prev) => (prev.includes(location) ? prev.filter((l) => l !== location) : [...prev, location]))
   }
-
-  const awsBase64FileQuery = useAwsBase64File({
-    aws_bucket: "bb-demos-public-data" as AwsBucket,
-    aws_key: "ypo-profiles-with-similar-nodes.json" as AwsKey,
-    saveToFile: true,
-  })
-
-  const similarNodesData = useMemo(() => {
-    if (!awsBase64FileQuery.data) return null
-
-    try {
-      const parsed = JSON.parse(awsBase64FileQuery.data)
-      return parsed
-    } catch (error) {
-      console.error("[v0] Error parsing JSON from S3:", error)
-      return null
-    }
-  }, [awsBase64FileQuery.data])
 
   return (
     <main className="container mx-auto p-6 space-y-8">

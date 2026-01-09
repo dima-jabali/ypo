@@ -2,8 +2,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useYpoProfiles } from "@/lib/hooks/use-ypo-profiles"
-import { ypoProfilesToMembers } from "@/lib/ypo-to-member-adapter"
 import { useStore, useEvents } from "@/lib/store"
 import { Users, Sparkles, TrendingUp, MapPin, Calendar, Heart } from "lucide-react"
 import Link from "next/link"
@@ -11,20 +9,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { generateRecommendations, type Recommendation } from "@/lib/recommendations"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useMemo } from "react"
+import similarNodesData from "@/data/similar-nodes.json"
 
 export default function ConnectionsPage() {
-  const { data: ypoData, isLoading } = useYpoProfiles()
+  const members = useMemo(() => similarNodesData, [])
   const events = useStore(useEvents)
-
-  const members = useMemo(() => {
-    if (!ypoData?.pages) return []
-    const allProfiles = ypoData.pages.flatMap((page) => page.results)
-    return ypoProfilesToMembers(allProfiles)
-  }, [ypoData])
 
   const currentUser = members[0]
 
-  if (isLoading || members.length === 0) {
+  if (members.length === 0) {
     return (
       <main className="container mx-auto p-6">
         <div className="flex items-center justify-center h-64">

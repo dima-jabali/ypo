@@ -84,6 +84,7 @@ interface AppState {
   recommendations: Recommendation[]
   chatMessages: ChatMessage[]
   selectedYpoProfileId: number | null
+  impersonatedProfileId: number | null
   setSearchQuery: (query: string) => void
   setSelectedFilters: (filters: AppState["selectedFilters"]) => void
   setCurrentLocation: (location: string | undefined) => void
@@ -91,6 +92,7 @@ interface AppState {
   addChatMessage: (message: ChatMessage) => void
   clearChat: () => void
   setSelectedYpoProfileId: (id: number | null) => void
+  setImpersonatedProfileId: (id: number | null) => void
 }
 
 export interface SearchHistoryItem {
@@ -130,6 +132,7 @@ export const useSearchHistory = (state: AppState) => state.searchHistory
 export const useRecommendations = (state: AppState) => state.recommendations
 export const useChatMessages = (state: AppState) => state.chatMessages
 export const useSelectedYpoProfileId = (state: AppState) => state.selectedYpoProfileId
+export const useImpersonatedProfileId = (state: AppState) => state.impersonatedProfileId
 
 // Fake realistic data
 const generateEvents = (): Event[] => [
@@ -418,6 +421,7 @@ export const useStore = create<AppState>((set, get) => ({
   recommendations: [],
   chatMessages: [],
   selectedYpoProfileId: null,
+  impersonatedProfileId: 2416, // Default to user 2416
   setSearchQuery: (query) => set({ searchQuery: query }),
   setSelectedFilters: (filters) => set({ selectedFilters: filters }),
   setCurrentLocation: (location) => set({ currentLocation: location }),
@@ -431,4 +435,5 @@ export const useStore = create<AppState>((set, get) => ({
     })),
   clearChat: () => set({ chatMessages: [] }),
   setSelectedYpoProfileId: (id) => set({ selectedYpoProfileId: id }),
+  setImpersonatedProfileId: (id) => set({ impersonatedProfileId: id }),
 }))

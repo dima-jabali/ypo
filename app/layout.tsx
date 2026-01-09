@@ -1,15 +1,14 @@
-import type React from "react";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
+import type React from "react"
+import type { Metadata } from "next"
+import { Geist, Geist_Mono } from "next/font/google"
 
-import { Header } from "@/components/header";
-import { QueryProvider } from "@/lib/providers/query-provider";
+import { Header } from "@/components/header"
+import { QueryProvider } from "@/lib/providers/query-provider"
 
-import "./globals.css";
+import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const _geist = Geist({ subsets: ["latin"] })
+const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "YPO Unified Member Brain - Demo",
@@ -33,20 +32,18 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
-};
+}
 
 export default function RootLayout({ children }: React.PropsWithChildren) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className="font-sans antialiased">
-          <QueryProvider>
-            <Header />
+    <html lang="en">
+      <body className="font-sans antialiased">
+        <QueryProvider>
+          <Header />
 
-            {children}
-          </QueryProvider>
-        </body>
-      </html>
-    </ClerkProvider>
-  );
+          {children}
+        </QueryProvider>
+      </body>
+    </html>
+  )
 }
