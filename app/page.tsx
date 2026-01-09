@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -21,6 +21,14 @@ export default function HomePage() {
   const content = useStore(useContent)
   const events = useStore(useEvents)
   const router = useRouter()
+
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
 
   const upcomingEvents = events.slice(0, 3)
 
@@ -224,7 +232,7 @@ export default function HomePage() {
                         <p className="font-semibold text-sm">{member.name}</p>
 
                         <Badge variant="outline" className="text-xs">
-                          {Math.round(Math.random() * 30 + 70)}% match
+                          71% match
                         </Badge>
                       </div>
 

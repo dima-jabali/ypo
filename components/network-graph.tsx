@@ -131,7 +131,7 @@ export function NetworkGraph() {
               value={[selectedDepth]}
               onValueChange={(value) => setSelectedDepth(value[0])}
               min={1}
-              max={4}
+              max={8}
               step={1}
               className="flex-1"
             />

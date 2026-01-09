@@ -1,15 +1,12 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { axiosClient } from "../axios-client";
 import type {
 	YpoProfile,
-  YpoProfileId,
-  YpoProfileResponse,
-  YpoProfilesResponse
+	YpoProfileId,
+	YpoProfilesResponse
 } from "../types/ypo-profile";
-import { isValidNumber } from "../utils";
 
 // Query keys
 export const ypoQueryKeys = {
@@ -23,8 +20,6 @@ export const ypoQueryKeys = {
  * Only fetches when user is authenticated and userId is available
  */
 export function useYpoProfiles() {
-	const { isLoaded, userId } = useAuth();
-
 	return useInfiniteQuery({
 		initialPageParam: {
 			limit: 100,
@@ -59,7 +54,6 @@ export function useYpoProfiles() {
 			return { ...firstPageParams, offset: prevOffset };
 		},
 
-		enabled: isLoaded && !!userId,
 	});
 }
 
@@ -68,8 +62,6 @@ export function useYpoProfiles() {
  * Only fetches when user is authenticated and ID is provided
  */
 export function useYpoProfile(id: YpoProfileId) {
-	const { isLoaded, userId } = useAuth();
-
 	return useQuery({
 		queryKey: ypoQueryKeys.profile(id),
 		queryFn: async () => {
@@ -79,6 +71,5 @@ export function useYpoProfile(id: YpoProfileId) {
 
 			return response.data;
 		},
-		enabled: isLoaded && !!userId && isValidNumber(id),
 	});
 }
