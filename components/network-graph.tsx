@@ -182,7 +182,7 @@ export function NetworkGraph() {
                 <li>• You are at the center</li>
                 <li>• Depth 1: Your direct connections</li>
                 <li>• Depth 2-3: Extended network</li>
-                <li>• Hover over nodes for details</li>
+                <li>• Click on nodes to see details</li>
                 <li>• Drag nodes to reposition</li>
                 <li>• Click "Focus on Me" to center view</li>
               </ul>

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Focus } from "lucide-react"
+import { Focus, ExternalLink } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface OptimizedProfile {
@@ -12,8 +12,8 @@ interface OptimizedProfile {
   position: string | null
   company: string | null
   avatar: string | null
-  chapter: string | null
-  industry: string | null
+  ypo_chapter: string | null
+  ypo_industry: string | null
   location: string | null
   neighbors: Array<{
     id: number
@@ -40,8 +40,8 @@ interface NetworkGraphClientProps {
 }
 
 export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphClientProps) {
-  const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null)
-  const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 })
+  const [clickedNode, setClickedNode] = useState<GraphNode | null>(null)
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
   const networkRef = useRef<any>(null)
   const connectedNodesRef = useRef<Set<string>>(new Set())
@@ -64,6 +64,26 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
     router.push(`/members/${profileId}`)
   }
 
+  const handleClosePopup = () => {
+    setClickedNode(null)
+    if (!networkRef.current) return
+
+    const nodes = networkRef.current.body.data.nodes
+    const edges = networkRef.current.body.data.edges
+
+    const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
+    nodes.update(nodeUpdates)
+
+    const allEdgeIds = edges.getIds()
+    const edgeUpdates = allEdgeIds.map((edgeId: any) => ({
+      id: edgeId,
+      color: "#9ca3af80",
+    }))
+    edges.update(edgeUpdates)
+
+    connectedNodesRef.current.clear()
+  }
+
   useEffect(() => {
     if (!containerRef.current || typeof window === "undefined") return
 
@@ -74,7 +94,7 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
       const nodes = new DataSet(
         graphData.nodes.map((node) => ({
           id: node.id,
-          label: `${node.name}\n${node.profile.chapter || ""}`,
+          label: `${node.name}\n${node.profile.ypo_chapter || ""}`,
           title: node.name,
           shape: node.avatar ? "circularImage" : "circle",
           image: node.avatar || undefined,
@@ -187,53 +207,42 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
       const network = new Network(containerRef.current, { nodes, edges }, options)
       networkRef.current = network
 
-      network.on("hoverNode", (params: any) => {
-        const nodeId = params.node
-        const node = graphData.nodes.find((n) => n.id === nodeId)
-        if (node) {
-          setHoveredNode(node)
-          const canvasPosition = network.getPositions([nodeId])[nodeId]
-          const DOMPosition = network.canvasToDOM(canvasPosition)
-          setHoverPosition({ x: DOMPosition.x, y: DOMPosition.y })
+      network.on("click", (params: any) => {
+        if (params.nodes.length > 0) {
+          const nodeId = params.nodes[0]
+          const node = graphData.nodes.find((n) => n.id === nodeId)
+          if (node) {
+            setClickedNode(node)
+            const canvasPosition = network.getPositions([nodeId])[nodeId]
+            const DOMPosition = network.canvasToDOM(canvasPosition)
+            setPopupPosition({ x: DOMPosition.x, y: DOMPosition.y })
 
-          const connectedNodes = network.getConnectedNodes(nodeId)
-          const connectedNodeSet = new Set([nodeId, ...connectedNodes])
-          connectedNodesRef.current = connectedNodeSet
+            const connectedNodes = network.getConnectedNodes(nodeId)
+            const connectedNodeSet = new Set([nodeId, ...connectedNodes])
+            connectedNodesRef.current = connectedNodeSet
 
-          const connectedEdges = network.getConnectedEdges(nodeId)
-          const connectedEdgeSet = new Set(connectedEdges)
+            const connectedEdges = network.getConnectedEdges(nodeId)
+            const connectedEdgeSet = new Set(connectedEdges)
 
-          const nodeUpdates = graphData.nodes.map((n) => ({
-            id: n.id,
-            opacity: connectedNodeSet.has(n.id) ? 1 : 0.15,
-          }))
-          nodes.update(nodeUpdates)
+            const nodeUpdates = graphData.nodes.map((n) => ({
+              id: n.id,
+              opacity: connectedNodeSet.has(n.id) ? 1 : 0.15,
+            }))
+            nodes.update(nodeUpdates)
 
-          const allEdgeIds = edges.getIds()
-          const edgeUpdates = allEdgeIds.map((edgeId) => {
-            const isConnected = connectedEdgeSet.has(edgeId as string)
-            return {
-              id: edgeId,
-              color: isConnected ? "#3b82f6cc" : "#9ca3af0d",
-            }
-          })
-          edges.update(edgeUpdates)
+            const allEdgeIds = edges.getIds()
+            const edgeUpdates = allEdgeIds.map((edgeId) => {
+              const isConnected = connectedEdgeSet.has(edgeId as string)
+              return {
+                id: edgeId,
+                color: isConnected ? "#3b82f6cc" : "#9ca3af0d",
+              }
+            })
+            edges.update(edgeUpdates)
+          }
+        } else {
+          handleClosePopup()
         }
-      })
-
-      network.on("blurNode", () => {
-        setHoveredNode(null)
-        connectedNodesRef.current.clear()
-
-        const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
-        nodes.update(nodeUpdates)
-
-        const allEdgeIds = edges.getIds()
-        const edgeUpdates = allEdgeIds.map((edgeId) => ({
-          id: edgeId,
-          color: "#9ca3af80",
-        }))
-        edges.update(edgeUpdates)
       })
 
       network.on("stabilizationIterationsDone", () => {
@@ -270,21 +279,21 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
 
       <div ref={containerRef} className="w-full" />
 
-      {hoveredNode && (
+      {clickedNode && (
         <div
-          className="absolute bg-popover border border-border rounded-lg shadow-xl p-3 z-10 cursor-pointer hover:bg-accent transition-colors"
+          className="absolute bg-popover border border-border rounded-lg shadow-xl p-4 z-10"
           style={{
-            left: hoverPosition.x,
-            top: hoverPosition.y - 80,
+            left: popupPosition.x,
+            top: popupPosition.y - 100,
             transform: "translateX(-50%)",
           }}
-          onClick={() => handleProfileClick(hoveredNode.profile.id)}
+          onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-start gap-3 min-w-[240px]">
-            <Avatar className="h-12 w-12 border-2">
-              <AvatarImage src={hoveredNode.avatar || "/placeholder.svg"} alt={hoveredNode.name} />
+          <div className="flex items-start gap-3 min-w-[320px]">
+            <Avatar className="h-14 w-14 border-2">
+              <AvatarImage src={clickedNode.avatar || "/placeholder.svg"} alt={clickedNode.name} />
               <AvatarFallback>
-                {hoveredNode.name
+                {clickedNode.name
                   ?.split(" ")
                   .map((n) => n[0])
                   .join("") || "?"}
@@ -292,9 +301,38 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
             </Avatar>
 
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm mb-0.5">{hoveredNode.profile.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{hoveredNode.profile.position}</p>
-              <p className="text-xs text-muted-foreground truncate">{hoveredNode.profile.company}</p>
+              <p className="font-semibold text-sm mb-1">{clickedNode.profile.name}</p>
+
+              {clickedNode.profile.position && (
+                <p className="text-xs text-muted-foreground truncate mb-0.5">{clickedNode.profile.position}</p>
+              )}
+
+              {clickedNode.profile.company && (
+                <p className="text-xs text-muted-foreground truncate mb-0.5">{clickedNode.profile.company}</p>
+              )}
+
+              {clickedNode.profile.location && (
+                <p className="text-xs text-muted-foreground truncate mb-0.5">📍 {clickedNode.profile.location}</p>
+              )}
+
+              <div className="flex gap-2 mt-2 mb-3">
+                {clickedNode.profile.ypo_chapter && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary">
+                    {clickedNode.profile.ypo_chapter}
+                  </span>
+                )}
+
+                {clickedNode.profile.ypo_industry && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground">
+                    {clickedNode.profile.ypo_industry}
+                  </span>
+                )}
+              </div>
+
+              <Button size="sm" className="w-full" onClick={() => handleProfileClick(clickedNode.profile.id)}>
+                <ExternalLink className="h-3 w-3 mr-2" />
+                Visit Profile
+              </Button>
             </div>
           </div>
         </div>
