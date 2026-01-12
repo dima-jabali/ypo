@@ -1,5 +1,11 @@
 import type { Tagged } from "type-fest"
 
+export type ProfileSearchParams = {
+  limit: number
+  offset: number
+  [key: string]: unknown
+}
+
 export type YpoProfileId = Tagged<string, "YpoProfileId">
 
 export interface YpoProfilesResponse {

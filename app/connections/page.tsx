@@ -10,8 +10,9 @@ import { generateRecommendations, type Recommendation } from "@/lib/recommendati
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useMemo } from "react"
 import similarNodesData from "@/data/similar-nodes.json"
+import { ClientOnly } from "@/components/client-only";
 
-export default function ConnectionsPage() {
+function Connections() {
   const members = useMemo(() => similarNodesData, [])
   const events = useStore(useEvents)
 
@@ -279,5 +280,13 @@ export default function ConnectionsPage() {
         </CardContent>
       </Card>
     </main>
+  )
+}
+
+export default function ConnectionsPage() {
+  return (
+    <ClientOnly>
+      <Connections />
+    </ClientOnly>
   )
 }
