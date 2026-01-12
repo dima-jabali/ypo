@@ -168,6 +168,9 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
         }),
       )
 
+      const nodeCount = graphData.nodes.length
+      const spacingMultiplier = nodeCount >= 50 ? 1.8 : nodeCount >= 30 ? 1.4 : 1
+
       const options = {
         nodes: {
           borderWidth: 3,
@@ -197,12 +200,12 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
             fit: true,
           },
           barnesHut: {
-            gravitationalConstant: -80000,
-            centralGravity: 0.05,
-            springLength: 800,
-            springConstant: 0.004,
+            gravitationalConstant: -120000 * spacingMultiplier, // Scale repulsion based on graph size
+            centralGravity: 0.03 / spacingMultiplier, // Reduce central pull for larger graphs
+            springLength: 150 * spacingMultiplier, // Scale spring length for more space
+            springConstant: 0.002 / spacingMultiplier, // Looser springs for larger graphs
             damping: 0.3,
-            avoidOverlap: 1,
+            avoidOverlap: 0.8,
           },
         },
         interaction: {
