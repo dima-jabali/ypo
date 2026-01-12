@@ -1,10 +1,14 @@
 "use client"
 
+import type React from "react"
+
 import { useEffect, useRef, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Focus, ExternalLink } from "lucide-react"
+import { Focus, ExternalLink, Sparkles, CheckCircle2, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useProfileSimilarity } from "@/lib/hooks/use-profile-similarity"
+import { Badge } from "@/components/ui/badge"
 
 interface OptimizedProfile {
   id: number
@@ -39,14 +43,22 @@ interface NetworkGraphClientProps {
   currentUserId: number
 }
 
+interface EdgeData {
+  profileId1: number
+  profileId2: number
+  position: { x: number; y: number }
+}
+
 export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphClientProps) {
   const [clickedNode, setClickedNode] = useState<GraphNode | null>(null)
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 })
+  const [clickedEdge, setClickedEdge] = useState<EdgeData | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const networkRef = useRef<any>(null)
   const connectedNodesRef = useRef<Set<string>>(new Set())
   const router = useRouter()
   const popupRef = useRef<HTMLDivElement>(null)
+  const edgePopupRef = useRef<HTMLDivElement>(null)
 
   const focusOnCurrentUser = () => {
     if (!networkRef.current) return
@@ -85,21 +97,32 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
     connectedNodesRef.current.clear()
   }
 
+  const handleCloseEdgePopup = () => {
+    setClickedEdge(null)
+  }
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
         handleClosePopup()
       }
+      if (edgePopupRef.current && !edgePopupRef.current.contains(event.target as Node)) {
+        handleCloseEdgePopup()
+      }
     }
 
-    if (clickedNode) {
+    if (clickedNode || clickedEdge) {
       document.addEventListener("mousedown", handleClickOutside)
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [clickedNode])
+  }, [clickedNode, clickedEdge])
+
+  useEffect(() => {
+    console.log("[v0] clickedEdge state changed:", clickedEdge)
+  }, [clickedEdge])
 
   useEffect(() => {
     if (!containerRef.current || typeof window === "undefined") return
@@ -200,10 +223,10 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
             fit: true,
           },
           barnesHut: {
-            gravitationalConstant: -120000 * spacingMultiplier, // Scale repulsion based on graph size
-            centralGravity: 0.03 / spacingMultiplier, // Reduce central pull for larger graphs
-            springLength: 150 * spacingMultiplier, // Scale spring length for more space
-            springConstant: 0.002 / spacingMultiplier, // Looser springs for larger graphs
+            gravitationalConstant: -120000 * spacingMultiplier,
+            centralGravity: 0.03 / spacingMultiplier,
+            springLength: 150 * spacingMultiplier,
+            springConstant: 0.002 / spacingMultiplier,
             damping: 0.3,
             avoidOverlap: 0.8,
           },
@@ -228,6 +251,8 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
       networkRef.current = network
 
       network.on("click", (params: any) => {
+        handleCloseEdgePopup()
+
         if (params.nodes.length > 0) {
           const nodeId = params.nodes[0]
           const node = graphData.nodes.find((n) => n.id === nodeId)
@@ -262,6 +287,51 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
           }
         } else {
           handleClosePopup()
+        }
+      })
+
+      network.on("selectEdge", (params: any) => {
+        console.log("[v0] Edge selected:", params)
+
+        if (params.edges.length > 0 && params.nodes.length === 0) {
+          handleClosePopup()
+          const edgeId = params.edges[0]
+          const edge = graphData.links[edgeId]
+
+          console.log("[v0] Edge data:", edge)
+          console.log("[v0] Edge ID:", edgeId, "Links array length:", graphData.links.length)
+
+          if (edge) {
+            const sourceNode = graphData.nodes.find((n) => n.id === edge.source)
+            const targetNode = graphData.nodes.find((n) => n.id === edge.target)
+
+            console.log("[v0] Source node:", sourceNode?.profile.id, sourceNode?.name)
+            console.log("[v0] Target node:", targetNode?.profile.id, targetNode?.name)
+
+            if (sourceNode && targetNode) {
+              const positions = network.getPositions([edge.source, edge.target])
+              const sourcePos = positions[edge.source]
+              const targetPos = positions[edge.target]
+              const midPoint = {
+                x: (sourcePos.x + targetPos.x) / 2,
+                y: (sourcePos.y + targetPos.y) / 2,
+              }
+              const DOMPosition = network.canvasToDOM(midPoint)
+
+              console.log("[v0] Setting clicked edge with IDs:", sourceNode.profile.id, targetNode.profile.id)
+              console.log("[v0] Position:", DOMPosition)
+
+              setTimeout(() => {
+                setClickedEdge({
+                  profileId1: sourceNode.profile.id,
+                  profileId2: targetNode.profile.id,
+                  position: { x: DOMPosition.x, y: DOMPosition.y },
+                })
+              }, 0)
+            }
+          } else {
+            console.log("[v0] Edge not found for edgeId:", edgeId)
+          }
         }
       })
 
@@ -358,6 +428,100 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
           </div>
         </div>
       )}
+
+      {clickedEdge && (
+        <EdgeSimilarityPopup
+          profileId1={clickedEdge.profileId1}
+          profileId2={clickedEdge.profileId2}
+          position={clickedEdge.position}
+          popupRef={edgePopupRef}
+        />
+      )}
+    </div>
+  )
+}
+
+function EdgeSimilarityPopup({
+  profileId1,
+  profileId2,
+  position,
+  popupRef,
+}: {
+  profileId1: number
+  profileId2: number
+  position: { x: number; y: number }
+  popupRef: React.RefObject<HTMLDivElement>
+}) {
+  const { data, isLoading, error } = useProfileSimilarity(profileId1, profileId2)
+
+  console.log("[v0] EdgeSimilarityPopup rendering with:", {
+    profileId1,
+    profileId2,
+    position,
+    isLoading,
+    hasData: !!data,
+    error,
+  })
+
+  if (error) {
+    console.log("[v0] EdgeSimilarityPopup error:", error)
+    return null
+  }
+
+  const scorePercentage = data ? Math.round(data.similarity * 100) : 0
+  console.log("[v0] EdgeSimilarityPopup rendering UI, score:", scorePercentage)
+
+  return (
+    <div
+      ref={popupRef}
+      className="absolute bg-popover border border-border rounded-lg shadow-xl p-4 z-10 max-w-md"
+      style={{
+        left: position.x,
+        top: position.y - 120,
+        transform: "translateX(-50%)",
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {isLoading ? (
+        <div className="flex items-center justify-center gap-3 min-w-[280px] py-4">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          <span className="text-sm text-muted-foreground">Loading similarity...</span>
+        </div>
+      ) : data ? (
+        <div className="min-w-[320px] max-w-md">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold">Connection Strength</span>
+            </div>
+            <Badge variant="default" className="text-lg font-bold">
+              {scorePercentage}%
+            </Badge>
+          </div>
+
+          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{data.similarity_reasons.title}</p>
+
+          {data.similarity_reasons.what_you_have_in_common && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-foreground mb-2">What they have in common:</p>
+              <ul className="space-y-1.5">
+                {data.similarity_reasons.what_you_have_in_common
+                  .split("\n")
+                  .filter((line) => line.trim().startsWith("-"))
+                  .slice(0, 3)
+                  .map((line, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
+                      <span className="text-xs text-muted-foreground leading-tight">
+                        {line.trim().substring(1).trim()}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      ) : null}
     </div>
   )
 }
