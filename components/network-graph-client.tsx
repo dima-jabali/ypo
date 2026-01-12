@@ -46,6 +46,7 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
   const networkRef = useRef<any>(null)
   const connectedNodesRef = useRef<Set<string>>(new Set())
   const router = useRouter()
+  const popupRef = useRef<HTMLDivElement>(null)
 
   const focusOnCurrentUser = () => {
     if (!networkRef.current) return
@@ -83,6 +84,22 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
 
     connectedNodesRef.current.clear()
   }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+        handleClosePopup()
+      }
+    }
+
+    if (clickedNode) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [clickedNode])
 
   useEffect(() => {
     if (!containerRef.current || typeof window === "undefined") return
@@ -281,6 +298,7 @@ export function NetworkGraphClient({ graphData, currentUserId }: NetworkGraphCli
 
       {clickedNode && (
         <div
+          ref={popupRef}
           className="absolute bg-popover border border-border rounded-lg shadow-xl p-4 z-10"
           style={{
             left: popupPosition.x,
