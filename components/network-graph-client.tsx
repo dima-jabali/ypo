@@ -17,6 +17,8 @@ interface OptimizedProfile {
   ypo_chapter: string | null
   ypo_industry: string | null
   location: string | null
+  umap_x: number | null
+  umap_y: number | null
   neighbors: Array<{
     id: number
     similarity: number
@@ -88,42 +90,67 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
     if (!containerRef.current) return
 
     const loadVisNetwork = async () => {
+      const umapCoords = graphData.nodes
+        .filter((n) => n.profile.umap_x !== null && n.profile.umap_y !== null)
+        .map((n) => ({ x: n.profile.umap_x!, y: n.profile.umap_y! }))
+
+      let scaleX = 1000
+      let scaleY = 1000
+
+      if (umapCoords.length > 0) {
+        const xValues = umapCoords.map((c) => c.x)
+        const yValues = umapCoords.map((c) => c.y)
+        const xRange = Math.max(...xValues) - Math.min(...xValues)
+        const yRange = Math.max(...yValues) - Math.min(...yValues)
+
+        scaleX = xRange > 0 ? (2000 / xRange) * 4 : 1000
+        scaleY = yRange > 0 ? (2000 / yRange) * 4 : 1000
+      }
+
       const nodes = new DataSet(
-        graphData.nodes.map((node) => ({
-          id: node.id,
-          label: `${node.name}\n${node.profile.ypo_chapter || ""}`,
-          title: node.name,
-          shape: node.avatar ? "circularImage" : "circle",
-          image: node.avatar || undefined,
-          color: node.avatar
-            ? undefined
-            : {
-                background: "#6366f1",
-                border: "#ffffff",
-                highlight: {
+        graphData.nodes.map((node) => {
+          const x = node.profile.umap_x !== null ? node.profile.umap_x * scaleX : undefined
+          const y = node.profile.umap_y !== null ? node.profile.umap_y * scaleY : undefined
+
+          return {
+            id: node.id,
+            label: `${node.name}\n${node.profile.ypo_chapter || ""}`,
+            title: node.name,
+            shape: node.avatar ? "circularImage" : "circle",
+            image: node.avatar || undefined,
+            x,
+            y,
+            fixed: x !== undefined && y !== undefined ? { x: true, y: true } : false,
+            color: node.avatar
+              ? undefined
+              : {
                   background: "#6366f1",
                   border: "#ffffff",
+                  highlight: {
+                    background: "#6366f1",
+                    border: "#ffffff",
+                  },
                 },
+            font: {
+              color: "#333333",
+              size: 11,
+              face: "Inter, system-ui, sans-serif",
+              multi: true,
+              bold: {
+                color: "#000000",
+                size: 12,
               },
-          font: {
-            color: "#333333",
-            size: 11,
-            face: "Inter, system-ui, sans-serif",
-            multi: true,
-            bold: {
-              color: "#000000",
-              size: 12,
             },
-          },
-          size: 35,
-          borderWidth: 3,
-          borderWidthSelected: 4,
-          shapeProperties: {
-            useBorderWithImage: true,
-          },
-          opacity: 1,
-          data: node,
-        })),
+            size: 35,
+            borderWidth: 3,
+            borderWidthSelected: 4,
+            shapeProperties: {
+              useBorderWithImage: true,
+            },
+            opacity: 1,
+            data: node,
+          }
+        }),
       )
 
       const edges = new DataSet(
@@ -151,6 +178,8 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
       const nodeCount = graphData.nodes.length
       const spacingMultiplier = nodeCount >= 50 ? 1.8 : nodeCount >= 30 ? 1.4 : 1
 
+      const hasUmapCoords = graphData.nodes.some((n) => n.profile.umap_x !== null && n.profile.umap_y !== null)
+
       const options = {
         nodes: {
           borderWidth: 3,
@@ -172,9 +201,9 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
           randomSeed: 42,
         },
         physics: {
-          enabled: true,
+          enabled: !hasUmapCoords,
           stabilization: {
-            enabled: true,
+            enabled: !hasUmapCoords,
             iterations: 1000,
             updateInterval: 25,
             fit: true,
@@ -248,7 +277,6 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
       })
 
       network.on("selectEdge", (params: any) => {
-        // Only process edge selection if no nodes were selected
         if (params.nodes.length === 0 && params.edges.length > 0) {
           const edgeId = params.edges[0]
           const edge = graphData.links[edgeId]
@@ -295,13 +323,11 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
 
       network.on("click", (params: any) => {
         if (params.nodes.length === 0 && params.edges.length === 0) {
-          // Clicked on empty canvas - do nothing, keep current selection
           return
         }
       })
 
       network.on("hoverNode", (params: any) => {
-        // Don't apply hover effects if something is already clicked
         if (clickedNodeRef.current || clickedEdgeRef.current) return
 
         const nodeId = params.node
@@ -330,7 +356,6 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
       })
 
       network.on("blurNode", () => {
-        // Don't reset if something is clicked
         if (clickedNodeRef.current || clickedEdgeRef.current) return
 
         const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
@@ -352,7 +377,6 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
       })
 
       network.on("hoverEdge", (params: any) => {
-        // Don't apply hover effects if something is already clicked
         if (clickedNodeRef.current || clickedEdgeRef.current) return
 
         const edgeId = params.edge
@@ -382,7 +406,6 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
       })
 
       network.on("blurEdge", () => {
-        // Don't reset if something is clicked
         if (clickedNodeRef.current || clickedEdgeRef.current) return
 
         const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
@@ -424,7 +447,7 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
         networkRef.current = null
       }
     }
-  }, [graphData]) // Removed clickedNode and clickedEdge from dependencies to prevent rebuild
+  }, [graphData])
 
   return (
     <div className="relative bg-white rounded-lg">

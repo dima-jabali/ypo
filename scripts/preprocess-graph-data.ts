@@ -15,6 +15,8 @@ interface YpoProfile {
     name: string
     similarity: number
   }>
+  umap_x: number | null
+  umap_y: number | null
   [key: string]: any
 }
 
@@ -27,6 +29,8 @@ interface OptimizedProfile {
   chapter: string | null
   industry: string | null
   location: string | null
+  umap_x: number | null
+  umap_y: number | null
   neighbors: Array<{
     id: number
     similarity: number
@@ -83,6 +87,8 @@ async function preprocessGraphData() {
         chapter: profile.ypo_chapter,
         industry: profile.ypo_industry,
         location: profile.location,
+        umap_x: profile.umap_x ?? null,
+        umap_y: profile.umap_y ?? null,
         neighbors: validNeighbors,
       }
     }
