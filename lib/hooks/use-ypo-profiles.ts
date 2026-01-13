@@ -19,8 +19,18 @@ export function useYpoProfiles(searchParams?: ProfileSearchParams) {
 
       if (searchParams) {
         Object.entries(searchParams).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== "") {
-            params.append(key, String(value))
+          if (value !== undefined && value !== null && value !== "" && value !== "all") {
+            if (key.endsWith("_filter")) {
+              if (Array.isArray(value)) {
+                if (value.length > 0) {
+                  params.append(key, JSON.stringify(value))
+                }
+              } else if (typeof value === "string") {
+                params.append(key, JSON.stringify([value]))
+              }
+            } else {
+              params.append(key, String(value))
+            }
           }
         })
       }
