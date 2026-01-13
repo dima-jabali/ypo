@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Focus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useProfileSimilarity } from "@/lib/hooks/use-profile-similarity"
 import { Network } from "vis-network"
 import { DataSet } from "vis-data"
+import type { DataSetInitialOptions } from "vis-data/declarations/data-set";
 
 interface OptimizedProfile {
   id: number
@@ -48,7 +49,6 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
   const containerRef = useRef<HTMLDivElement>(null)
   const networkRef = useRef<Network | null>(null)
   const connectedNodesRef = useRef<Set<string>>(new Set())
-  const router = useRouter()
 
   const focusOnCurrentUser = () => {
     if (!networkRef.current) return
@@ -63,11 +63,7 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
     })
   }
 
-  const handleProfileClick = (profileId: number) => {
-    router.push(`/members/${profileId}`)
-  }
-
-  const handleClearSelection = () => {
+  const handleClearSelection = useCallback(() => {
     if (!networkRef.current) return
 
     const nodes = networkRef.current.body.data.nodes
@@ -84,7 +80,7 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
     edges.update(edgeUpdates)
 
     connectedNodesRef.current.clear()
-  }
+  }, [graphData])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -146,10 +142,12 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
             borderWidthSelected: 4,
             shapeProperties: {
               useBorderWithImage: true,
+              interpolation: false,
             },
             opacity: 1,
+            crossOrigin: "anonymous",
             data: node,
-          }
+          } satisfies DataSetInitialOptions<string>;
         }),
       )
 
@@ -448,6 +446,28 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
       }
     }
   }, [graphData])
+
+  useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      // 1. Reset visual styles in the canvas
+      handleClearSelection();
+      
+      // 2. Notify parent to clear the info cards
+      onFocusChange(null);
+
+      // 3. Clear internal refs used for hover logic
+      // Note: You'll need to move these refs or logic so they are accessible
+      // or simply rely on the network.unselectAll() method
+      if (networkRef.current) {
+        networkRef.current.unselectAll();
+      }
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+  return () => window.removeEventListener("keydown", handleKeyDown);
+}, [handleClearSelection, onFocusChange]);
 
   return (
     <div className="relative bg-white rounded-lg">
