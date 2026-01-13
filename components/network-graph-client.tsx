@@ -1,10 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Focus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useProfileSimilarity } from "@/lib/hooks/use-profile-similarity"
+import { Network } from "vis-network"
+import { DataSet } from "vis-data"
 
 interface OptimizedProfile {
   id: number
@@ -37,20 +39,12 @@ interface GraphLink {
 interface NetworkGraphClientProps {
   graphData: { nodes: GraphNode[]; links: GraphLink[] }
   currentUserId: number
-  onFocusChange?: (focusedElement: { type: "node" | "edge"; data: any } | null) => void
+  onFocusChange: (element: { type: "node" | "edge"; data: any } | null) => void
 }
 
-interface EdgeData {
-  profileId1: number
-  profileId2: number
-  position: { x: number; y: number }
-}
-
-export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: NetworkGraphClientProps) {
-  const [clickedNode, setClickedNode] = useState<GraphNode | null>(null)
-  const [clickedEdge, setClickedEdge] = useState<EdgeData | null>(null)
+function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: NetworkGraphClientProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const networkRef = useRef<any>(null)
+  const networkRef = useRef<Network | null>(null)
   const connectedNodesRef = useRef<Set<string>>(new Set())
   const router = useRouter()
 
@@ -72,10 +66,6 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
   }
 
   const handleClearSelection = () => {
-    setClickedNode(null)
-    setClickedEdge(null)
-    onFocusChange?.(null)
-
     if (!networkRef.current) return
 
     const nodes = networkRef.current.body.data.nodes
@@ -95,48 +85,9 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
   }
 
   useEffect(() => {
-    if (clickedNode) {
-      onFocusChange?.({
-        type: "node",
-        data: clickedNode,
-      })
-    }
-  }, [clickedNode, onFocusChange])
-
-  useEffect(() => {
-    if (clickedEdge) {
-      onFocusChange?.({
-        type: "edge",
-        data: {
-          profileId1: clickedEdge.profileId1,
-          profileId2: clickedEdge.profileId2,
-          isLoading: true,
-        },
-      })
-    }
-  }, [clickedEdge, onFocusChange])
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (clickedNode || clickedEdge) {
-        handleClearSelection()
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside)
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [clickedNode, clickedEdge])
-
-  useEffect(() => {
-    if (!containerRef.current || typeof window === "undefined") return
+    if (!containerRef.current) return
 
     const loadVisNetwork = async () => {
-      const { Network } = await import("vis-network")
-      const { DataSet } = await import("vis-data")
-
       const nodes = new DataSet(
         graphData.nodes.map((node) => ({
           id: node.id,
@@ -256,14 +207,18 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
       const network = new Network(containerRef.current, { nodes, edges }, options)
       networkRef.current = network
 
-      network.on("click", (params: any) => {
-        setClickedEdge(null)
+      const clickedNodeRef = { current: null as GraphNode | null }
+      const clickedEdgeRef = { current: null as any | null }
 
+      network.on("selectNode", (params: any) => {
         if (params.nodes.length > 0) {
           const nodeId = params.nodes[0]
           const node = graphData.nodes.find((n) => n.id === nodeId)
           if (node) {
-            setClickedNode(node)
+            clickedEdgeRef.current = null
+            clickedNodeRef.current = node
+            const focusData = { type: "node" as const, data: node }
+            onFocusChange(focusData)
 
             const connectedNodes = network.getConnectedNodes(nodeId)
             const connectedNodeSet = new Set([nodeId, ...connectedNodes])
@@ -279,23 +234,22 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
             nodes.update(nodeUpdates)
 
             const allEdgeIds = edges.getIds()
-            const edgeUpdates = allEdgeIds.map((edgeId) => {
-              const isConnected = connectedEdgeSet.has(edgeId as string)
+            const edgeUpdates = allEdgeIds.map((id) => {
+              const isConnected = connectedEdgeSet.has(id)
               return {
-                id: edgeId,
-                color: isConnected ? "#3b82f6cc" : "#9ca3af0d",
+                id: id,
+                color: isConnected ? "#3b82f6" : "#9ca3af0d",
+                width: isConnected ? 3 : 1,
               }
             })
             edges.update(edgeUpdates)
           }
-        } else {
-          handleClearSelection()
         }
       })
 
       network.on("selectEdge", (params: any) => {
-        if (params.edges.length > 0 && params.nodes.length === 0) {
-          setClickedNode(null)
+        // Only process edge selection if no nodes were selected
+        if (params.nodes.length === 0 && params.edges.length > 0) {
           const edgeId = params.edges[0]
           const edge = graphData.links[edgeId]
 
@@ -304,27 +258,52 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
             const targetNode = graphData.nodes.find((n) => n.id === edge.target)
 
             if (sourceNode && targetNode) {
-              const positions = network.getPositions([edge.source, edge.target])
-              const sourcePos = positions[edge.source]
-              const targetPos = positions[edge.target]
-              const midPoint = {
-                x: (sourcePos.x + targetPos.x) / 2,
-                y: (sourcePos.y + targetPos.y) / 2,
-              }
+              clickedNodeRef.current = null
+              clickedEdgeRef.current = { edgeId, ...edge }
 
-              setTimeout(() => {
-                setClickedEdge({
-                  profileId1: sourceNode.profile.id,
-                  profileId2: targetNode.profile.id,
-                  position: midPoint,
-                })
-              }, 0)
+              const connectedNodeSet = new Set([edge.source, edge.target])
+              const nodeUpdates = graphData.nodes.map((n) => ({
+                id: n.id,
+                opacity: connectedNodeSet.has(n.id) ? 1 : 0.15,
+              }))
+              nodes.update(nodeUpdates)
+
+              const allEdgeIds = edges.getIds()
+              const edgeUpdates = allEdgeIds.map((id) => {
+                const isSelected = id === edgeId
+                return {
+                  id: id,
+                  color: isSelected ? "#3b82f6" : "#9ca3af0d",
+                  width: isSelected ? 3 : 1,
+                }
+              })
+              edges.update(edgeUpdates)
+
+              const focusData = {
+                type: "edge" as const,
+                data: {
+                  source: edge.source,
+                  target: edge.target,
+                  similarity: edge.similarity,
+                },
+              }
+              onFocusChange(focusData)
             }
           }
         }
       })
 
+      network.on("click", (params: any) => {
+        if (params.nodes.length === 0 && params.edges.length === 0) {
+          // Clicked on empty canvas - do nothing, keep current selection
+          return
+        }
+      })
+
       network.on("hoverNode", (params: any) => {
+        // Don't apply hover effects if something is already clicked
+        if (clickedNodeRef.current || clickedEdgeRef.current) return
+
         const nodeId = params.node
         const connectedNodes = network.getConnectedNodes(nodeId)
         const connectedEdges = network.getConnectedEdges(nodeId)
@@ -351,6 +330,9 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
       })
 
       network.on("blurNode", () => {
+        // Don't reset if something is clicked
+        if (clickedNodeRef.current || clickedEdgeRef.current) return
+
         const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
         nodes.update(nodeUpdates)
 
@@ -370,6 +352,9 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
       })
 
       network.on("hoverEdge", (params: any) => {
+        // Don't apply hover effects if something is already clicked
+        if (clickedNodeRef.current || clickedEdgeRef.current) return
+
         const edgeId = params.edge
         const edge = graphData.links[edgeId]
 
@@ -397,6 +382,9 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
       })
 
       network.on("blurEdge", () => {
+        // Don't reset if something is clicked
+        if (clickedNodeRef.current || clickedEdgeRef.current) return
+
         const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
         nodes.update(nodeUpdates)
 
@@ -436,7 +424,7 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
         networkRef.current = null
       }
     }
-  }, [graphData])
+  }, [graphData]) // Removed clickedNode and clickedEdge from dependencies to prevent rebuild
 
   return (
     <div className="relative bg-white rounded-lg">
@@ -448,31 +436,6 @@ export function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: 
       </div>
 
       <div ref={containerRef} className="w-full" />
-
-      {clickedEdge && (
-        <EdgeSimilarityFetcher
-          profileId1={clickedEdge.profileId1}
-          profileId2={clickedEdge.profileId2}
-          onDataLoaded={(data) => {
-            onFocusChange?.({
-              type: "edge",
-              data: {
-                profileId1: clickedEdge.profileId1,
-                profileId2: clickedEdge.profileId2,
-                similarityScore: Math.round(data.similarity * 100),
-                title: data.similarity_reasons.title,
-                commonalities:
-                  data.similarity_reasons.what_you_have_in_common
-                    ?.split("\n")
-                    .filter((line: string) => line.trim().startsWith("-"))
-                    .slice(0, 3)
-                    .map((line: string) => line.trim().substring(1).trim()) || [],
-                isLoading: false,
-              },
-            })
-          }}
-        />
-      )}
     </div>
   )
 }
@@ -496,3 +459,5 @@ function EdgeSimilarityFetcher({
 
   return null
 }
+
+export { NetworkGraphClient, EdgeSimilarityFetcher }

@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider"
 import { TrendingUp, FocusIcon } from "lucide-react"
 import { NetworkGraphClient } from "./network-graph-client"
 import { useStore } from "@/lib/store"
+import { useProfileSimilarity } from "@/lib/hooks/use-profile-similarity"
 import similarNodesData from "@/data/similar-nodes.json"
 
 interface Profile {
@@ -46,7 +47,6 @@ function buildDepthLimitedGraph(profiles: Profile[], startUserId: number, maxDep
   // Start from user 2416
   const startProfile = profilesMap.get(startUserId)
   if (!startProfile) {
-    console.log(`[v0] Start user ${startUserId} not found in data`)
     return { nodes, links }
   }
 
@@ -95,7 +95,6 @@ function buildDepthLimitedGraph(profiles: Profile[], startUserId: number, maxDep
     }
   }
 
-  console.log(`[v0] Graph built: ${nodes.length} nodes, ${links.length} links`)
   return { nodes, links }
 }
 
@@ -143,40 +142,126 @@ function NodeInfoCard({ node }: { node: any }) {
   )
 }
 
-function EdgeInfoCard({ edge }: { edge: any }) {
+function EdgeInfoCard({ edge, graphData }: { edge: any; graphData: { nodes: GraphNode[]; links: GraphLink[] } }) {
+  const sourceNode = graphData.nodes.find((node) => node.id === edge.source)
+  const targetNode = graphData.nodes.find((node) => node.id === edge.target)
+  const similarityScore = edge.similarity ? Math.round(edge.similarity * 100) : 0
+
+  const sourceId = sourceNode ? Number(sourceNode.id) : null
+  const targetId = targetNode ? Number(targetNode.id) : null
+
+  const { data: similarityData, isLoading } = useProfileSimilarity(sourceId, targetId)
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Connection Details</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Similarity Score</span>
+      <CardContent className="space-y-4">
+        {/* Similarity Score */}
+        <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
+          <span className="text-sm font-medium">Similarity Score</span>
           <Badge variant="default" className="text-lg font-bold">
-            {edge.similarityScore}%
+            {similarityScore}%
           </Badge>
         </div>
 
-        {edge.title && <p className="text-xs text-muted-foreground leading-relaxed">{edge.title}</p>}
-
-        {edge.commonalities && edge.commonalities.length > 0 && (
+        {/* Source Node */}
+        {sourceNode && (
           <div className="space-y-2">
-            <p className="text-xs font-medium">What they have in common:</p>
-            <ul className="space-y-1.5">
-              {edge.commonalities.map((item: string, idx: number) => (
-                <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
-                  <span className="text-primary">•</span>
-                  <span className="flex-1">{item}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="text-xs font-medium text-muted-foreground">Member 1</p>
+            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                {sourceNode.name
+                  ?.split(" ")
+                  .map((n: string) => n[0])
+                  .join("") || "?"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm">{sourceNode.name}</p>
+                {sourceNode.profile?.position && (
+                  <p className="text-xs text-muted-foreground truncate">{sourceNode.profile.position}</p>
+                )}
+                {sourceNode.profile?.current_company_name && (
+                  <p className="text-xs text-muted-foreground truncate">{sourceNode.profile.current_company_name}</p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
-        {edge.isLoading && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            Loading details...
+        {/* Target Node */}
+        {targetNode && (
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">Member 2</p>
+            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                {targetNode.name
+                  ?.split(" ")
+                  .map((n: string) => n[0])
+                  .join("") || "?"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm">{targetNode.name}</p>
+                {targetNode.profile?.position && (
+                  <p className="text-xs text-muted-foreground truncate">{targetNode.profile.position}</p>
+                )}
+                {targetNode.profile?.current_company_name && (
+                  <p className="text-xs text-muted-foreground truncate">{targetNode.profile.current_company_name}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Detailed Similarity Reasons */}
+        {isLoading && (
+          <div className="p-3 bg-muted/30 rounded-lg">
+            <p className="text-xs text-muted-foreground">Loading similarity details...</p>
+          </div>
+        )}
+
+        {similarityData?.similarity_reasons && (
+          <div className="space-y-3 pt-2 border-t">
+            <p className="text-sm font-semibold text-primary">{similarityData.similarity_reasons.title}</p>
+
+            {similarityData.similarity_reasons.what_you_have_in_common && (
+              <div className="space-y-1">
+                <p className="text-xs font-medium">What you have in common</p>
+                <p className="text-xs text-muted-foreground">
+                  {similarityData.similarity_reasons.what_you_have_in_common}
+                </p>
+              </div>
+            )}
+
+            {similarityData.similarity_reasons.where_you_differ && (
+              <div className="space-y-1">
+                <p className="text-xs font-medium">Where you differ</p>
+                <p className="text-xs text-muted-foreground">{similarityData.similarity_reasons.where_you_differ}</p>
+              </div>
+            )}
+
+            {similarityData.similarity_reasons.what_you_might_learn_from_each_other && (
+              <div className="space-y-1">
+                <p className="text-xs font-medium">What you might learn from each other</p>
+                <p className="text-xs text-muted-foreground">
+                  {similarityData.similarity_reasons.what_you_might_learn_from_each_other}
+                </p>
+              </div>
+            )}
+
+            {similarityData.similarity_reasons.how_you_might_be_helpful_to_each_other && (
+              <div className="space-y-1">
+                <p className="text-xs font-medium">How you might be helpful to each other</p>
+                <p className="text-xs text-muted-foreground">
+                  {similarityData.similarity_reasons.how_you_might_be_helpful_to_each_other}
+                </p>
+              </div>
+            )}
+
+            {similarityData.similarity_reasons.closing && (
+              <p className="text-xs text-muted-foreground italic pt-1">{similarityData.similarity_reasons.closing}</p>
+            )}
           </div>
         )}
       </CardContent>
@@ -192,10 +277,13 @@ export function NetworkGraph() {
     data: any
   } | null>(null)
 
+  const handleFocusChange = (element: { type: "node" | "edge"; data: any } | null) => {
+    setFocusedElement(element)
+  }
+
   const graphData = useMemo(() => {
     const profiles = similarNodesData as Profile[]
     const userId = impersonatedProfileId || 2416
-    console.log(`[v0] Building depth-${selectedDepth} graph from user ${userId}`)
     return buildDepthLimitedGraph(profiles, userId, selectedDepth)
   }, [selectedDepth, impersonatedProfileId])
 
@@ -237,7 +325,7 @@ export function NetworkGraph() {
             <NetworkGraphClient
               graphData={graphData}
               currentUserId={impersonatedProfileId || 2416}
-              onFocusChange={setFocusedElement}
+              onFocusChange={handleFocusChange}
             />
           </CardContent>
         </Card>
@@ -247,7 +335,7 @@ export function NetworkGraph() {
             focusedElement.type === "node" ? (
               <NodeInfoCard node={focusedElement.data} />
             ) : (
-              <EdgeInfoCard edge={focusedElement.data} />
+              <EdgeInfoCard edge={focusedElement.data} graphData={graphData} />
             )
           ) : (
             <Card className="border-dashed">
