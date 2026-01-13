@@ -3,7 +3,7 @@ import { useMemo, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Slider } from "@/components/ui/slider"
-import { TrendingUp } from "lucide-react"
+import { TrendingUp, FocusIcon } from "lucide-react"
 import { NetworkGraphClient } from "./network-graph-client"
 import { useStore } from "@/lib/store"
 import similarNodesData from "@/data/similar-nodes.json"
@@ -99,9 +99,98 @@ function buildDepthLimitedGraph(profiles: Profile[], startUserId: number, maxDep
   return { nodes, links }
 }
 
+function NodeInfoCard({ node }: { node: any }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Member Details</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex items-start gap-3">
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-semibold text-primary">
+            {node.name
+              ?.split(" ")
+              .map((n: string) => n[0])
+              .join("") || "?"}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm">{node.name}</p>
+            {node.profile?.position && (
+              <p className="text-xs text-muted-foreground truncate">{node.profile.position}</p>
+            )}
+            {node.profile?.current_company_name && (
+              <p className="text-xs text-muted-foreground truncate">{node.profile.current_company_name}</p>
+            )}
+          </div>
+        </div>
+
+        {node.profile?.location && <div className="text-xs text-muted-foreground">📍 {node.profile.location}</div>}
+
+        <div className="flex flex-wrap gap-2">
+          {node.profile?.ypo_chapter && (
+            <Badge variant="default" className="text-xs">
+              {node.profile.ypo_chapter}
+            </Badge>
+          )}
+          {node.profile?.ypo_industry && (
+            <Badge variant="secondary" className="text-xs">
+              {node.profile.ypo_industry}
+            </Badge>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function EdgeInfoCard({ edge }: { edge: any }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Connection Details</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Similarity Score</span>
+          <Badge variant="default" className="text-lg font-bold">
+            {edge.similarityScore}%
+          </Badge>
+        </div>
+
+        {edge.title && <p className="text-xs text-muted-foreground leading-relaxed">{edge.title}</p>}
+
+        {edge.commonalities && edge.commonalities.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-xs font-medium">What they have in common:</p>
+            <ul className="space-y-1.5">
+              {edge.commonalities.map((item: string, idx: number) => (
+                <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
+                  <span className="text-primary">•</span>
+                  <span className="flex-1">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {edge.isLoading && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            Loading details...
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
 export function NetworkGraph() {
   const [selectedDepth, setSelectedDepth] = useState(3)
   const impersonatedProfileId = useStore((state) => state.impersonatedProfileId)
+  const [focusedElement, setFocusedElement] = useState<{
+    type: "node" | "edge"
+    data: any
+  } | null>(null)
 
   const graphData = useMemo(() => {
     const profiles = similarNodesData as Profile[]
@@ -145,50 +234,76 @@ export function NetworkGraph() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <Card className="lg:col-span-3 border-2">
           <CardContent className="p-0">
-            <NetworkGraphClient graphData={graphData} currentUserId={impersonatedProfileId || 2416} />
+            <NetworkGraphClient
+              graphData={graphData}
+              currentUserId={impersonatedProfileId || 2416}
+              onFocusChange={setFocusedElement}
+            />
           </CardContent>
         </Card>
 
         <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Network Statistics
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Total Members</span>
-                <Badge variant="secondary">{graphData.nodes.length}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Connections</span>
-                <Badge variant="secondary">{graphData.links.length}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Depth Levels</span>
-                <Badge variant="secondary">0-{selectedDepth}</Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">How to Use</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-xs text-muted-foreground space-y-1.5">
-                <li>• You are at the center</li>
-                <li>• Depth 1: Your direct connections</li>
-                <li>• Depth 2-3: Extended network</li>
-                <li>• Click on nodes to see details</li>
-                <li>• Drag nodes to reposition</li>
-                <li>• Click "Focus on Me" to center view</li>
-              </ul>
-            </CardContent>
-          </Card>
+          {focusedElement ? (
+            focusedElement.type === "node" ? (
+              <NodeInfoCard node={focusedElement.data} />
+            ) : (
+              <EdgeInfoCard edge={focusedElement.data} />
+            )
+          ) : (
+            <Card className="border-dashed">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FocusIcon className="h-4 w-4" />
+                  Selected Info
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">Click or hover over nodes and edges to see details here</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Network Statistics
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Total Members</span>
+              <Badge variant="secondary">{graphData.nodes.length}</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Connections</span>
+              <Badge variant="secondary">{graphData.links.length}</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Depth Levels</span>
+              <Badge variant="secondary">0-{selectedDepth}</Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">How to Use</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="text-xs text-muted-foreground space-y-1.5">
+              <li>• You are at the center</li>
+              <li>• Depth 1: Your direct connections</li>
+              <li>• Depth 2-3: Extended network</li>
+              <li>• Click on nodes to see details</li>
+              <li>• Drag nodes to reposition</li>
+              <li>• Click "Focus on Me" to center view</li>
+            </ul>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
