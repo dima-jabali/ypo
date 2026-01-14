@@ -7,6 +7,7 @@ import { QueryProvider } from "@/lib/providers/query-provider";
 
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { TooltipProvider } from "@/components/Tooltip";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -38,6 +39,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: React.PropsWithChildren) {
 	return (
 		<ClerkProvider>
+			<TooltipProvider>
 			<html lang="en">
 				<body className="font-sans antialiased">
 					<QueryProvider>
@@ -47,6 +49,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
 					</QueryProvider>
 				</body>
 			</html>
+			</TooltipProvider>
 		</ClerkProvider>
 	);
 }

@@ -20,6 +20,7 @@ import {
   type Content,
 } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { ChatOrNotebook } from "@/views/chat-or-notebook";
 
 // Intelligent search function with fuzzy matching
 function searchMembers(
@@ -366,6 +367,8 @@ export function ChatInterface({ filters }: ChatInterfaceProps) {
 
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold">Magical Member Search</h3>
+
+                <ChatOrNotebook/>
 
                 <p className="text-muted-foreground max-w-md text-pretty">
                   Search by name, location, industry, interests, or ask natural questions. Our AI
