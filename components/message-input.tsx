@@ -716,21 +716,6 @@ export const MessageInput = memo(function MessageInput() {
 					) : null}
 				</div>
 			</div>
-
-			<div className="flex justify-between pb-1">
-				<div className="flex gap-2 items-center">
-					<ExportAsPdfButton />
-				</div>
-
-				<p className="text-xs text-primary">
-					Press&nbsp;
-					<span className="rounded-sm bg-muted-strong py-0.5 px-1 font-bold">
-						{shouldPressEnterToSend ? null : isMacOS() ? "Cmd + " : "Ctrl + "}
-						Enter
-					</span>
-					&nbsp;to send message.
-				</p>
-			</div>
 		</div>
 	);
 });

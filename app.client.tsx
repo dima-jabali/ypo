@@ -1,5 +1,3 @@
-import type { PostHogConfig } from "posthog-js";
-import { PostHogProvider } from "posthog-js/react";
 import { lazy, memo } from "react";
 
 import { Sidebar } from "#/components/layout/Sidebar";
@@ -18,7 +16,6 @@ import {
 	useRerenderTreeStore,
 } from "./contexts/use-rerender-tree";
 import { HandleIfUserHasChanged } from "./features/auth/handle-if-user-has-changed";
-import { HandleIframeCommunication } from "./features/iframe-comm/handle-iframe-comm";
 import { isDev } from "./helpers/utils";
 
 const Sapien = lazy(async () => ({
@@ -35,44 +32,8 @@ const ChatUsageDashboard = lazy(async () => ({
 	).ChatUsageDashboard,
 }));
 
-const POSTHOG_HOST = import.meta.env.VITE_PUBLIC_POSTHOG_HOST;
-const POSTHOG_KEY = import.meta.env.VITE_PUBLIC_POSTHOG_KEY;
-
-if (!POSTHOG_HOST || !POSTHOG_KEY) {
-	throw new Error(
-		"PostHog host or key is not defined. Please check your environment variables.",
-	);
-}
-
-const isProduction = import.meta.env.MODE === "production";
-
-const POSTHOG_OPTIONS: Partial<PostHogConfig> = {
-	name: "Better Brain Chat App PostHog Client",
-	session_idle_timeout_seconds: 60 * 60 * 2, // 2 hours
-	enable_recording_console_log: true,
-	capture_performance: true,
-	capture_dead_clicks: true,
-	capture_exceptions: true, // This enables capturing exceptions using Error Tracking, set to false if you don't want this
-	capture_pageleave: true,
-	api_host: POSTHOG_HOST,
-	defaults: "2025-05-24",
-	capture_heatmaps: true,
-	capture_pageview: true,
-	enable_heatmaps: true,
-	autocapture: true,
-	session_recording: {
-		recordCrossOriginIframes: false,
-		recordHeaders: true,
-		recordBody: true,
-		maskCapturedNetworkRequestFn(data) {
-			return data;
-		},
-	},
-};
-
 export function App() {
-	const appWithoutPosthog = (
-		<MakeQueryClientProvider>
+		return <MakeQueryClientProvider>
 			<Authenticated>
 				<HandleIfUserHasChanged>
 					<AllContexts>
@@ -83,24 +44,7 @@ export function App() {
 				</HandleIfUserHasChanged>
 			</Authenticated>
 		</MakeQueryClientProvider>
-	);
-
-	return (
-		<>
-			<HandleIframeCommunication />
-
-			{isProduction ? (
-				<PostHogProvider options={POSTHOG_OPTIONS} apiKey={POSTHOG_KEY!}>
-					{appWithoutPosthog}
-				</PostHogProvider>
-			) : (
-				appWithoutPosthog
-			)}
-		</>
-	);
 }
-
-App.whyDidYouRender = true;
 
 const Main = memo(function Main() {
 	const renderTreeKey = useRerenderTreeStore().use.key();
@@ -153,5 +97,3 @@ const Main = memo(function Main() {
 		</div>
 	);
 });
-
-Main.whyDidYouRender = true;

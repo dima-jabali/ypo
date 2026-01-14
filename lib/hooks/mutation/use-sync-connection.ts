@@ -8,7 +8,7 @@ import type {
 	DatabaseConnectionType,
 	GoogleDriveDatabaseConnection,
 } from "#/types/databases";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export enum AirtableConnectionFieldsUpdateEntityType {
 	Field = "FIELD",

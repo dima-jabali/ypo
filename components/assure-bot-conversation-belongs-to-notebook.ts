@@ -56,5 +56,3 @@ export const AssureBotConversationBelongsToNotebook = memo(
 		return children;
 	},
 );
-
-AssureBotConversationBelongsToNotebook.whyDidYouRender = true;

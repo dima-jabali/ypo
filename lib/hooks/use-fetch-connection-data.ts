@@ -10,7 +10,7 @@ import type {
 } from "#/types/databases";
 import type { ISODateString } from "#/types/general";
 import type { BetterbrainUser } from "#/types/notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import type { Organization } from "./use-fetch-all-organizations";
 
 export type GetConnectionDataResponse = {

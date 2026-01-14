@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { clientAPI_V1 } from "#/api";
 import type { BetterbrainUser } from "#/types/notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 type SearchForUserByEmailRequest = {
 	email: string;

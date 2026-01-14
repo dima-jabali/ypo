@@ -7,7 +7,7 @@ import type {
 	BotId,
 	ChannelConfigType,
 } from "#/types/bot-source";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 type CreateBotCommunicationConfigBase = {
 	bot_id: BotId;

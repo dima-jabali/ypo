@@ -19,7 +19,7 @@ import {
 	GeneralFileType,
 	type GeneralFile,
 } from "#/types/notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import type { AwsBucket, AwsKey } from "./use-fetch-all-organizations";
 
 type GetGeneralFilesPageResponse = {

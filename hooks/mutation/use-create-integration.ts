@@ -9,7 +9,7 @@ import type {
 	GoogleDriveDatabaseConnection,
 	NormalDatabaseConnection,
 } from "#/types/databases";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type CreateIntegrationResponseBase<T extends DatabaseConnectionType> =
 	T extends DatabaseConnectionType.GoogleDrive

@@ -4,7 +4,7 @@ import { clientAPI_V1 } from "#/api";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import type { BotSource, BotSourceType, Website } from "#/types/bot-source";
 import type { FileId, OrganizationId } from "#/types/general";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import type { GoogleDriveDatabaseConnectionId } from "#/types/databases";
 
 export type CreateBotSourceRequest =

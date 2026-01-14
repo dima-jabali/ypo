@@ -7,7 +7,6 @@ import axios, {
 	type AxiosResponse,
 	type InternalAxiosRequestConfig,
 } from "axios";
-import posthog from "posthog-js";
 import { email, number, object, string } from "zod/mini";
 
 import { ToastVariant } from "./components/Toast/ToastVariant";
@@ -126,7 +125,7 @@ import { queryKeyFactory } from "./hooks/query-keys";
 const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 if (!BACKEND_API) {
-	throw new Error("VITE_PUBLIC_BACKEND_URL is not defined");
+	throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
 }
 
 export const clientAPI_V1 = axios.create({
@@ -1096,11 +1095,6 @@ export const api = {
 			const res = await clientAPI_V1.get<FetchBetterbrainUserResponse>("/user");
 
 			const user = res.data;
-
-			posthog.identify(`${user.id}`, {
-				name: `${res.data.first_name} ${res.data.last_name}`,
-				email: res.data.email,
-			});
 
 			return user;
 		},

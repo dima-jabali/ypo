@@ -4,7 +4,7 @@ import { invariant } from "es-toolkit";
 import { GET_AWS_BASE64_FILE_ACTION } from "#/helpers/utils";
 import type { Base64File } from "#/types/general";
 import type { AwsBucket, AwsKey } from "../fetch/use-fetch-all-organizations";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type FetchAwsBase64FileProps = {
 	aws_bucket: AwsBucket | null | undefined;

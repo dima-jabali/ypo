@@ -8,7 +8,7 @@ import type {
 	ClickUpEntityType,
 	DatabaseConnectionType,
 } from "#/types/databases";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type ClickUpConnectionFieldsUpdate = {
 	index_documents_for_children_by_default?: boolean;

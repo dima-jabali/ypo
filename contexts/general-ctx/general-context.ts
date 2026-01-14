@@ -1,3 +1,6 @@
+"use client";
+
+
 import type { Updater } from "@tanstack/react-query";
 import type { Tagged } from "type-fest";
 import { create } from "zustand";
@@ -243,7 +246,7 @@ const generalContextStoreBase = create(
 					userId: null,
 
 					pageArchived: FilterArchived.ONLY_NON_ARCHIVED,
-					organizationId: NaN as OrganizationId,
+					organizationId: 417 as OrganizationId,
 					searchTextForSimilarQueries: null,
 					brieflyKeepSidebarOpen: false,
 					pageOffset: 0 as PageOffset,

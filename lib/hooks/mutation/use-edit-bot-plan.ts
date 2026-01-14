@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { clientAPI_V1 } from "#/api";
 import type { Plan, PlanStep } from "#/types/chat";
 import type { PatchProjectResponseAction } from "#/types/post-block-update-types";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import type {
 	BotConversationId,

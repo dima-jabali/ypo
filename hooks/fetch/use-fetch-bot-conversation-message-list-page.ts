@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	useSuspenseInfiniteQuery,
 	type InfiniteData,
@@ -64,6 +66,8 @@ export function useFetchBotConversationMessageListPage<
 	useFetchBotConversation();
 
 	const botConversationId = generalContextStore.use.botConversationId();
+
+	console.log({botConversationId})
 
 	if (!isValidNumber(botConversationId)) {
 		shouldNeverHappen("notebookMetadataBotConversationId not defined!");

@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -15,6 +17,8 @@ export function useFetchBotConversation<SelectedData = BotConversation>(
 	>,
 ) {
 	const botConversationId = generalContextStore.use.botConversationId();
+
+	console.log("useFetchBotConversation",{botConversationId})
 
 	if (!isValidNumber(botConversationId)) {
 		shouldNeverHappen(

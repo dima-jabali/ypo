@@ -10,7 +10,7 @@ import {
 } from "#/contexts/general-ctx/general-context";
 import { identity } from "#/helpers/utils";
 import type { Bot } from "#/types/bot-source";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type GetAllBotsRequest = {
 	sort_direction?: "desc" | "asc" | null;

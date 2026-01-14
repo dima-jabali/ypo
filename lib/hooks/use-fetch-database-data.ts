@@ -14,7 +14,7 @@ import type {
 	StandardSchema,
 } from "#/types/databases";
 import type { ISODateString } from "#/types/general";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type DatabaseDataRequest = {
 	action_inputs: {

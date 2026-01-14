@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { clientAPI_V1 } from "#/api";
 import type { ISODateString, OrganizationId } from "#/types/general";
 import type { BetterbrainUser, OrganizationMemberRole } from "#/types/notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 type SendInviteToEmailRequest = {
 	orgId: OrganizationId;

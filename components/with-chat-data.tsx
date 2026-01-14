@@ -10,6 +10,8 @@ export function WithChatData({
 	children,
 	fallback,
 }: React.PropsWithChildren<{ fallback?: React.ReactNode }>) {
+	return children;
+	
 	return (
 		<WithNotebookIdAndList>
 			<WithNotebook>

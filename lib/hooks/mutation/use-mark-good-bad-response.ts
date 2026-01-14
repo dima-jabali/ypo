@@ -11,7 +11,7 @@ import type {
 	BotConversationMessageId,
 } from "#/types/chat";
 import type { BotConversationId } from "#/types/general";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type MarkResponseAsGoodOrBadRequest = {
 	botConversationMessageId: BotConversationMessageId;

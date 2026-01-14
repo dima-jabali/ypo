@@ -9,7 +9,7 @@ import { selectNothing } from "#/helpers/utils";
 import { ColorScheme } from "#/types/general";
 import { camelCase } from "scule";
 import type { CamelCase } from "type-fest";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type SettingsBase = {
 	/** Only present on user_settings and project_settings */

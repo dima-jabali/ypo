@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import type { BotSource } from "#/types/bot-source";
 import type { OrganizationId } from "#/types/general";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type GetAllBotSourcesRequest = {
 	sort_direction?: "desc" | "asc";

@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { clientAPI_V1 } from "#/api";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import type { Bot, BotCommunicationType, BotType } from "#/types/bot-source";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type CreateBotRequest = {
 	communication_type?: BotCommunicationType;

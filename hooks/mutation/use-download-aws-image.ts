@@ -4,7 +4,7 @@ import { invariant } from "es-toolkit";
 import { GET_AWS_FILE_AS_STRING_BINARY_ACTION } from "#/helpers/utils";
 import type { GoogleDriveVerboseSource } from "#/types/chat";
 import type { Base64Image } from "#/types/general";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type FetchAwsImageProps =
 	GoogleDriveVerboseSource["content_list"][0]["image_url"];

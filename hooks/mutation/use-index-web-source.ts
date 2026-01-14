@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { clientAPI_V1 } from "#/api";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import type { Website } from "#/types/bot-source";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 type IndexWebsiteRequest = {
 	website_url: string;

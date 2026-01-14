@@ -16,7 +16,7 @@ import {
 	type PostBlockResponse,
 } from "#/types/post-block-update-types";
 import { useDownloadedNotebookId } from "../fetch/use-fetch-notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import { applyNotebookResponseUpdates } from "#/helpers/apply-notebook-response-updates";
 
 export function useUpdateResultVariable(blockUuid: NotebookBlockUuid) {

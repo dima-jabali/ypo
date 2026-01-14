@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 
 import { clientAPI_V1 } from "#/api";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 type RemoveMemberFromOrgRequest = {
 	userId: string;

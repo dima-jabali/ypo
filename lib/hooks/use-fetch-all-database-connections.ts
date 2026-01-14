@@ -16,7 +16,7 @@ import {
 	type SlackChannelWithName,
 	type SlackConnectionDataWithDefinedChannels,
 } from "#/types/databases";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import { dataManagerStore } from "#/contexts/data-manager";
 
 export type AllDatabaseConnections = {

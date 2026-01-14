@@ -5,7 +5,7 @@ import {
 import { useMemo } from "react";
 
 import type { PDF, PDFOrCSVSourceType } from "#/types/bot-source";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 
 export type GetPDFOrCSVFilesPageRequest = {

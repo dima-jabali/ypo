@@ -8,17 +8,9 @@ type AuthContext = {
 	token: string;
 };
 
-const IS_USING_LOCAL_CLERK = process.env.NEXT_PUBLIC_IS_USING_LOCAL_CLERK;
-
-if (!IS_USING_LOCAL_CLERK) {
-	throw new Error(
-		"import.meta.env.VITE_PUBLIC_IS_USING_LOCAL_CLERK is not defined",
-	);
-}
-
 const authStoreBase = create(
 	subscribeWithSelector<AuthContext>(() => ({
-		isUsingLocalClerk: IS_USING_LOCAL_CLERK === "true",
+		isUsingLocalClerk: true,
 		clerkApiToken: "",
 		token: "",
 	})),

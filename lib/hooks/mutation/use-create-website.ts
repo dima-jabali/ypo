@@ -4,7 +4,7 @@ import { clientAPI_V1 } from "#/api";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import type { Website } from "#/types/bot-source";
 import type { OrganizationId } from "#/types/general";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type CreateWebsiteRequest = {
 	organizationId: OrganizationId;

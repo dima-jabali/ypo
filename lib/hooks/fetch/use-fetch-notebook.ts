@@ -13,7 +13,7 @@ import {
 	type NotebookBlock,
 	type NotebookBlockUuid,
 } from "#/types/notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type FetchNotebookResponse = Notebook;
 

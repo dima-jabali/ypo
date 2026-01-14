@@ -7,7 +7,7 @@ import type {
 	AwsKey,
 	Organization,
 } from "../fetch/use-fetch-all-organizations";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import type { ChatTools } from "#/types/notebook";
 
 export type MutateOrganizationRequest = {

@@ -118,7 +118,6 @@ export const NormalMonacoEditor = memo(function NormalMonacoEditor(
 				language={language}
 			/>
 
-			{autocomplete ? <HandleSetupAutocomplete {...props} /> : null}
 		</Suspense>
 	);
 

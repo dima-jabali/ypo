@@ -13,7 +13,7 @@ import type {
 	BetterbrainUserId,
 	OrganizationMemberRole,
 } from "#/types/notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import type { OrganizationMember } from "./use-invite-user-to-org";
 
 type UpdateOrgMemberRequest = {

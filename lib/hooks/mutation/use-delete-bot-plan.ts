@@ -9,7 +9,7 @@ import type {
 	OrganizationId,
 } from "#/types/general";
 import type { PatchProjectResponseAction } from "#/types/post-block-update-types";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import { applyNotebookResponseUpdates } from "#/helpers/apply-notebook-response-updates";
 
 export type DeleteBotPlanRequestProps = {

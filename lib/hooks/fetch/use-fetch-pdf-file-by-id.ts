@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { isValidNumber } from "#/helpers/utils";
 import type { FileId } from "#/types/general";
 import type { PdfId } from "#/types/notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import type { BotSourceType } from "#/types/bot-source";
 
 export type GetPresignedUrlByFileIdResponse = {

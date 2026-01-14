@@ -5,7 +5,7 @@ import { GET_AWS_FILE_AS_STRING_BINARY_ACTION } from "#/helpers/utils";
 import type { GoogleDriveVerboseSource } from "#/types/chat";
 import type { GeneralFileType } from "#/types/notebook";
 import type { AwsBucket, AwsKey } from "../fetch/use-fetch-all-organizations";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type FileToDownload = {
 	type: GeneralFileType.CSV;

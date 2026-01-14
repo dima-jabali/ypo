@@ -7,7 +7,7 @@ import type {
 	DatabaseConnectionType,
 	SearchSchemaResponse,
 } from "#/types/databases";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 type SearchSchemaRequestParams = {
 	connection_id?: DatabaseConnection["id"] | undefined;

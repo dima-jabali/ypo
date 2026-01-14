@@ -6,7 +6,7 @@ import {
 	type PageOffset,
 } from "#/contexts/general-ctx/general-context";
 import type { OrgMemberWithRole } from "#/types/notebook";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import { useWithCurrentOrg } from "../use-current-organization";
 
 export type FetchOrganizationUsersRequest = {

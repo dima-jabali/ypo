@@ -11,7 +11,7 @@ import type {
 	SlackConnectionDataWithDefinedChannels,
 } from "#/types/databases";
 import type { OrganizationId } from "#/types/general";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 const mutationKey = queryKeyFactory.put["update-integration"].queryKey;
 

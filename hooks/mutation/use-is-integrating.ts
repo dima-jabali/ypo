@@ -1,5 +1,5 @@
 import { useIsMutating } from "@tanstack/react-query";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 const mutationKey = queryKeyFactory.post["create-integration"].queryKey;
 

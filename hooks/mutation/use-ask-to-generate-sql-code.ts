@@ -7,7 +7,7 @@ import {
 	type WriteSqlAction,
 	type WriteSqlResponse,
 } from "#/types/post-block-update-types";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 const mutationKey = queryKeyFactory.post["ask-to-generate-sql-code"].queryKey;
 

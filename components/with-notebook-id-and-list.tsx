@@ -10,6 +10,7 @@ export function WithNotebookIdAndList({ children }: React.PropsWithChildren) {
 }
 
 function WithNotebookList({ children }: React.PropsWithChildren) {
+	
 	const createNotebookIfOrgHasNoneQuery = useCreateNotebookIfOrgHasNone();
 
 	if (createNotebookIfOrgHasNoneQuery.isEnabled) {

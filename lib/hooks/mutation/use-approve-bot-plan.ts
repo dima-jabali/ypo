@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 import {
 	useEditBotPlan,
 	type EditBotPlanRequestProps,

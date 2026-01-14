@@ -15,7 +15,7 @@ import type {
 	SettingsKey,
 	SettingsReturnType,
 } from "../fetch/use-fetch-settings";
-import { queryKeyFactory } from "../query-keys";
+import { queryKeyFactory } from "@/hooks/query-keys";
 
 export type SetSettingsRequest = {
 	project_id?: number | undefined;
