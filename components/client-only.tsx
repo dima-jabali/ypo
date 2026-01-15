@@ -9,5 +9,5 @@ export function ClientOnly({ children }: React.PropsWithChildren) {
 		setHasMounted(true);
 	}, []);
 
-	return hasMounted ? children : null;
+	return hasMounted && typeof window !== "undefined" ? children : null;
 }

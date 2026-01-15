@@ -1,3 +1,5 @@
+import { MagicRegExpTransformPlugin } from 'magic-regexp/transform'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -7,6 +9,11 @@ const nextConfig = {
     unoptimized: true,
   },
   reactCompiler: true,
+  webpack(config) {
+    config.plugins = config.plugins || []
+    config.plugins.push(MagicRegExpTransformPlugin.webpack())
+    return config
+  }
 };
 
 export default nextConfig;

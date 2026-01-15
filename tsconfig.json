@@ -2,7 +2,7 @@
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "target": "ES6",
+		"target": "ESNext",
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -11,6 +11,8 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    		"alwaysStrict": true,
+		"strictNullChecks": true,
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
@@ -19,7 +21,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "#/*": ["./src/*"],
+      "@/*": ["./*"],
     }
   },
   "include": [
