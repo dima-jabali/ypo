@@ -246,7 +246,9 @@ export function ChatInterface({ filters }: ChatInterfaceProps) {
 }
 
 function ChatWrapper() {
-  const botConversationId = generalContextStore.use.botConversationId() ?? '4517'
+  // const botConversationId = generalContextStore.use.botConversationId() ?? '4517'
+  const botConversationId = 4517
+
 
   // if (!isValidNumber(botConversationId)) {
   //   return <EmptyData />

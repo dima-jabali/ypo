@@ -8,7 +8,7 @@ import { generalContextStore } from "#/contexts/general-ctx/general-context"
 import type { SourceID } from "#/contexts/source-citation-context"
 import { getSourceMainValues, type SourceMainValues } from "#/features/sources-for-user/get-source-main-values"
 import { normalizeSources, type NormalizedSource } from "#/features/sources-for-user/get-top-n-sources"
-import { identity, isDev, isValidNumber, shouldNeverHappen } from "#/helpers/utils"
+import { identity, isDev, isValidNumber } from "#/helpers/utils"
 import { queryKeyFactory } from "#/hooks/query-keys"
 import type { BotConversationMessage, ParallelConversationId, SourceForUserType } from "#/types/chat"
 import type { BotConversationId } from "#/types/general"
@@ -42,24 +42,23 @@ export function useFetchBotConversationMessageListPage<SelectedData = BotConvers
 ) {
   useFetchBotConversation(botConversationId)
 
-  console.log({ botConversationId })
-
-  if (!isValidNumber(botConversationId)) {
-    shouldNeverHappen("notebookMetadataBotConversationId not defined!")
-  }
+  const isValidBot = isValidNumber(botConversationId)
 
   const { queryOptions, initialPageParam } = useMemo(() => {
+    // Use a fallback ID of -1 when botConversationId is null/invalid
+    const safeId = isValidBot ? botConversationId : (-1 as BotConversationId)
+
     const initialPageParam: GetBotConversationMessagesPageRequest = {
       visible_to_user: "true",
-      botConversationId,
+      botConversationId: safeId,
       limit: 100,
       offset: 0,
     }
 
-    const queryOptions = queryKeyFactory.get["bot-conversation-message-list-page"](botConversationId)
+    const queryOptions = queryKeyFactory.get["bot-conversation-message-list-page"](safeId)
 
     return { queryOptions, initialPageParam }
-  }, [botConversationId])
+  }, [botConversationId, isValidBot])
 
   return useSuspenseInfiniteQuery({
     refetchOnWindowFocus: false,
@@ -68,6 +67,7 @@ export function useFetchBotConversationMessageListPage<SelectedData = BotConvers
     initialPageParam,
     ...queryOptions,
     select,
+    enabled: isValidBot,
     getNextPageParam: (lastPage, _allPages, lastPageParams) => {
       const nextOffset = lastPageParams.offset + lastPageParams.limit
 

@@ -36,7 +36,7 @@ export function WithBotConversationId(
 	props: React.PropsWithChildren<{ fallback: React.ReactNode }>,
 ) {
 	const notebookMetadataBotConversationId =
-		generalContextStore.use.botConversationId();
+		generalContextStore.use.botConversationId() ?? 4517;
 
 	return isValidNumber(notebookMetadataBotConversationId) ? (
 		props.children

@@ -63,7 +63,7 @@ export function useFetchBotConversationMessageListPage<
 ) {
 	useFetchBotConversation();
 
-	const botConversationId = generalContextStore.use.botConversationId();
+	const botConversationId = generalContextStore.use.botConversationId() ?? 4517;
 
 	if (!isValidNumber(botConversationId)) {
 		shouldNeverHappen("notebookMetadataBotConversationId not defined!");

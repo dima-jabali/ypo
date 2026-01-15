@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 
-import { identity, isValidNumber, shouldNeverHappen } from "#/helpers/utils"
+import { identity, isValidNumber } from "#/helpers/utils"
 import { queryKeyFactory } from "#/hooks/query-keys"
 import type { BotConversation } from "#/types/notebook"
 
@@ -13,9 +13,9 @@ export function useFetchBotConversation<SelectedData = BotConversation>(
   botConversationId: number | null,
   select: (data: BotConversation) => SelectedData = identity<BotConversation, SelectedData>,
 ) {
-  console.log("useFetchBotConversation", { botConversationId })
+  const safeId = isValidNumber(botConversationId) ? botConversationId : -1
 
-  const queryOptions = useMemo(() => queryKeyFactory.get["bot-conversation"](botConversationId), [botConversationId])
+  const queryOptions = useMemo(() => queryKeyFactory.get["bot-conversation"](safeId), [safeId])
 
   const result = useSuspenseQuery({
     gcTime: Number.POSITIVE_INFINITY, // Maintain on cache
@@ -25,9 +25,7 @@ export function useFetchBotConversation<SelectedData = BotConversation>(
   })
 
   if (!isValidNumber(botConversationId)) {
-    shouldNeverHappen(
-      "handleSendMessage must be used within a downloaded notebook so that botConversationId can be fetched.",
-    )
+    return { is_streaming: false } as SelectedData
   }
 
   return result.data
