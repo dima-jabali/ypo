@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: React.PropsWithChildren) {
 	return (
 		<html lang="en">
-			<body className="font-sans antialiased">
+			<body className="font-sans antialiased simple-scrollbar min-h-screen min-w-screen">
 				<Suspense fallback={null}>
 					<Providers>
 						{children}

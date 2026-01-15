@@ -73,7 +73,7 @@ function Home() {
 	};
 
 	return (
-		<main className="container mx-auto p-6 space-y-8">
+		<main className="container mx-auto p-6 space-y-8 simple-scrollbar">
 			{/* Hero Section */}
 			<section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 md:p-12 border border-primary/20">
 				<div className="relative z-10">

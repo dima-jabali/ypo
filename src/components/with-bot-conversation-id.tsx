@@ -1,3 +1,5 @@
+"use client";
+
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import { isValidNumber } from "#/helpers/utils";
 import { useFetchNotebook } from "#/hooks/fetch/use-fetch-notebook";
@@ -30,7 +32,6 @@ function TriggerSuspenseToHaveBotConversationIdFromDownloadedNotebook(
 			: SELECT_NOTEBOOK_WITH_BOT_CONVERSATION;
 }
 
-TriggerSuspenseToHaveBotConversationIdFromDownloadedNotebook.whyDidYouRender = true;
 
 export function WithBotConversationId(
 	props: React.PropsWithChildren<{ fallback: React.ReactNode }>,
@@ -45,4 +46,3 @@ export function WithBotConversationId(
 	);
 }
 
-WithBotConversationId.whyDidYouRender = true;

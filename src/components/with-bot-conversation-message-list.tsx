@@ -1,3 +1,5 @@
+"use client";
+
 import { useFetchBotConversationMessageListPage } from "#/hooks/fetch/use-fetch-bot-conversation-message-list-page";
 
 export function WithBotConversationMessageList({

@@ -2,6 +2,9 @@
 @import url("https://fonts.cdnfonts.com/css/inter");
 
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
 	--simple-scrollbar-width: 12px;
@@ -18,6 +21,13 @@
 		.textarea {
 		@apply base-ring data-[state=open]:base-ring;
 	}
+
+	  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 @utility base-ring {
@@ -335,76 +345,7 @@
 	@apply text-link hover:text-link-hover active:text-link-active visited:text-link-visited;
 }
 
-/* Dark mode: */
 @theme {
-	--color-button-active: color-mix(in oklab, #fff 20%, transparent);
-	--color-button-hover: color-mix(in oklab, #fff 10%, transparent);
-
-	--color-border-smooth: rgb(255 255 255 / 0.3);
-	--color-accent-strong: hsl(260, 78%, 50%);
-	--color-accent: #6947ff;
-	--color-ring: #6947ff;
-	--color-accent-light: rgb(105 71 255 / 0.15);
-	--color-accent-foreground: #fff;
-	--color-parallel-msg: #353736;
-
-	--color-badge-primary: hsl(223deg 98.61% 67.41%);
-	--color-badge-orange-foreground: rgb(215, 164, 33);
-	--color-badge-orange: rgb(55, 53, 46);
-
-	--color-muted-foreground: hsl(215 20.2% 65.1%);
-	--color-warning: oklch(0.795 0.184 86.047);
-	--color-bg-muted: hsl(217.2 32.6% 17.5%);
-	--color-destructive: hsl(0, 90%, 70%);
-	--color-muted: rgba(255 255 255 / 0.7);
-	--color-muted-strong: oklch(0.372 0.044 257.287);
-	--color-attention: oklch(0.901 0.076 70.697);
-	--color-attention-strong: oklch(0.901 0.076 70.697);
-
-	--color-positive: oklch(0.723 0.219 149.579);
-	--color-secondary: #000;
-	--color-primary: #fff;
-
-	--color-popover: hsl(222.2 84% 4.9%);
-	--color-notebook: rgb(23 25 24 / 1);
-	--color-link: hsl(200deg 66% 62%);
-	--color-link-hover: hsl(179.7deg 100% 53.33%);
-	--color-link-active: hsl(243deg 100% 87.27%);
-	--color-link-visited: hsl(302.03deg 100% 75.59%);
-
-	--color-user-sources: oklch(0.274 0.006 286.033);
-	--color-alt-row: rgba(255 255 255 / 0.1);
-	--color-default-badge: #e7e1e1;
-	--color-highlight: hsl(251, 100%, 64%);
-	--color-aside: hsl(258deg 9% 16%);
-	--color-mention: rgba(255 255 255 / 0.17);
-
-	--simple-scrollbar-active-thumb-color: rgb(95, 95, 95);
-	--simple-scrollbar-thumb-color: #3d3f42;
-
-	/* [START] Sapien */
-
-	/* The header background color when its column contains the selected cell: */
-	--color-bg-header-has-focus: rgb(50 50 50);
-	/* The header background color when it is hovered: */
-	--color-bg-header-hovered: rgb(70 70 70);
-	/* The header text color: */
-	--color-text-header-color: rgb(200 200 200);
-
-	/* [END] Sapien */
-
-	/* Things that don't change between color shemes: */
-	--font-inter: InterVariable, Inter, sans-serif;
-	--font-mono: JetBrains Mono, monospace;
-
-	--shadow-border: inset 0 0 0 1px;
-
-	--animate-background: background-move 2s ease infinite;
-
-	--open-sidebar-width: 256px;
-}
-
-html[data-color-scheme="light"] {
 	--color-button-active: rgb(0 0 0 / 20%);
 	--color-button-hover: rgb(0 0 0 / 10%);
 
@@ -459,6 +400,77 @@ html[data-color-scheme="light"] {
 	--color-text-header-color: rgb(50 50 50);
 
 	/* [END] Sapien */
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.098 0 0);
+  --card: oklch(0.99 0 0);
+  --card-foreground: oklch(0.098 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.098 0 0);
+  --primary: oklch(0.286 0.067 265.755);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.953 0.008 265.755);
+  --secondary-foreground: oklch(0.286 0.067 265.755);
+  --muted: oklch(0.963 0.004 265.755);
+  --muted-foreground: oklch(0.533 0.015 265.755);
+  --accent: oklch(0.953 0.008 265.755);
+  --accent-foreground: oklch(0.286 0.067 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0.004 265.755);
+  --input: oklch(0.922 0.004 265.755);
+  --ring: oklch(0.286 0.067 265.755);
+  --chart-1: oklch(0.486 0.151 265.755);
+  --chart-2: oklch(0.698 0.145 212.127);
+  --chart-3: oklch(0.827 0.108 84.429);
+  --chart-4: oklch(0.533 0.183 313.425);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.098 0 0);
+  --sidebar-primary: oklch(0.286 0.067 265.755);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.953 0.008 265.755);
+  --sidebar-accent-foreground: oklch(0.286 0.067 265.755);
+  --sidebar-border: oklch(0.922 0.004 265.755);
+  --sidebar-ring: oklch(0.286 0.067 265.755);
+
+	  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 html,

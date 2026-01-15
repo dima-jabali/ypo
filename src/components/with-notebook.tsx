@@ -1,3 +1,5 @@
+"use client";
+
 import { Fragment } from "react";
 
 import { useDownloadedNotebookUuid } from "#/hooks/fetch/use-fetch-notebook";

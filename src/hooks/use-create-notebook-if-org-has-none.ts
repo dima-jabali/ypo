@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 
 import { createNotebookUuid } from "#/helpers/utils";
@@ -9,6 +11,7 @@ import { generalContextStore } from "#/contexts/general-ctx/general-context";
 type HasCreatedNotebook = boolean;
 
 export function useCreateNotebookIfOrgHasNone() {
+	
 	const organizationId = generalContextStore.use.organizationId();
 	const hasNotebooksInList = useHasNotebooksInList();
 	const createNotebook = useCreateNotebook();

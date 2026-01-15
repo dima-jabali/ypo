@@ -12,6 +12,10 @@ import { Label } from "@/components/ui/label";
 import { useEvents, useMembers, useStore } from "@/lib/store";
 
 export default function SearchPage() {
+		if (typeof window === "undefined") {
+		return null;
+	}
+	
 	const members = useStore(useMembers);
 	const events = useStore(useEvents);
 
@@ -311,7 +315,7 @@ export default function SearchPage() {
 					</Card>
 				</aside>
 
-				<div className="flex-1 min-w-0">
+				<div className="flex-1 min-w-0 max-h-[80vh]">
 					<WithOrganizationIdAndListBoundary failedText="Something went wrong at the main page!">
 						<ChatOrNotebook />
 					</WithOrganizationIdAndListBoundary>

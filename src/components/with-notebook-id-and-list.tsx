@@ -1,7 +1,13 @@
+"use client";
+
 import { useCreateNotebookIfOrgHasNone } from "#/hooks/use-create-notebook-if-org-has-none";
 import { useSetNotebookToFirst } from "#/hooks/use-set-notebook-to-first";
 
 export function WithNotebookIdAndList({ children }: React.PropsWithChildren) {
+	if (typeof window === "undefined") {
+		return null;
+	}
+
 	return (
 		<WithNotebookList>
 			<WithNotebookId>{children}</WithNotebookId>
@@ -10,6 +16,10 @@ export function WithNotebookIdAndList({ children }: React.PropsWithChildren) {
 }
 
 function WithNotebookList({ children }: React.PropsWithChildren) {
+	if (typeof window === "undefined") {
+		return null;
+	}
+
 	const createNotebookIfOrgHasNoneQuery = useCreateNotebookIfOrgHasNone();
 
 	if (createNotebookIfOrgHasNoneQuery.isEnabled) {
@@ -20,6 +30,10 @@ function WithNotebookList({ children }: React.PropsWithChildren) {
 }
 
 function WithNotebookId({ children }: React.PropsWithChildren) {
+	if (typeof window === "undefined") {
+		return null;
+	}
+
 	const setNotebookToFirstQuery = useSetNotebookToFirst();
 
 	if (setNotebookToFirstQuery.isEnabled) {

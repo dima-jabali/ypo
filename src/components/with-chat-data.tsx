@@ -1,3 +1,5 @@
+"use client";
+
 import { WithBotConversationId } from "#/components/with-bot-conversation-id";
 import { AssureBotConversationBelongsToNotebook } from "./assure-bot-conversation-belongs-to-notebook";
 import { AssureNotebookBelongsToOrg } from "./assure-notebook-belongs-to-org";
@@ -10,6 +12,10 @@ export function WithChatData({
 	children,
 	fallback,
 }: React.PropsWithChildren<{ fallback?: React.ReactNode }>) {
+		if (typeof window === "undefined") {
+		return null;
+	}
+
 	return (
 		<WithNotebookIdAndList>
 			<WithNotebook>

@@ -1,3 +1,5 @@
+"use client";
+
 import { PlateController } from "platejs/react";
 import { memo } from "react";
 
@@ -18,23 +20,30 @@ import {
 	useHasAnyMessage,
 	useNormalizedMessages,
 } from "#/hooks/fetch/use-fetch-bot-conversation-message-list-page";
+import { ClientOnly } from "@/components/client-only";
 
 export const ChatOrNotebook = memo(function ChatOrNotebook() {
+	if (typeof window === "undefined") {
+		return null;
+	}
+
 	return (
-		<SourceCitationContextProvider>
-			<DefaultSuspenseAndErrorBoundary
-				failedText="Something went wrong"
-				fallbackFor="with-chat-data"
-			>
-				<WithChatData>
-					<ChatContextProvider>
-						<SlashProvider>
-							<Chat />
-						</SlashProvider>
-					</ChatContextProvider>
-				</WithChatData>
-			</DefaultSuspenseAndErrorBoundary>
-		</SourceCitationContextProvider>
+		<ClientOnly>
+			<SourceCitationContextProvider>
+				<DefaultSuspenseAndErrorBoundary
+					failedText="Something went wrong"
+					fallbackFor="with-chat-data"
+				>
+					<WithChatData>
+						<ChatContextProvider>
+							<SlashProvider>
+								<Chat />
+							</SlashProvider>
+						</ChatContextProvider>
+					</WithChatData>
+				</DefaultSuspenseAndErrorBoundary>
+			</SourceCitationContextProvider>
+		</ClientOnly>
 	);
 });
 

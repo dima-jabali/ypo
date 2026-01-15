@@ -8,6 +8,8 @@ import { authStore } from "#/contexts/auth/auth";
 export type FetchBetterbrainUserResponse = BetterbrainUser;
 
 export function useFetchBetterbrainUser() {
+
+	
 	const isUsingLocalClerk = authStore.use.isUsingLocalClerk();
 	const clerkApiToken = authStore.use.token();
 	const token = authStore.use.token();

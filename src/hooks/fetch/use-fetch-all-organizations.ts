@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import type { Tagged } from "type-fest";

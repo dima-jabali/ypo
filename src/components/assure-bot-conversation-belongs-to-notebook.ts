@@ -1,3 +1,5 @@
+"use client";
+
 import { memo } from "react";
 
 import { isValidNumber } from "#/helpers/utils";
@@ -56,5 +58,3 @@ export const AssureBotConversationBelongsToNotebook = memo(
 		return children;
 	},
 );
-
-AssureBotConversationBelongsToNotebook.whyDidYouRender = true;
