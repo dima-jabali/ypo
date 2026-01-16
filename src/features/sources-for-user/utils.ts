@@ -3,13 +3,13 @@
  * This function handles URLs with or without a hash and returns a clean URL.
  */
 export function removeUrlHash(maybeUrl: string): string {
-	const parsedUrl = URL.parse(maybeUrl);
+  const parsedUrl = URL.parse(maybeUrl);
 
-	if (parsedUrl === null) {
-		return maybeUrl;
-	}
+  if (parsedUrl === null) {
+    return maybeUrl;
+  }
 
-	parsedUrl.hash = "";
+  parsedUrl.hash = "";
 
-	return parsedUrl.href;
+  return parsedUrl.href;
 }

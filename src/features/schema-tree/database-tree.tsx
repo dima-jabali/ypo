@@ -9,93 +9,93 @@ import { IconType } from "./helpers/types";
 import { UNKNOWN_NAME } from "./utils";
 
 export function DatabaseTree({
-	expandedItemsRef,
-	activeItemRef,
-	entity,
-	db,
-	renderEntityType,
+  expandedItemsRef,
+  activeItemRef,
+  entity,
+  db,
+  renderEntityType,
 }: ChildTreeProps<Database>) {
-	const [dbParams, setDbParams] = useState<FetchDatabaseDataParams>();
-	const [topLevelId] = useState(`${entity.name}`);
+  const [dbParams, setDbParams] = useState<FetchDatabaseDataParams>();
+  const [topLevelId] = useState(`${entity.name}`);
 
-	const fetchDatabaseDataQuery = useFetchDatabaseData(dbParams);
+  const fetchDatabaseDataQuery = useFetchDatabaseData(dbParams);
 
-	function handleOnClick() {
-		if (fetchDatabaseDataQuery.isLoading) return;
+  function handleOnClick() {
+    if (fetchDatabaseDataQuery.isLoading) return;
 
-		const needsToFetchData = !entity.schematas;
+    const needsToFetchData = !entity.schematas;
 
-		if (!needsToFetchData) return;
+    if (!needsToFetchData) return;
 
-		setDbParams({
-			entity_type: entity.entity_type,
-			entity_id: entity.id,
-			db,
-		});
-	}
+    setDbParams({
+      entity_type: entity.entity_type,
+      entity_id: entity.id,
+      db,
+    });
+  }
 
-	const children = [
-		<Tree
-			expandedItemsRef={expandedItemsRef}
-			type={IconType.SCHEMAS_FOLDER}
-			activeItemRef={activeItemRef}
-			key={EntityType.SCHEMATA}
-			id={EntityType.SCHEMATA}
-			showNumberOfChildren
-			name="Schematas"
-			isParent
-		>
-			{entity.schematas?.map(renderEntityType)}
-		</Tree>,
-	];
+  const children = [
+    <Tree
+      expandedItemsRef={expandedItemsRef}
+      type={IconType.SCHEMAS_FOLDER}
+      activeItemRef={activeItemRef}
+      key={EntityType.SCHEMATA}
+      id={EntityType.SCHEMATA}
+      showNumberOfChildren
+      name="Schematas"
+      isParent
+    >
+      {entity.schematas?.map(renderEntityType)}
+    </Tree>,
+  ];
 
-	if (entity.fields && entity.fields.length > 0) {
-		children.push(
-			<Tree
-				expandedItemsRef={expandedItemsRef}
-				type={IconType.TABLES_FOLDER}
-				activeItemRef={activeItemRef}
-				key={EntityType.FIELD}
-				id={EntityType.FIELD}
-				showNumberOfChildren
-				name="Fields"
-				isParent
-			>
-				{entity.fields.map(renderEntityType)}
-			</Tree>,
-		);
-	}
+  if (entity.fields && entity.fields.length > 0) {
+    children.push(
+      <Tree
+        expandedItemsRef={expandedItemsRef}
+        type={IconType.TABLES_FOLDER}
+        activeItemRef={activeItemRef}
+        key={EntityType.FIELD}
+        id={EntityType.FIELD}
+        showNumberOfChildren
+        name="Fields"
+        isParent
+      >
+        {entity.fields.map(renderEntityType)}
+      </Tree>,
+    );
+  }
 
-	if (entity.tables && entity.tables.length > 0) {
-		children.push(
-			<Tree
-				expandedItemsRef={expandedItemsRef}
-				type={IconType.TABLES_FOLDER}
-				activeItemRef={activeItemRef}
-				key={EntityType.TABLE}
-				id={EntityType.TABLE}
-				showNumberOfChildren
-				name="Tables"
-				isParent
-			>
-				{entity.tables.map(renderEntityType)}
-			</Tree>,
-		);
-	}
+  if (entity.tables && entity.tables.length > 0) {
+    children.push(
+      <Tree
+        expandedItemsRef={expandedItemsRef}
+        type={IconType.TABLES_FOLDER}
+        activeItemRef={activeItemRef}
+        key={EntityType.TABLE}
+        id={EntityType.TABLE}
+        showNumberOfChildren
+        name="Tables"
+        isParent
+      >
+        {entity.tables.map(renderEntityType)}
+      </Tree>,
+    );
+  }
 
-	return (
-		<Tree
-			isLoading={fetchDatabaseDataQuery.isLoading}
-			expandedItemsRef={expandedItemsRef}
-			name={entity.name ?? UNKNOWN_NAME}
-			activeItemRef={activeItemRef}
-			type={IconType.DATABASE}
-			onClick={handleOnClick}
-			key={topLevelId}
-			id={topLevelId}
-			isParent
-		>
-			{children}
-		</Tree>
-	);
+  return (
+    <Tree
+      isLoading={fetchDatabaseDataQuery.isLoading}
+      expandedItemsRef={expandedItemsRef}
+      name={entity.name ?? UNKNOWN_NAME}
+      activeItemRef={activeItemRef}
+      type={IconType.DATABASE}
+      onClick={handleOnClick}
+      key={topLevelId}
+      id={topLevelId}
+      isParent
+    >
+      {children}
+    </Tree>
+  );
 }

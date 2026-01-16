@@ -7,71 +7,67 @@ import { highlightString } from "#/helpers/highlight-string";
 const URL_REGEX = /(?:\b)(?<url>https?:\/\/[^\s)>]+|www\.[^\s)>]+\/?)/g;
 
 export function HighlightStringWithFilterRegex({
-	withLink = true,
-	string,
+  withLink = true,
+  string,
 }: {
-	withLink?: boolean;
-	string: string;
+  withLink?: boolean;
+  string: string;
 }) {
-	const filterRegex = useFilterRegexStore().use.filterRegex();
-	const id = useId();
+  const filterRegex = useFilterRegexStore().use.filterRegex();
+  const id = useId();
 
-	if (!string) {
-		return null;
-	}
+  if (!string) {
+    return null;
+  }
 
-	const jsxs: Array<React.ReactNode> = [];
-	let lastStringIndex = 0;
+  const jsxs: Array<React.ReactNode> = [];
+  let lastStringIndex = 0;
 
-	if (withLink) {
-		// eslint-disable-next-line react-hooks/immutability
-		URL_REGEX.lastIndex = 0;
+  if (withLink) {
+    // eslint-disable-next-line react-hooks/immutability
+    URL_REGEX.lastIndex = 0;
 
-		string.matchAll(URL_REGEX).forEach((match) => {
-			const url = match.groups?.url;
+    string.matchAll(URL_REGEX).forEach((match) => {
+      const url = match.groups?.url;
 
-			if (!url) {
-				return;
-			}
+      if (!url) {
+        return;
+      }
 
-			const startIndex = match.index;
+      const startIndex = match.index;
 
-			const stringBefore = string.slice(lastStringIndex, startIndex);
+      const stringBefore = string.slice(lastStringIndex, startIndex);
 
-			lastStringIndex = startIndex + url.length;
+      lastStringIndex = startIndex + url.length;
 
-			jsxs.push(
-				<Fragment key={startIndex}>
-					{highlightString(stringBefore, filterRegex, "inline")}
+      jsxs.push(
+        <Fragment key={startIndex}>
+          {highlightString(stringBefore, filterRegex, "inline")}
 
-					<a
-						className="link break-all inline w-fit"
-						rel="noopener noreferrer"
-						target="_blank"
-						href={url}
-					>
-						{highlightString(url, filterRegex, "", "")}
-					</a>
-				</Fragment>,
-			);
-		});
-	}
+          <a
+            className="link break-all inline w-fit"
+            rel="noopener noreferrer"
+            target="_blank"
+            href={url}
+          >
+            {highlightString(url, filterRegex, "", "")}
+          </a>
+        </Fragment>,
+      );
+    });
+  }
 
-	return (
-		<Fragment key={id}>
-			{jsxs.length > 0 ? (
-				<>
-					{jsxs}
+  return (
+    <Fragment key={id}>
+      {jsxs.length > 0 ? (
+        <>
+          {jsxs}
 
-					{highlightString(
-						string.slice(lastStringIndex),
-						filterRegex,
-						"inline",
-					)}
-				</>
-			) : (
-				highlightString(string, filterRegex)
-			)}
-		</Fragment>
-	);
+          {highlightString(string.slice(lastStringIndex), filterRegex, "inline")}
+        </>
+      ) : (
+        highlightString(string, filterRegex)
+      )}
+    </Fragment>
+  );
 }

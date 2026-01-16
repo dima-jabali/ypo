@@ -2,23 +2,23 @@ import { isEqual } from "es-toolkit";
 
 import type { BlockFilterAndSort } from "#/types/notebook";
 import {
-	type ChildFilter,
-	type Filter,
-	type FilterGroup,
-	FilterOperator,
-	ValueOperator,
+  type ChildFilter,
+  type Filter,
+  type FilterGroup,
+  FilterOperator,
+  ValueOperator,
 } from "./utilityTypes";
 
 const FILTERS_WITHOUT_VALUE_INPUT = [
-	ValueOperator.IS_NOT_EMPTY,
-	ValueOperator.IS_EMPTY,
-	undefined,
-	null,
+  ValueOperator.IS_NOT_EMPTY,
+  ValueOperator.IS_EMPTY,
+  undefined,
+  null,
 ];
 
 export const DEFAULT_FILTERS: BlockFilterAndSort = {
-	filters: undefined,
-	sort_by: undefined,
+  filters: undefined,
+  sort_by: undefined,
 };
 
 export const VALUE_OPERATOR_KEY = "valueOperator";
@@ -29,36 +29,33 @@ export const COLUMN_KEY = "column";
 export const VALUE_KEY = "value";
 
 export const makeDefaultGroupOfFilters = (): FilterGroup => {
-	const defaultParentFilter: FilterGroup = {
-		filterOperator: FilterOperator.AND,
-		children: [] as Filter[],
-		parent: undefined,
-	};
+  const defaultParentFilter: FilterGroup = {
+    filterOperator: FilterOperator.AND,
+    children: [] as Filter[],
+    parent: undefined,
+  };
 
-	const defaultChildFilter: ChildFilter = {
-		column: { name: "", type: undefined },
-		parent: defaultParentFilter,
-		valueOperator: undefined,
-		caseSensitive: false,
-		value: undefined,
-	};
+  const defaultChildFilter: ChildFilter = {
+    column: { name: "", type: undefined },
+    parent: defaultParentFilter,
+    valueOperator: undefined,
+    caseSensitive: false,
+    value: undefined,
+  };
 
-	defaultParentFilter.children.push(defaultChildFilter);
+  defaultParentFilter.children.push(defaultChildFilter);
 
-	return defaultParentFilter;
+  return defaultParentFilter;
 };
 
 export const shouldHaveValueInput = (filterOperator: ChildFilter): boolean => {
-	return !FILTERS_WITHOUT_VALUE_INPUT.includes(filterOperator.valueOperator);
+  return !FILTERS_WITHOUT_VALUE_INPUT.includes(filterOperator.valueOperator);
 };
 
-export const areFiltersEqual = (
-	a: BlockFilterAndSort,
-	b: BlockFilterAndSort,
-) => {
-	// JSON.stringify is needed to compare when there are objects with `undefined` or not existing values:
-	const prevParsed = JSON.parse(JSON.stringify(a));
-	const currParsed = JSON.parse(JSON.stringify(b));
+export const areFiltersEqual = (a: BlockFilterAndSort, b: BlockFilterAndSort) => {
+  // JSON.stringify is needed to compare when there are objects with `undefined` or not existing values:
+  const prevParsed = JSON.parse(JSON.stringify(a));
+  const currParsed = JSON.parse(JSON.stringify(b));
 
-	return isEqual(prevParsed, currParsed);
+  return isEqual(prevParsed, currParsed);
 };

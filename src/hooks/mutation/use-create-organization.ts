@@ -2,13 +2,13 @@ import { type QueryFilters, useMutation } from "@tanstack/react-query";
 
 import { clientAPI_V1 } from "#/api";
 import type {
-	GetOrganizationsResponse,
-	Organization,
+  GetOrganizationsResponse,
+  Organization,
 } from "#/hooks/fetch/use-fetch-all-organizations";
 import { queryKeyFactory } from "#/hooks/query-keys";
 
 export type CreateOrganizationRequestBody = {
-	name: string;
+  name: string;
 };
 
 export type CreateOrganizationResponse = Organization;
@@ -16,75 +16,56 @@ export type CreateOrganizationResponse = Organization;
 const mutationKey = queryKeyFactory.post["organization"].queryKey;
 
 const cancelQueriesParams: QueryFilters = {
-	queryKey: queryKeyFactory.get["all-organizations"].queryKey,
+  queryKey: queryKeyFactory.get["all-organizations"].queryKey,
 };
 
 export const useCreateOrganization = () => {
-				if (typeof window === "undefined") {
-		return null;
-	}
-	
-	return useMutation<
-		CreateOrganizationResponse | null,
-		Error,
-		CreateOrganizationRequestBody
-	>({
-		mutationKey,
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-		mutationFn: async (body: CreateOrganizationRequestBody) =>
-			(
-				await clientAPI_V1.post<CreateOrganizationResponse>(
-					"/organizations",
-					body,
-				)
-			).data,
+  return useMutation<CreateOrganizationResponse | null, Error, CreateOrganizationRequestBody>({
+    mutationKey,
 
-		onSuccess: (newOrganizationFromResponse, _, __, ctx) => {
-			ctx.client.setQueryData<GetOrganizationsResponse["results"]>(
-				cancelQueriesParams.queryKey!,
-				(cachedAllOrganizations) => {
-					if (!(cachedAllOrganizations && newOrganizationFromResponse)) {
-						console.log(
-							"No cachedAllOrganizations or newOrganizationFromResponse!",
-							{
-								newOrganizationFromResponse,
-								cachedAllOrganizations,
-							},
-						);
+    mutationFn: async (body: CreateOrganizationRequestBody) =>
+      (await clientAPI_V1.post<CreateOrganizationResponse>("/organizations", body)).data,
 
-						return cachedAllOrganizations;
-					}
+    onSuccess: (newOrganizationFromResponse, _, __, ctx) => {
+      ctx.client.setQueryData<GetOrganizationsResponse["results"]>(
+        cancelQueriesParams.queryKey!,
+        (cachedAllOrganizations) => {
+          if (!(cachedAllOrganizations && newOrganizationFromResponse)) {
+            console.log("No cachedAllOrganizations or newOrganizationFromResponse!", {
+              newOrganizationFromResponse,
+              cachedAllOrganizations,
+            });
 
-					// Assure that the new project is not already in the list:
-					if (
-						cachedAllOrganizations.some(
-							(org) => org.id === newOrganizationFromResponse.id,
-						)
-					) {
-						console.log(
-							"The new organization is already in the list. No need to add it again!",
-							{
-								newOrganizationFromResponse,
-								cachedAllOrganizations,
-							},
-						);
+            return cachedAllOrganizations;
+          }
 
-						return cachedAllOrganizations;
-					}
+          // Assure that the new project is not already in the list:
+          if (cachedAllOrganizations.some((org) => org.id === newOrganizationFromResponse.id)) {
+            console.log("The new organization is already in the list. No need to add it again!", {
+              newOrganizationFromResponse,
+              cachedAllOrganizations,
+            });
 
-					const newAllOrganizationsCache: typeof cachedAllOrganizations = [
-						...cachedAllOrganizations,
-						newOrganizationFromResponse,
-					];
+            return cachedAllOrganizations;
+          }
 
-					return newAllOrganizationsCache;
-				},
-			);
-		},
+          const newAllOrganizationsCache: typeof cachedAllOrganizations = [
+            ...cachedAllOrganizations,
+            newOrganizationFromResponse,
+          ];
 
-		meta: {
-			cancelQuery: queryKeyFactory.get["all-organizations"],
-			errorTitle: "Error creating organization!",
-		},
-	});
+          return newAllOrganizationsCache;
+        },
+      );
+    },
+
+    meta: {
+      cancelQuery: queryKeyFactory.get["all-organizations"],
+      errorTitle: "Error creating organization!",
+    },
+  });
 };

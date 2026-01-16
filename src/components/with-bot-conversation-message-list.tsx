@@ -2,37 +2,29 @@
 
 import { useFetchBotConversationMessageListPage } from "#/hooks/fetch/use-fetch-bot-conversation-message-list-page";
 
-export function WithBotConversationMessageList({
-	children,
-}: React.PropsWithChildren) {
-			if (typeof window === "undefined") {
-		return null;
-	}
-	
-	return (
-		<WithBotConversationMessageList_>
-			{children}
-		</WithBotConversationMessageList_>
-	);
+export function WithBotConversationMessageList({ children }: React.PropsWithChildren) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return <WithBotConversationMessageList_>{children}</WithBotConversationMessageList_>;
 }
 
-function WithBotConversationMessageList_({
-	children,
-}: React.PropsWithChildren) {
-			if (typeof window === "undefined") {
-		return null;
-	}
-	
-	// Destructure to not trigger a re-render when the value changes:
-	const { isEnabled: isFetchBotConversationMessageListPageEnabled } =
-		useFetchBotConversationMessageListPage(); // This will trigger a Suspense.
+function WithBotConversationMessageList_({ children }: React.PropsWithChildren) {
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-	// Just so it doesn't get compiled away:
-	if (!isFetchBotConversationMessageListPageEnabled) {
-		console.log({
-			isFetchBotConversationMessageListPageEnabled,
-		});
-	}
+  // Destructure to not trigger a re-render when the value changes:
+  const { isEnabled: isFetchBotConversationMessageListPageEnabled } =
+    useFetchBotConversationMessageListPage(); // This will trigger a Suspense.
 
-	return children;
+  // Just so it doesn't get compiled away:
+  if (!isFetchBotConversationMessageListPageEnabled) {
+    console.log({
+      isFetchBotConversationMessageListPageEnabled,
+    });
+  }
+
+  return children;
 }

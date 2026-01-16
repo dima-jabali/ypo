@@ -1,3 +1,3 @@
 export const SnowflakeForm: React.FC = () => {
-	return null;
+  return null;
 };

@@ -6,49 +6,45 @@ import type { BetterbrainUser, OrganizationMemberRole } from "#/types/notebook";
 import { queryKeyFactory } from "../query-keys";
 
 type SendInviteToEmailRequest = {
-	orgId: OrganizationId;
-	first_name: string;
-	last_name: string;
-	email: string;
+  orgId: OrganizationId;
+  first_name: string;
+  last_name: string;
+  email: string;
 };
 
 export type OrganizationMember = {
-	organization: { id: OrganizationId };
-	role: OrganizationMemberRole;
-	created_at: ISODateString;
-	updated_at: ISODateString;
-	user: BetterbrainUser;
+  organization: { id: OrganizationId };
+  role: OrganizationMemberRole;
+  created_at: ISODateString;
+  updated_at: ISODateString;
+  user: BetterbrainUser;
 };
 
 type SendInviteToEmailResponse = {
-	organization_member: OrganizationMember;
-	user_notifications: Array<string>;
+  organization_member: OrganizationMember;
+  user_notifications: Array<string>;
 };
 
 const mutationKey = queryKeyFactory.post["invite-user-to-org"].queryKey;
 
 export function useInviteUserToOrganizationMutation() {
-	return useMutation<
-		SendInviteToEmailResponse,
-		Error,
-		SendInviteToEmailRequest
-	>({
-		mutationKey,
+  return useMutation<SendInviteToEmailResponse, Error, SendInviteToEmailRequest>({
+    mutationKey,
 
-		mutationFn: async (arg: SendInviteToEmailRequest) => {
-			const { orgId, ...body } = arg;
+    mutationFn: async (arg: SendInviteToEmailRequest) => {
+      const { orgId, ...body } = arg;
 
-			const path = `/organizations/${orgId}/users`;
+      const path = `/organizations/${orgId}/users`;
 
-			return await clientAPI_V1.post<
-				SendInviteToEmailRequest,
-				SendInviteToEmailResponse
-			>(path, body);
-		},
+      return await clientAPI_V1.post<SendInviteToEmailRequest, SendInviteToEmailResponse>(
+        path,
+        body,
+      );
+    },
 
-		meta: {
-			invalidateQuery: queryKeyFactory.get["all-organizations"],
-			cancelQuery: queryKeyFactory.get["all-organizations"],
-		},
-	});
+    meta: {
+      invalidateQuery: queryKeyFactory.get["all-organizations"],
+      cancelQuery: queryKeyFactory.get["all-organizations"],
+    },
+  });
 }

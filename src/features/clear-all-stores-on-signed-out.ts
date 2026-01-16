@@ -6,12 +6,12 @@ import { allEditorsInfo } from "#/contexts/monaco-editors-info";
 import { queryClient } from "#/contexts/query-client";
 
 export function ClearAllStoresOnSignedOut() {
-	databasesSchemaStore.setState(databasesSchemaStore.getInitialState());
-	generalContextStore.setState(generalContextStore.getInitialState());
-	dataManagerStore.setState(dataManagerStore.getInitialState());
-	allEditorsInfo.clear();
-	droppedFiles.clear();
-	queryClient.clear();
+  databasesSchemaStore.setState(databasesSchemaStore.getInitialState());
+  generalContextStore.setState(generalContextStore.getInitialState());
+  dataManagerStore.setState(dataManagerStore.getInitialState());
+  allEditorsInfo.clear();
+  droppedFiles.clear();
+  queryClient.clear();
 
-	return null;
+  return null;
 }

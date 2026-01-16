@@ -6,49 +6,41 @@ import type { GoogleDriveVerboseSource } from "#/types/chat";
 import type { Base64Image } from "#/types/general";
 import { queryKeyFactory } from "../query-keys";
 
-export type FetchAwsImageProps =
-	GoogleDriveVerboseSource["content_list"][0]["image_url"];
+export type FetchAwsImageProps = GoogleDriveVerboseSource["content_list"][0]["image_url"];
 
-export function useDownloadAwsImage({
-	aws_bucket,
-	aws_key,
-}: FetchAwsImageProps) {
-	return useQuery({
-		staleTime: Infinity,
+export function useDownloadAwsImage({ aws_bucket, aws_key }: FetchAwsImageProps) {
+  return useQuery({
+    staleTime: Infinity,
 
-		queryKey: [
-			...queryKeyFactory.get["aws-image"].queryKey,
-			aws_bucket,
-			aws_key,
-		],
+    queryKey: [...queryKeyFactory.get["aws-image"].queryKey, aws_bucket, aws_key],
 
-		queryFn: async () => {
-			const imageType = aws_key.split(".").at(-1);
+    queryFn: async () => {
+      const imageType = aws_key.split(".").at(-1);
 
-			if (!imageType) {
-				throw new Error("Image type not found");
-			}
+      if (!imageType) {
+        throw new Error("Image type not found");
+      }
 
-			const formData = new FormData();
-			formData.set("formId", GET_AWS_FILE_AS_STRING_BINARY_ACTION);
-			formData.set("fileMimeType", imageType);
-			formData.set("aws_bucket", aws_bucket);
-			formData.set("aws_key", aws_key);
+      const formData = new FormData();
+      formData.set("formId", GET_AWS_FILE_AS_STRING_BINARY_ACTION);
+      formData.set("fileMimeType", imageType);
+      formData.set("aws_bucket", aws_bucket);
+      formData.set("aws_key", aws_key);
 
-			const res = await fetch("/actions", {
-				body: formData,
-				method: "POST",
-			});
+      const res = await fetch("/actions", {
+        body: formData,
+        method: "POST",
+      });
 
-			const img = await res.text();
+      const img = await res.text();
 
-			invariant(img, "No fileAsBase64String!");
+      invariant(img, "No fileAsBase64String!");
 
-			return img as Base64Image;
-		},
+      return img as Base64Image;
+    },
 
-		meta: {
-			errorTitle: "Error downloading all conversations!",
-		},
-	});
+    meta: {
+      errorTitle: "Error downloading all conversations!",
+    },
+  });
 }

@@ -1,112 +1,112 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Focus } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useProfileSimilarity } from "@/lib/hooks/use-profile-similarity"
-import { Network } from "vis-network"
-import { DataSet } from "vis-data"
+import { useCallback, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Focus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useProfileSimilarity } from "@/lib/hooks/use-profile-similarity";
+import { Network } from "vis-network";
+import { DataSet } from "vis-data";
 import type { DataSetInitialOptions } from "vis-data/declarations/data-set";
 
 interface OptimizedProfile {
-  id: number
-  name: string
-  position: string | null
-  company: string | null
-  avatar: string | null
-  ypo_chapter: string | null
-  ypo_industry: string | null
-  location: string | null
-  umap_x: number | null
-  umap_y: number | null
+  id: number;
+  name: string;
+  position: string | null;
+  company: string | null;
+  avatar: string | null;
+  ypo_chapter: string | null;
+  ypo_industry: string | null;
+  location: string | null;
+  umap_x: number | null;
+  umap_y: number | null;
   neighbors: Array<{
-    id: number
-    similarity: number
-  }>
+    id: number;
+    similarity: number;
+  }>;
 }
 
 interface GraphNode {
-  id: string
-  name: string
-  profile: OptimizedProfile
-  avatar?: string
+  id: string;
+  name: string;
+  profile: OptimizedProfile;
+  avatar?: string;
 }
 
 interface GraphLink {
-  source: string
-  target: string
-  similarity: number
+  source: string;
+  target: string;
+  similarity: number;
 }
 
 interface NetworkGraphClientProps {
-  graphData: { nodes: GraphNode[]; links: GraphLink[] }
-  currentUserId: number
-  onFocusChange: (element: { type: "node" | "edge"; data: any } | null) => void
+  graphData: { nodes: GraphNode[]; links: GraphLink[] };
+  currentUserId: number;
+  onFocusChange: (element: { type: "node" | "edge"; data: any } | null) => void;
 }
 
 function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: NetworkGraphClientProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const networkRef = useRef<Network | null>(null)
-  const connectedNodesRef = useRef<Set<string>>(new Set())
+  const containerRef = useRef<HTMLDivElement>(null);
+  const networkRef = useRef<Network | null>(null);
+  const connectedNodesRef = useRef<Set<string>>(new Set());
 
   const focusOnCurrentUser = () => {
-    if (!networkRef.current) return
+    if (!networkRef.current) return;
 
-    const currentUserIdString = String(currentUserId)
+    const currentUserIdString = String(currentUserId);
     networkRef.current.focus(currentUserIdString, {
       scale: 1.5,
       animation: {
         duration: 1000,
         easingFunction: "easeInOutQuad",
       },
-    })
-  }
+    });
+  };
 
   const handleClearSelection = useCallback(() => {
-    if (!networkRef.current) return
+    if (!networkRef.current) return;
 
-    const nodes = networkRef.current.body.data.nodes
-    const edges = networkRef.current.body.data.edges
+    const nodes = networkRef.current.body.data.nodes;
+    const edges = networkRef.current.body.data.edges;
 
-    const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
-    nodes.update(nodeUpdates)
+    const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }));
+    nodes.update(nodeUpdates);
 
-    const allEdgeIds = edges.getIds()
+    const allEdgeIds = edges.getIds();
     const edgeUpdates = allEdgeIds.map((edgeId: any) => ({
       id: edgeId,
       color: "#9ca3af80",
-    }))
-    edges.update(edgeUpdates)
+    }));
+    edges.update(edgeUpdates);
 
-    connectedNodesRef.current.clear()
-  }, [graphData])
+    connectedNodesRef.current.clear();
+  }, [graphData]);
 
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current) return;
 
     const loadVisNetwork = async () => {
       const umapCoords = graphData.nodes
         .filter((n) => n.profile.umap_x !== null && n.profile.umap_y !== null)
-        .map((n) => ({ x: n.profile.umap_x!, y: n.profile.umap_y! }))
+        .map((n) => ({ x: n.profile.umap_x!, y: n.profile.umap_y! }));
 
-      let scaleX = 1000
-      let scaleY = 1000
+      let scaleX = 1000;
+      let scaleY = 1000;
 
       if (umapCoords.length > 0) {
-        const xValues = umapCoords.map((c) => c.x)
-        const yValues = umapCoords.map((c) => c.y)
-        const xRange = Math.max(...xValues) - Math.min(...xValues)
-        const yRange = Math.max(...yValues) - Math.min(...yValues)
+        const xValues = umapCoords.map((c) => c.x);
+        const yValues = umapCoords.map((c) => c.y);
+        const xRange = Math.max(...xValues) - Math.min(...xValues);
+        const yRange = Math.max(...yValues) - Math.min(...yValues);
 
-        scaleX = xRange > 0 ? (2000 / xRange) * 4 : 1000
-        scaleY = yRange > 0 ? (2000 / yRange) * 4 : 1000
+        scaleX = xRange > 0 ? (2000 / xRange) * 4 : 1000;
+        scaleY = yRange > 0 ? (2000 / yRange) * 4 : 1000;
       }
 
       const nodes = new DataSet(
         graphData.nodes.map((node) => {
-          const x = node.profile.umap_x !== null ? node.profile.umap_x * scaleX : undefined
-          const y = node.profile.umap_y !== null ? node.profile.umap_y * scaleY : undefined
+          const x = node.profile.umap_x !== null ? node.profile.umap_x * scaleX : undefined;
+          const y = node.profile.umap_y !== null ? node.profile.umap_y * scaleY : undefined;
 
           return {
             id: node.id,
@@ -149,12 +149,12 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
             data: node,
           } satisfies DataSetInitialOptions<string>;
         }),
-      )
+      );
 
       const edges = new DataSet(
         graphData.links.map((link, idx) => {
-          const similarity = link.similarity || 0.5
-          const width = 1 + (similarity - 0.7) * 10
+          const similarity = link.similarity || 0.5;
+          const width = 1 + (similarity - 0.7) * 10;
 
           return {
             id: idx,
@@ -169,14 +169,16 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
               type: "continuous",
             },
             title: `Similarity: ${(similarity * 100).toFixed(1)}%`,
-          }
+          };
         }),
-      )
+      );
 
-      const nodeCount = graphData.nodes.length
-      const spacingMultiplier = nodeCount >= 50 ? 1.8 : nodeCount >= 30 ? 1.4 : 1
+      const nodeCount = graphData.nodes.length;
+      const spacingMultiplier = nodeCount >= 50 ? 1.8 : nodeCount >= 30 ? 1.4 : 1;
 
-      const hasUmapCoords = graphData.nodes.some((n) => n.profile.umap_x !== null && n.profile.umap_y !== null)
+      const hasUmapCoords = graphData.nodes.some(
+        (n) => n.profile.umap_x !== null && n.profile.umap_y !== null,
+      );
 
       const options = {
         nodes: {
@@ -225,85 +227,85 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
         },
         height: "600px",
         width: "100%",
-      }
+      };
 
       if (networkRef.current) {
-        networkRef.current.destroy()
+        networkRef.current.destroy();
       }
 
-      const network = new Network(containerRef.current, { nodes, edges }, options)
-      networkRef.current = network
+      const network = new Network(containerRef.current, { nodes, edges }, options);
+      networkRef.current = network;
 
-      const clickedNodeRef = { current: null as GraphNode | null }
-      const clickedEdgeRef = { current: null as any | null }
+      const clickedNodeRef = { current: null as GraphNode | null };
+      const clickedEdgeRef = { current: null as any | null };
 
       network.on("selectNode", (params: any) => {
         if (params.nodes.length > 0) {
-          const nodeId = params.nodes[0]
-          const node = graphData.nodes.find((n) => n.id === nodeId)
+          const nodeId = params.nodes[0];
+          const node = graphData.nodes.find((n) => n.id === nodeId);
           if (node) {
-            clickedEdgeRef.current = null
-            clickedNodeRef.current = node
-            const focusData = { type: "node" as const, data: node }
-            onFocusChange(focusData)
+            clickedEdgeRef.current = null;
+            clickedNodeRef.current = node;
+            const focusData = { type: "node" as const, data: node };
+            onFocusChange(focusData);
 
-            const connectedNodes = network.getConnectedNodes(nodeId)
-            const connectedNodeSet = new Set([nodeId, ...connectedNodes])
-            connectedNodesRef.current = connectedNodeSet
+            const connectedNodes = network.getConnectedNodes(nodeId);
+            const connectedNodeSet = new Set([nodeId, ...connectedNodes]);
+            connectedNodesRef.current = connectedNodeSet;
 
-            const connectedEdges = network.getConnectedEdges(nodeId)
-            const connectedEdgeSet = new Set(connectedEdges)
+            const connectedEdges = network.getConnectedEdges(nodeId);
+            const connectedEdgeSet = new Set(connectedEdges);
 
             const nodeUpdates = graphData.nodes.map((n) => ({
               id: n.id,
               opacity: connectedNodeSet.has(n.id) ? 1 : 0.15,
-            }))
-            nodes.update(nodeUpdates)
+            }));
+            nodes.update(nodeUpdates);
 
-            const allEdgeIds = edges.getIds()
+            const allEdgeIds = edges.getIds();
             const edgeUpdates = allEdgeIds.map((id) => {
-              const isConnected = connectedEdgeSet.has(id)
+              const isConnected = connectedEdgeSet.has(id);
               return {
                 id: id,
                 color: isConnected ? "#3b82f6" : "#9ca3af0d",
                 width: isConnected ? 3 : 1,
-              }
-            })
-            edges.update(edgeUpdates)
+              };
+            });
+            edges.update(edgeUpdates);
           }
         }
-      })
+      });
 
       network.on("selectEdge", (params: any) => {
         if (params.nodes.length === 0 && params.edges.length > 0) {
-          const edgeId = params.edges[0]
-          const edge = graphData.links[edgeId]
+          const edgeId = params.edges[0];
+          const edge = graphData.links[edgeId];
 
           if (edge) {
-            const sourceNode = graphData.nodes.find((n) => n.id === edge.source)
-            const targetNode = graphData.nodes.find((n) => n.id === edge.target)
+            const sourceNode = graphData.nodes.find((n) => n.id === edge.source);
+            const targetNode = graphData.nodes.find((n) => n.id === edge.target);
 
             if (sourceNode && targetNode) {
-              clickedNodeRef.current = null
-              clickedEdgeRef.current = { edgeId, ...edge }
+              clickedNodeRef.current = null;
+              clickedEdgeRef.current = { edgeId, ...edge };
 
-              const connectedNodeSet = new Set([edge.source, edge.target])
+              const connectedNodeSet = new Set([edge.source, edge.target]);
               const nodeUpdates = graphData.nodes.map((n) => ({
                 id: n.id,
                 opacity: connectedNodeSet.has(n.id) ? 1 : 0.15,
-              }))
-              nodes.update(nodeUpdates)
+              }));
+              nodes.update(nodeUpdates);
 
-              const allEdgeIds = edges.getIds()
+              const allEdgeIds = edges.getIds();
               const edgeUpdates = allEdgeIds.map((id) => {
-                const isSelected = id === edgeId
+                const isSelected = id === edgeId;
                 return {
                   id: id,
                   color: isSelected ? "#3b82f6" : "#9ca3af0d",
                   width: isSelected ? 3 : 1,
-                }
-              })
-              edges.update(edgeUpdates)
+                };
+              });
+              edges.update(edgeUpdates);
 
               const focusData = {
                 type: "edge" as const,
@@ -312,162 +314,162 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
                   target: edge.target,
                   similarity: edge.similarity,
                 },
-              }
-              onFocusChange(focusData)
+              };
+              onFocusChange(focusData);
             }
           }
         }
-      })
+      });
 
       network.on("click", (params: any) => {
         if (params.nodes.length === 0 && params.edges.length === 0) {
-          return
+          return;
         }
-      })
+      });
 
       network.on("hoverNode", (params: any) => {
-        if (clickedNodeRef.current || clickedEdgeRef.current) return
+        if (clickedNodeRef.current || clickedEdgeRef.current) return;
 
-        const nodeId = params.node
-        const connectedNodes = network.getConnectedNodes(nodeId)
-        const connectedEdges = network.getConnectedEdges(nodeId)
-        const connectedNodeSet = new Set([nodeId, ...connectedNodes])
-        const connectedEdgeSet = new Set(connectedEdges)
+        const nodeId = params.node;
+        const connectedNodes = network.getConnectedNodes(nodeId);
+        const connectedEdges = network.getConnectedEdges(nodeId);
+        const connectedNodeSet = new Set([nodeId, ...connectedNodes]);
+        const connectedEdgeSet = new Set(connectedEdges);
 
         const nodeUpdates = graphData.nodes.map((n) => ({
           id: n.id,
           opacity: connectedNodeSet.has(n.id) ? 1 : 0.5,
-        }))
-        nodes.update(nodeUpdates)
+        }));
+        nodes.update(nodeUpdates);
 
-        const allEdgeIds = edges.getIds()
+        const allEdgeIds = edges.getIds();
         const edgeUpdates = allEdgeIds.map((edgeId) => {
-          const isConnected = connectedEdgeSet.has(edgeId as string)
+          const isConnected = connectedEdgeSet.has(edgeId as string);
           return {
             id: edgeId,
             color: isConnected ? "#3b82f6" : "#9ca3af80",
             width: isConnected ? 3 : undefined,
             opacity: isConnected ? 1 : 0.5,
-          }
-        })
-        edges.update(edgeUpdates)
-      })
+          };
+        });
+        edges.update(edgeUpdates);
+      });
 
       network.on("blurNode", () => {
-        if (clickedNodeRef.current || clickedEdgeRef.current) return
+        if (clickedNodeRef.current || clickedEdgeRef.current) return;
 
-        const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
-        nodes.update(nodeUpdates)
+        const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }));
+        nodes.update(nodeUpdates);
 
-        const allEdgeIds = edges.getIds()
+        const allEdgeIds = edges.getIds();
         const edgeUpdates = allEdgeIds.map((edgeId) => {
-          const originalEdge = graphData.links[edgeId as number]
-          const similarity = originalEdge?.similarity || 0.5
-          const width = 1 + (similarity - 0.7) * 10
+          const originalEdge = graphData.links[edgeId as number];
+          const similarity = originalEdge?.similarity || 0.5;
+          const width = 1 + (similarity - 0.7) * 10;
           return {
             id: edgeId,
             color: "#9ca3af80",
             width: Math.max(1, Math.min(width, 4)),
             opacity: 1,
-          }
-        })
-        edges.update(edgeUpdates)
-      })
+          };
+        });
+        edges.update(edgeUpdates);
+      });
 
       network.on("hoverEdge", (params: any) => {
-        if (clickedNodeRef.current || clickedEdgeRef.current) return
+        if (clickedNodeRef.current || clickedEdgeRef.current) return;
 
-        const edgeId = params.edge
-        const edge = graphData.links[edgeId]
+        const edgeId = params.edge;
+        const edge = graphData.links[edgeId];
 
         if (edge) {
-          const connectedNodeSet = new Set([edge.source, edge.target])
+          const connectedNodeSet = new Set([edge.source, edge.target]);
 
           const nodeUpdates = graphData.nodes.map((n) => ({
             id: n.id,
             opacity: connectedNodeSet.has(n.id) ? 1 : 0.5,
-          }))
-          nodes.update(nodeUpdates)
+          }));
+          nodes.update(nodeUpdates);
 
-          const allEdgeIds = edges.getIds()
+          const allEdgeIds = edges.getIds();
           const edgeUpdates = allEdgeIds.map((id) => {
-            const isHovered = id === edgeId
+            const isHovered = id === edgeId;
             return {
               id: id,
               color: isHovered ? "#3b82f6" : "#9ca3af80",
               width: isHovered ? 3 : undefined,
               opacity: isHovered ? 1 : 0.5,
-            }
-          })
-          edges.update(edgeUpdates)
+            };
+          });
+          edges.update(edgeUpdates);
         }
-      })
+      });
 
       network.on("blurEdge", () => {
-        if (clickedNodeRef.current || clickedEdgeRef.current) return
+        if (clickedNodeRef.current || clickedEdgeRef.current) return;
 
-        const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }))
-        nodes.update(nodeUpdates)
+        const nodeUpdates = graphData.nodes.map((n) => ({ id: n.id, opacity: 1 }));
+        nodes.update(nodeUpdates);
 
-        const allEdgeIds = edges.getIds()
+        const allEdgeIds = edges.getIds();
         const edgeUpdates = allEdgeIds.map((edgeId) => {
-          const originalEdge = graphData.links[edgeId as number]
-          const similarity = originalEdge?.similarity || 0.5
-          const width = 1 + (similarity - 0.7) * 10
+          const originalEdge = graphData.links[edgeId as number];
+          const similarity = originalEdge?.similarity || 0.5;
+          const width = 1 + (similarity - 0.7) * 10;
           return {
             id: edgeId,
             color: "#9ca3af80",
             width: Math.max(1, Math.min(width, 4)),
             opacity: 1,
-          }
-        })
-        edges.update(edgeUpdates)
-      })
+          };
+        });
+        edges.update(edgeUpdates);
+      });
 
       network.on("stabilizationIterationsDone", () => {
-        network.setOptions({ physics: { enabled: false } })
-      })
+        network.setOptions({ physics: { enabled: false } });
+      });
 
       network.on("dragEnd", (params: any) => {
         if (params.nodes.length > 0) {
-          const nodeId = params.nodes[0]
-          const position = network.getPositions([nodeId])[nodeId]
-          nodes.update({ id: nodeId, x: position.x, y: position.y, fixed: { x: true, y: true } })
+          const nodeId = params.nodes[0];
+          const position = network.getPositions([nodeId])[nodeId];
+          nodes.update({ id: nodeId, x: position.x, y: position.y, fixed: { x: true, y: true } });
         }
-      })
-    }
+      });
+    };
 
-    loadVisNetwork()
+    loadVisNetwork();
 
     return () => {
       if (networkRef.current) {
-        networkRef.current.destroy()
-        networkRef.current = null
+        networkRef.current.destroy();
+        networkRef.current = null;
       }
-    }
-  }, [graphData])
+    };
+  }, [graphData]);
 
   useEffect(() => {
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Escape") {
-      // 1. Reset visual styles in the canvas
-      handleClearSelection();
-      
-      // 2. Notify parent to clear the info cards
-      onFocusChange(null);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        // 1. Reset visual styles in the canvas
+        handleClearSelection();
 
-      // 3. Clear internal refs used for hover logic
-      // Note: You'll need to move these refs or logic so they are accessible
-      // or simply rely on the network.unselectAll() method
-      if (networkRef.current) {
-        networkRef.current.unselectAll();
+        // 2. Notify parent to clear the info cards
+        onFocusChange(null);
+
+        // 3. Clear internal refs used for hover logic
+        // Note: You'll need to move these refs or logic so they are accessible
+        // or simply rely on the network.unselectAll() method
+        if (networkRef.current) {
+          networkRef.current.unselectAll();
+        }
       }
-    }
-  };
+    };
 
-  window.addEventListener("keydown", handleKeyDown);
-  return () => window.removeEventListener("keydown", handleKeyDown);
-}, [handleClearSelection, onFocusChange]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleClearSelection, onFocusChange]);
 
   return (
     <div className="relative bg-white rounded-lg">
@@ -480,7 +482,7 @@ function NetworkGraphClient({ graphData, currentUserId, onFocusChange }: Network
 
       <div ref={containerRef} className="w-full" />
     </div>
-  )
+  );
 }
 
 function EdgeSimilarityFetcher({
@@ -488,19 +490,19 @@ function EdgeSimilarityFetcher({
   profileId2,
   onDataLoaded,
 }: {
-  profileId1: number
-  profileId2: number
-  onDataLoaded: (data: any) => void
+  profileId1: number;
+  profileId2: number;
+  onDataLoaded: (data: any) => void;
 }) {
-  const { data, isLoading, error } = useProfileSimilarity(profileId1, profileId2)
+  const { data, isLoading, error } = useProfileSimilarity(profileId1, profileId2);
 
   useEffect(() => {
     if (data && !isLoading && !error) {
-      onDataLoaded(data)
+      onDataLoaded(data);
     }
-  }, [data, isLoading, error, onDataLoaded])
+  }, [data, isLoading, error, onDataLoaded]);
 
-  return null
+  return null;
 }
 
-export { NetworkGraphClient, EdgeSimilarityFetcher }
+export { NetworkGraphClient, EdgeSimilarityFetcher };

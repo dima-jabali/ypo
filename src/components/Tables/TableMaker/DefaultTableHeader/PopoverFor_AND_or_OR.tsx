@@ -7,64 +7,61 @@ import { isAParent } from "./FiltersToBeApplied/helpers";
 import { useSetAnd_or_Or } from "./helperFilterHooks";
 
 type Props = {
-	isSecondInARow?: boolean;
-	filter: Filter;
+  isSecondInARow?: boolean;
+  filter: Filter;
 };
 
-export const PopoverFor_AND_or_OR: React.FC<Props> = ({
-	filter,
-	isSecondInARow,
-}) => {
-	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+export const PopoverFor_AND_or_OR: React.FC<Props> = ({ filter, isSecondInARow }) => {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-	const setAnd_or_Or = useSetAnd_or_Or();
+  const setAnd_or_Or = useSetAnd_or_Or();
 
-	const selectAndClose = (newValue: FilterOperator): void => {
-		setAnd_or_Or(filter, newValue);
-		setIsPopoverOpen(false);
-	};
+  const selectAndClose = (newValue: FilterOperator): void => {
+    setAnd_or_Or(filter, newValue);
+    setIsPopoverOpen(false);
+  };
 
-	const filterOperator =
-		isAParent(filter) && !isSecondInARow
-			? filter.filterOperator
-			: filter.parent?.filterOperator || FilterOperator.AND;
+  const filterOperator =
+    isAParent(filter) && !isSecondInARow
+      ? filter.filterOperator
+      : filter.parent?.filterOperator || FilterOperator.AND;
 
-	return (
-		<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-			<PopoverTrigger className="inline-flex justify-between items-center h-8 w-full border border-border-smooth py-1 px-2 button-hover rounded">
-				{filterOperator}
+  return (
+    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+      <PopoverTrigger className="inline-flex justify-between items-center h-8 w-full border border-border-smooth py-1 px-2 button-hover rounded">
+        {filterOperator}
 
-				<ChevronDownIcon className="size-4 text-primary" />
-			</PopoverTrigger>
+        <ChevronDownIcon className="size-4 text-primary" />
+      </PopoverTrigger>
 
-			<PopoverContent
-				className="flex flex-col gap-1 w-full min-w-min items-start justify-start text-sm"
-				side="bottom"
-			>
-				<button
-					className="flex justify-start items-center w-full gap-2 rounded py-1 px-2 button-hover data-[default-checked=true]:bg-button-active"
-					data-default-checked={filterOperator === FilterOperator.AND}
-					onPointerDown={() => selectAndClose(FilterOperator.AND)}
-				>
-					<div className="flex flex-col justify-center items-start w-full">
-						<span>And</span>
+      <PopoverContent
+        className="flex flex-col gap-1 w-full min-w-min items-start justify-start text-sm"
+        side="bottom"
+      >
+        <button
+          className="flex justify-start items-center w-full gap-2 rounded py-1 px-2 button-hover data-[default-checked=true]:bg-button-active"
+          data-default-checked={filterOperator === FilterOperator.AND}
+          onPointerDown={() => selectAndClose(FilterOperator.AND)}
+        >
+          <div className="flex flex-col justify-center items-start w-full">
+            <span>And</span>
 
-						<p className="text-muted">All filters must match</p>
-					</div>
-				</button>
+            <p className="text-muted">All filters must match</p>
+          </div>
+        </button>
 
-				<button
-					className="flex justify-start items-center w-full gap-2 rounded py-1 px-2 button-hover data-[default-checked=true]:bg-button-active"
-					data-default-checked={filterOperator === FilterOperator.OR}
-					onPointerDown={() => selectAndClose(FilterOperator.OR)}
-				>
-					<div className="flex flex-col justify-center items-start w-full">
-						<span>Or</span>
+        <button
+          className="flex justify-start items-center w-full gap-2 rounded py-1 px-2 button-hover data-[default-checked=true]:bg-button-active"
+          data-default-checked={filterOperator === FilterOperator.OR}
+          onPointerDown={() => selectAndClose(FilterOperator.OR)}
+        >
+          <div className="flex flex-col justify-center items-start w-full">
+            <span>Or</span>
 
-						<p className="text-muted">At least one filter must match</p>
-					</div>
-				</button>
-			</PopoverContent>
-		</Popover>
-	);
+            <p className="text-muted">At least one filter must match</p>
+          </div>
+        </button>
+      </PopoverContent>
+    </Popover>
+  );
 };

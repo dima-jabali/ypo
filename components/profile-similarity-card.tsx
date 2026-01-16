@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Sparkles, Users, Lightbulb, HandHelping, MessageCircle } from "lucide-react"
-import { useProfileSimilarity } from "@/lib/hooks/use-profile-similarity"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Sparkles, Users, Lightbulb, HandHelping, MessageCircle } from "lucide-react";
+import { useProfileSimilarity } from "@/lib/hooks/use-profile-similarity";
 
 interface ProfileSimilarityCardProps {
-  viewerId: number
-  profileId: number
+  viewerId: number;
+  profileId: number;
 }
 
 function parseBulletPoints(text: string): string[] {
@@ -15,14 +15,14 @@ function parseBulletPoints(text: string): string[] {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.startsWith("-"))
-    .map((line) => line.substring(1).trim())
+    .map((line) => line.substring(1).trim());
 }
 
 export function ProfileSimilarityCard({ viewerId, profileId }: ProfileSimilarityCardProps) {
-  const { data, isLoading, error } = useProfileSimilarity(viewerId, profileId)
+  const { data, isLoading, error } = useProfileSimilarity(viewerId, profileId);
 
   if (error) {
-    return null
+    return null;
   }
 
   if (isLoading) {
@@ -37,16 +37,16 @@ export function ProfileSimilarityCard({ viewerId, profileId }: ProfileSimilarity
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   if (!data) {
-    return null
+    return null;
   }
 
-  const scorePercentage = Math.round(data.similarity * 100)
-  const commonalities = parseBulletPoints(data.similarity_reasons.what_you_have_in_common)
-  const differences = parseBulletPoints(data.similarity_reasons.where_you_differ)
+  const scorePercentage = Math.round(data.similarity * 100);
+  const commonalities = parseBulletPoints(data.similarity_reasons.what_you_have_in_common);
+  const differences = parseBulletPoints(data.similarity_reasons.where_you_differ);
 
   return (
     <div className="space-y-4">
@@ -156,9 +156,11 @@ export function ProfileSimilarityCard({ viewerId, profileId }: ProfileSimilarity
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-foreground leading-relaxed">{data.similarity_reasons.closing}</p>
+          <p className="text-sm text-foreground leading-relaxed">
+            {data.similarity_reasons.closing}
+          </p>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,144 +1,134 @@
 import { isRecord } from "#/helpers/utils";
 import {
-	CHILDREN_KEY,
-	COLUMN_KEY,
-	PARENT_KEY,
-	VALUE_OPERATOR_KEY,
-	shouldHaveValueInput,
+  CHILDREN_KEY,
+  COLUMN_KEY,
+  PARENT_KEY,
+  VALUE_OPERATOR_KEY,
+  shouldHaveValueInput,
 } from "#/components/Tables/TableMaker/filters/filters";
 import {
-	isSerializedFilterGroup,
-	isUndefined,
+  isSerializedFilterGroup,
+  isUndefined,
 } from "#/components/Tables/TableMaker/filters/typeGuards";
 import type {
-	ChildFilter,
-	ColumnInfo,
-	EntriesOfFilter,
-	Filter,
-	FilterGroup,
-	SerializedChildFilter,
-	SerializedFilter,
+  ChildFilter,
+  ColumnInfo,
+  EntriesOfFilter,
+  Filter,
+  FilterGroup,
+  SerializedChildFilter,
+  SerializedFilter,
 } from "#/components/Tables/TableMaker/filters/utilityTypes";
 
 export const serializeFiltersToJson = (
-	filter: Filter,
-	visited = new Set<Filter>(),
+  filter: Filter,
+  visited = new Set<Filter>(),
 ): SerializedFilter | undefined => {
-	// This is a function made by an AI to filter out objects with undefined values and handle circular references.
+  // This is a function made by an AI to filter out objects with undefined values and handle circular references.
 
-	if (visited.has(filter)) return;
+  if (visited.has(filter)) return;
 
-	visited.add(filter);
+  visited.add(filter);
 
-	const serializedObj: Record<string, unknown> = {};
+  const serializedObj: Record<string, unknown> = {};
 
-	for (const [key, value] of Object.entries(filter) as EntriesOfFilter) {
-		if (key === PARENT_KEY || value === undefined) continue;
+  for (const [key, value] of Object.entries(filter) as EntriesOfFilter) {
+    if (key === PARENT_KEY || value === undefined) continue;
 
-		if (key === CHILDREN_KEY) {
-			const serializedArray: unknown[] = [];
+    if (key === CHILDREN_KEY) {
+      const serializedArray: unknown[] = [];
 
-			for (const child of value as Filter[]) {
-				const serializedValues = serializeFiltersToJson(child, visited);
+      for (const child of value as Filter[]) {
+        const serializedValues = serializeFiltersToJson(child, visited);
 
-				if (serializedValues) {
-					serializedArray.push(serializedValues);
-				}
-			}
+        if (serializedValues) {
+          serializedArray.push(serializedValues);
+        }
+      }
 
-			if (serializedArray.length > 0) {
-				serializedObj[key] = serializedArray;
-			}
-		} else if (
-			key === COLUMN_KEY &&
-			typeof (value as ColumnInfo).name === "string"
-		) {
-			if ((value as ColumnInfo).name) {
-				serializedObj[key] = value as ColumnInfo; // non-empty string
-			}
-		} else if (key === VALUE_OPERATOR_KEY) {
-			if (value === undefined) continue;
+      if (serializedArray.length > 0) {
+        serializedObj[key] = serializedArray;
+      }
+    } else if (key === COLUMN_KEY && typeof (value as ColumnInfo).name === "string") {
+      if ((value as ColumnInfo).name) {
+        serializedObj[key] = value as ColumnInfo; // non-empty string
+      }
+    } else if (key === VALUE_OPERATOR_KEY) {
+      if (value === undefined) continue;
 
-			if (shouldHaveValueInput(filter as ChildFilter)) {
-				if ((filter as ChildFilter).value !== undefined) {
-					serializedObj[key] = value;
-				}
-			} else {
-				serializedObj[key] = value;
-			}
-		} else {
-			serializedObj[key] = value;
-		}
-	}
+      if (shouldHaveValueInput(filter as ChildFilter)) {
+        if ((filter as ChildFilter).value !== undefined) {
+          serializedObj[key] = value;
+        }
+      } else {
+        serializedObj[key] = value;
+      }
+    } else {
+      serializedObj[key] = value;
+    }
+  }
 
-	return isValidSerializedFilter(serializedObj) ? serializedObj : undefined;
+  return isValidSerializedFilter(serializedObj) ? serializedObj : undefined;
 };
 
-const isValidSerializedFilter = (
-	obj: Record<string, unknown>,
-): obj is SerializedFilter => {
-	if (!isRecord(obj)) return false;
+const isValidSerializedFilter = (obj: Record<string, unknown>): obj is SerializedFilter => {
+  if (!isRecord(obj)) return false;
 
-	if (Object.keys(obj).length < 2) return false;
+  if (Object.keys(obj).length < 2) return false;
 
-	if (isSerializedFilterGroup(obj)) {
-		const { filterOperator, children } = obj;
+  if (isSerializedFilterGroup(obj)) {
+    const { filterOperator, children } = obj;
 
-		if (isUndefined(filterOperator) || isUndefined(children)) {
-			return false;
-		}
+    if (isUndefined(filterOperator) || isUndefined(children)) {
+      return false;
+    }
 
-		return true;
-	} else {
-		const { value, valueOperator, caseSensitive, column } =
-			obj as SerializedChildFilter;
+    return true;
+  } else {
+    const { value, valueOperator, caseSensitive, column } = obj as SerializedChildFilter;
 
-		if (
-			isUndefined(valueOperator) ||
-			isUndefined(caseSensitive) ||
-			isUndefined(column)
-		) {
-			return false;
-		}
+    if (isUndefined(valueOperator) || isUndefined(caseSensitive) || isUndefined(column)) {
+      return false;
+    }
 
-		if (shouldHaveValueInput(obj as ChildFilter)) {
-			if (isUndefined(value)) return false;
-		}
+    if (shouldHaveValueInput(obj as ChildFilter)) {
+      if (isUndefined(value)) return false;
+    }
 
-		return true;
-	}
+    return true;
+  }
 };
 
 export const deserializeJsonToFilters = (
-	json: SerializedFilter | undefined,
-	objs: Filter[] = [],
+  json: SerializedFilter | undefined,
+  objs: Filter[] = [],
 ): Filter | undefined => {
-	if (!json) return;
+  if (!json) return;
 
-	if (isSerializedFilterGroup(json)) {
-		const filterGroup: FilterGroup = {
-			filterOperator: json.filterOperator,
-			parent: undefined,
-			children: [],
-		};
+  if (isSerializedFilterGroup(json)) {
+    const filterGroup: FilterGroup = {
+      filterOperator: json.filterOperator,
+      parent: undefined,
+      children: [],
+    };
 
-		objs.push(filterGroup);
+    objs.push(filterGroup);
 
-		filterGroup.children = json.children
-			.map((childJson) => deserializeJsonToFilters(childJson, objs))
-			.filter(Boolean) as Filter[];
+    filterGroup.children = json.children
+      .map((childJson) => deserializeJsonToFilters(childJson, objs))
+      .filter(Boolean) as Filter[];
 
-		return filterGroup;
-	} else {
-		// It's a ChildFilter
-		const childFilter: ChildFilter = {
-			parent: objs.at(-1) as FilterGroup,
-			valueOperator: json.valueOperator,
-			caseSensitive: json.caseSensitive,
-			column: json.column,
-			value: json.value,
-		};
+    return filterGroup;
+  } else {
+    // It's a ChildFilter
+    const childFilter: ChildFilter = {
+      parent: objs.at(-1) as FilterGroup,
+      valueOperator: json.valueOperator,
+      caseSensitive: json.caseSensitive,
+      column: json.column,
+      value: json.value,
+    };
 
-		return childFilter;
-	}
+    return childFilter;
+  }
 };

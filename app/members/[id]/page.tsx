@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useYpoProfile } from "@/lib/hooks/use-ypo-profiles"
-import { ProfileSimilarityCard } from "@/components/profile-similarity-card"
-import { useStore, useImpersonatedProfileId } from "@/lib/store"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useYpoProfile } from "@/lib/hooks/use-ypo-profiles";
+import { ProfileSimilarityCard } from "@/components/profile-similarity-card";
+import { useStore, useImpersonatedProfileId } from "@/lib/store";
 import {
   Award,
   Building2,
@@ -22,14 +22,14 @@ import {
   MessageCircle,
   BookOpen,
   Sparkles,
-} from "lucide-react"
-import Link from "next/link"
-import { useParams } from "next/navigation"
+} from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export default function MemberDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const { isLoading, error, data: member } = useYpoProfile(Number.parseInt(id))
-  const currentUserId = useStore(useImpersonatedProfileId)
+  const { id } = useParams<{ id: string }>();
+  const { isLoading, error, data: member } = useYpoProfile(Number.parseInt(id));
+  const currentUserId = useStore(useImpersonatedProfileId);
 
   if (isLoading) {
     return (
@@ -41,7 +41,7 @@ export default function MemberDetailPage() {
           </CardContent>
         </Card>
       </main>
-    )
+    );
   }
 
   if (error || !id || !member) {
@@ -58,7 +58,7 @@ export default function MemberDetailPage() {
           </CardContent>
         </Card>
       </main>
-    )
+    );
   }
 
   return (
@@ -94,13 +94,17 @@ export default function MemberDetailPage() {
 
                     <p className="text-lg text-muted-foreground">{member.position}</p>
 
-                    <p className="text-lg font-semibold text-primary">{member.current_company_name}</p>
+                    <p className="text-lg font-semibold text-primary">
+                      {member.current_company_name}
+                    </p>
 
                     {member.linkedin_id && (
                       <div className="mt-3 p-3 bg-accent/30 rounded-lg border border-accent/50">
                         <div className="flex items-center gap-2 mb-2">
                           <Linkedin className="h-4 w-4 text-primary" />
-                          <span className="text-xs font-semibold text-muted-foreground">LinkedIn</span>
+                          <span className="text-xs font-semibold text-muted-foreground">
+                            LinkedIn
+                          </span>
                         </div>
                       </div>
                     )}
@@ -282,7 +286,9 @@ export default function MemberDetailPage() {
                     <Building2 className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium">Industry</p>
-                      <p className="text-sm text-muted-foreground">{member.current_company_industry}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {member.current_company_industry}
+                      </p>
                     </div>
                   </div>
                   <Separator />
@@ -305,7 +311,9 @@ export default function MemberDetailPage() {
                   <Award className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium">Followers</p>
-                    <p className="text-sm text-muted-foreground">{member.followers.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {member.followers.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               )}
@@ -327,7 +335,9 @@ export default function MemberDetailPage() {
                         ? `${member.city}, ${member.location}`
                         : member.city || member.location}
                     </p>
-                    {member.country_code && <p className="text-xs text-muted-foreground mt-1">{member.country_code}</p>}
+                    {member.country_code && (
+                      <p className="text-xs text-muted-foreground mt-1">{member.country_code}</p>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -421,5 +431,5 @@ export default function MemberDetailPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }

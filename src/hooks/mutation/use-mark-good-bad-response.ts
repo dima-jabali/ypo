@@ -1,23 +1,16 @@
-import {
-	useMutation,
-	type MutationObserverOptions,
-	type QueryClient,
-} from "@tanstack/react-query";
+import { useMutation, type MutationObserverOptions, type QueryClient } from "@tanstack/react-query";
 
 import { clientAPI_V1 } from "#/api";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
-import type {
-	BotConversationMessage,
-	BotConversationMessageId,
-} from "#/types/chat";
+import type { BotConversationMessage, BotConversationMessageId } from "#/types/chat";
 import type { BotConversationId } from "#/types/general";
 import { queryKeyFactory } from "../query-keys";
 
 export type MarkResponseAsGoodOrBadRequest = {
-	botConversationMessageId: BotConversationMessageId;
-	botConversationId: BotConversationId;
-	thumbs_up: boolean | null;
-	feedback_text: string;
+  botConversationMessageId: BotConversationMessageId;
+  botConversationId: BotConversationId;
+  thumbs_up: boolean | null;
+  feedback_text: string;
 };
 
 export type MarkResponseAsGoodOrBadResponse = BotConversationMessage;
@@ -25,97 +18,88 @@ export type MarkResponseAsGoodOrBadResponse = BotConversationMessage;
 const mutationKey = queryKeyFactory.post["mark-good-bad-response"].queryKey;
 
 export function useMarkGoodBadResponse() {
-	return useMutation<
-		MarkResponseAsGoodOrBadResponse,
-		Error,
-		MarkResponseAsGoodOrBadRequest
-	>({
-		mutationKey,
-	});
+  return useMutation<MarkResponseAsGoodOrBadResponse, Error, MarkResponseAsGoodOrBadRequest>({
+    mutationKey,
+  });
 }
 
-export function setMutationDefaults_markGoodBadResponse(
-	queryClient: QueryClient,
-) {
-	queryClient.setMutationDefaults(mutationKey, {
-		mutationFn: async (args) => {
-			const { botConversationId, botConversationMessageId, ...body } = args;
-			const path = `bot-conversations/${botConversationId}/messages/${botConversationMessageId}/feedback`;
+export function setMutationDefaults_markGoodBadResponse(queryClient: QueryClient) {
+  queryClient.setMutationDefaults(mutationKey, {
+    mutationFn: async (args) => {
+      const { botConversationId, botConversationMessageId, ...body } = args;
+      const path = `bot-conversations/${botConversationId}/messages/${botConversationMessageId}/feedback`;
 
-			const res = await clientAPI_V1.post<MarkResponseAsGoodOrBadResponse>(
-				path,
-				body,
-			);
+      const res = await clientAPI_V1.post<MarkResponseAsGoodOrBadResponse>(path, body);
 
-			return res.data;
-		},
+      return res.data;
+    },
 
-		onMutate(args) {
-			const { botConversationId, botConversationMessageId } = args;
+    onMutate(args) {
+      const { botConversationId, botConversationMessageId } = args;
 
-			generalContextStore
-				.getState()
-				.setBotConversationMessageListPages(botConversationId, (prevData) => {
-					if (!prevData) return prevData;
+      generalContextStore
+        .getState()
+        .setBotConversationMessageListPages(botConversationId, (prevData) => {
+          if (!prevData) return prevData;
 
-					const ret: typeof prevData = {
-						...prevData,
-						pages: prevData.pages.map((page) => {
-							return {
-								...page,
-								results: page.results.map((result) => {
-									if (result.id === botConversationMessageId) {
-										return {
-											...result,
-											feedback_text: args.feedback_text,
-											thumbs_up: args.thumbs_up,
-										};
-									}
+          const ret: typeof prevData = {
+            ...prevData,
+            pages: prevData.pages.map((page) => {
+              return {
+                ...page,
+                results: page.results.map((result) => {
+                  if (result.id === botConversationMessageId) {
+                    return {
+                      ...result,
+                      feedback_text: args.feedback_text,
+                      thumbs_up: args.thumbs_up,
+                    };
+                  }
 
-									return result;
-								}),
-							};
-						}),
-					};
+                  return result;
+                }),
+              };
+            }),
+          };
 
-					return ret;
-				});
-		},
+          return ret;
+        });
+    },
 
-		onSuccess(updatedBotConversationMessage, args) {
-			const { botConversationId, botConversationMessageId } = args;
+    onSuccess(updatedBotConversationMessage, args) {
+      const { botConversationId, botConversationMessageId } = args;
 
-			generalContextStore
-				.getState()
-				.setBotConversationMessageListPages(botConversationId, (prevData) => {
-					if (!prevData) return prevData;
+      generalContextStore
+        .getState()
+        .setBotConversationMessageListPages(botConversationId, (prevData) => {
+          if (!prevData) return prevData;
 
-					const ret: typeof prevData = {
-						...prevData,
-						pages: prevData.pages.map((page) => {
-							return {
-								...page,
-								results: page.results.map((result) => {
-									if (result.id === botConversationMessageId) {
-										return updatedBotConversationMessage;
-									}
+          const ret: typeof prevData = {
+            ...prevData,
+            pages: prevData.pages.map((page) => {
+              return {
+                ...page,
+                results: page.results.map((result) => {
+                  if (result.id === botConversationMessageId) {
+                    return updatedBotConversationMessage;
+                  }
 
-									return result;
-								}),
-							};
-						}),
-					};
+                  return result;
+                }),
+              };
+            }),
+          };
 
-					return ret;
-				});
-		},
+          return ret;
+        });
+    },
 
-		meta: {
-			errorTitle: "Failed to mark response as good or bad!",
-		},
-	} satisfies MutationObserverOptions<
-		MarkResponseAsGoodOrBadResponse,
-		Error,
-		MarkResponseAsGoodOrBadRequest
-	>);
+    meta: {
+      errorTitle: "Failed to mark response as good or bad!",
+    },
+  } satisfies MutationObserverOptions<
+    MarkResponseAsGoodOrBadResponse,
+    Error,
+    MarkResponseAsGoodOrBadRequest
+  >);
 }

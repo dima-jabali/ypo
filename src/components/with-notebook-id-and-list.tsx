@@ -4,41 +4,41 @@ import { useCreateNotebookIfOrgHasNone } from "#/hooks/use-create-notebook-if-or
 import { useSetNotebookToFirst } from "#/hooks/use-set-notebook-to-first";
 
 export function WithNotebookIdAndList({ children }: React.PropsWithChildren) {
-	if (typeof window === "undefined") {
-		return null;
-	}
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-	return (
-		<WithNotebookList>
-			<WithNotebookId>{children}</WithNotebookId>
-		</WithNotebookList>
-	);
+  return (
+    <WithNotebookList>
+      <WithNotebookId>{children}</WithNotebookId>
+    </WithNotebookList>
+  );
 }
 
 function WithNotebookList({ children }: React.PropsWithChildren) {
-	if (typeof window === "undefined") {
-		return null;
-	}
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-	const createNotebookIfOrgHasNoneQuery = useCreateNotebookIfOrgHasNone();
+  const createNotebookIfOrgHasNoneQuery = useCreateNotebookIfOrgHasNone();
 
-	if (createNotebookIfOrgHasNoneQuery.isEnabled) {
-		return createNotebookIfOrgHasNoneQuery.data ? children : null;
-	}
+  if (createNotebookIfOrgHasNoneQuery.isEnabled) {
+    return createNotebookIfOrgHasNoneQuery.data ? children : null;
+  }
 
-	return children;
+  return children;
 }
 
 function WithNotebookId({ children }: React.PropsWithChildren) {
-	if (typeof window === "undefined") {
-		return null;
-	}
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-	const setNotebookToFirstQuery = useSetNotebookToFirst();
+  const setNotebookToFirstQuery = useSetNotebookToFirst();
 
-	if (setNotebookToFirstQuery.isEnabled) {
-		return setNotebookToFirstQuery.data ? children : null;
-	}
+  if (setNotebookToFirstQuery.isEnabled) {
+    return setNotebookToFirstQuery.data ? children : null;
+  }
 
-	return children;
+  return children;
 }

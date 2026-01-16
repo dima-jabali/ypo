@@ -16,13 +16,13 @@ export type Base64Image = `data:image/${string};base64,${string}`;
 export type Base64File = `data:${string};base64,${string}`;
 
 export const ColorScheme = Object.freeze({
-	light: "light",
-	dark: "dark",
+  light: "light",
+  dark: "dark",
 } as const);
 
 export type Mutable<T> =
-	T extends ReadonlySet<T>
-		? Set<T>
-		: T extends ReadonlyMap<infer K, infer V>
-			? Map<K, V>
-			: { -readonly [P in keyof T]: T[P] };
+  T extends ReadonlySet<T>
+    ? Set<T>
+    : T extends ReadonlyMap<infer K, infer V>
+      ? Map<K, V>
+      : { -readonly [P in keyof T]: T[P] };

@@ -3,12 +3,12 @@ import { useState } from "react";
 
 import { Button, ButtonVariant } from "#/components/Button";
 import {
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "#/components/Dialog";
 import { Input } from "#/components/Input";
 import { StyledTextarea } from "#/components/styled-text-area";
@@ -18,163 +18,154 @@ import { useCreateBot } from "#/hooks/mutation/use-create-bot";
 import { useCreateBotCommunication } from "#/hooks/mutation/use-create-bot-communication";
 import { useCreateBotCommunicationConfig } from "#/hooks/mutation/use-create-bot-communication-config";
 import { useCurrentOrganization } from "#/hooks/use-current-organization";
-import {
-	BotCommunicationType,
-	BotType,
-	ChannelConfigType,
-} from "#/types/bot-source";
+import { BotCommunicationType, BotType, ChannelConfigType } from "#/types/bot-source";
 import type { SlackConnectionDataWithDefinedChannels } from "#/types/databases";
 
 type Props = {
-	connection?: SlackConnectionDataWithDefinedChannels;
+  connection?: SlackConnectionDataWithDefinedChannels;
 };
 
 export const BOT_DESCRIPTION_INPUT_NAME = "bot-description";
 export const BOT_NAME_INPUT_NAME = "bot-name";
 
 export function CreateBotDialog({ connection }: Props) {
-	const currentOrganization = useCurrentOrganization();
+  const currentOrganization = useCurrentOrganization();
 
-	// const allBotTags: BotTag[] = []; // TODO
+  // const allBotTags: BotTag[] = []; // TODO
 
-	// const [selectedTags, setSelectedTags] = useState<BotTag[]>([]);
-	const [isCreatingBot, setIsCreatingBot] = useState(false);
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // const [selectedTags, setSelectedTags] = useState<BotTag[]>([]);
+  const [isCreatingBot, setIsCreatingBot] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-	const createBotCommunicationConfig = useCreateBotCommunicationConfig();
-	const createBotCommunication = useCreateBotCommunication();
-	const createBotMutation = useCreateBot();
+  const createBotCommunicationConfig = useCreateBotCommunicationConfig();
+  const createBotCommunication = useCreateBotCommunication();
+  const createBotMutation = useCreateBot();
 
-	const handleCreateSlackBot = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+  const handleCreateSlackBot = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-		if (!currentOrganization) {
-			toast({
-				title: "You don't organization selected!",
-				variant: ToastVariant.Destructive,
-			});
+    if (!currentOrganization) {
+      toast({
+        title: "You don't organization selected!",
+        variant: ToastVariant.Destructive,
+      });
 
-			return;
-		}
+      return;
+    }
 
-		// Casting here because `e.target` can only be an `HTMLFormElement`:
-		const formData = new FormData(e.target as HTMLFormElement);
+    // Casting here because `e.target` can only be an `HTMLFormElement`:
+    const formData = new FormData(e.target as HTMLFormElement);
 
-		// Casting here cause we know it is a string:
-		const botDescription =
-			(formData.get(BOT_DESCRIPTION_INPUT_NAME) as string | null)?.trim() ?? "";
+    // Casting here cause we know it is a string:
+    const botDescription =
+      (formData.get(BOT_DESCRIPTION_INPUT_NAME) as string | null)?.trim() ?? "";
 
-		// Casting here cause we know it is a string:
-		const botName = (
-			formData.get(BOT_NAME_INPUT_NAME) as string | null
-		)?.trim();
+    // Casting here cause we know it is a string:
+    const botName = (formData.get(BOT_NAME_INPUT_NAME) as string | null)?.trim();
 
-		if (!botName) {
-			toast({
-				title: "Please enter a bot name!",
-				variant: ToastVariant.Destructive,
-			});
+    if (!botName) {
+      toast({
+        title: "Please enter a bot name!",
+        variant: ToastVariant.Destructive,
+      });
 
-			return;
-		}
+      return;
+    }
 
-		try {
-			setIsCreatingBot(true);
+    try {
+      setIsCreatingBot(true);
 
-			const newBot = await createBotMutation.mutateAsync({
-				communication_type: BotCommunicationType.Slack,
-				type: BotType.QuestionsAndAnswers,
-				description: botDescription,
-				name: botName,
-			});
+      const newBot = await createBotMutation.mutateAsync({
+        communication_type: BotCommunicationType.Slack,
+        type: BotType.QuestionsAndAnswers,
+        description: botDescription,
+        name: botName,
+      });
 
-			console.log("createBot response: ", { newBot, connection });
+      console.log("createBot response: ", { newBot, connection });
 
-			setIsDialogOpen(false);
+      setIsDialogOpen(false);
 
-			if (connection) {
-				const newCommConfig = await createBotCommunicationConfig.mutateAsync({
-					channel_config_type: ChannelConfigType.Selected,
-					communication_type: BotCommunicationType.Slack,
-					slack_connection_id: connection.id,
-					allowed_slack_channel_ids: [],
-					bot_id: newBot.id,
-				});
+      if (connection) {
+        const newCommConfig = await createBotCommunicationConfig.mutateAsync({
+          channel_config_type: ChannelConfigType.Selected,
+          communication_type: BotCommunicationType.Slack,
+          slack_connection_id: connection.id,
+          allowed_slack_channel_ids: [],
+          bot_id: newBot.id,
+        });
 
-				console.log({ newCommConfig });
+        console.log({ newCommConfig });
 
-				//                 const newBotWithCommConfig: Bot = {
-				//                     ...newBot,
-				//                     communication_configs: [...newBot.communication_configs, newCommConfig],
-				//                 };
-				//                 const newConnectionWithBot: typeof connection = {
-				//                     ...connection,
-				//                 };
-				//
-				//                 console.log({ newBotWithCommConfig });
+        //                 const newBotWithCommConfig: Bot = {
+        //                     ...newBot,
+        //                     communication_configs: [...newBot.communication_configs, newCommConfig],
+        //                 };
+        //                 const newConnectionWithBot: typeof connection = {
+        //                     ...connection,
+        //                 };
+        //
+        //                 console.log({ newBotWithCommConfig });
 
-				// setBotDatabaseConnection(newConnectionWithBot));
-			}
+        // setBotDatabaseConnection(newConnectionWithBot));
+      }
 
-			// Create a default Chat channel (BotConversation) to talk with the bot:
-			const newBotConversation = await createBotCommunication.mutateAsync({
-				botId: newBot.id,
-				title: "Hello!",
-			});
+      // Create a default Chat channel (BotConversation) to talk with the bot:
+      const newBotConversation = await createBotCommunication.mutateAsync({
+        botId: newBot.id,
+        title: "Hello!",
+      });
 
-			console.log({ newBotConversation });
+      console.log({ newBotConversation });
 
-			toast({
-				title: "Bot created successfully!",
-				variant: ToastVariant.Success,
-			});
-		} catch (error) {
-			console.error("Failed to create bot:", error);
+      toast({
+        title: "Bot created successfully!",
+        variant: ToastVariant.Success,
+      });
+    } catch (error) {
+      console.error("Failed to create bot:", error);
 
-			toast({
-				title: "Failed to create bot!",
-				variant: ToastVariant.Destructive,
-			});
-		} finally {
-			setIsCreatingBot(false);
-		}
-	};
+      toast({
+        title: "Failed to create bot!",
+        variant: ToastVariant.Destructive,
+      });
+    } finally {
+      setIsCreatingBot(false);
+    }
+  };
 
-	return (
-		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-			<DialogTrigger asChild>
-				<Button variant={ButtonVariant.PURPLE}>
-					<PlusIcon className="size-5" />
+  return (
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <Button variant={ButtonVariant.PURPLE}>
+          <PlusIcon className="size-5" />
 
-					<p>Create</p>
-				</Button>
-			</DialogTrigger>
+          <p>Create</p>
+        </Button>
+      </DialogTrigger>
 
-			<DialogContent className="simple-scrollbar">
-				<DialogHeader>
-					<DialogTitle className="pl-2">Create Bot</DialogTitle>
-				</DialogHeader>
+      <DialogContent className="simple-scrollbar">
+        <DialogHeader>
+          <DialogTitle className="pl-2">Create Bot</DialogTitle>
+        </DialogHeader>
 
-				<form
-					className="mt-10 flex h-[92%] flex-col gap-5"
-					onSubmit={handleCreateSlackBot}
-				>
-					<label className="flex flex-col gap-1">
-						<p className="pl-2">
-							Name
-							<span className="align-top text-sm text-destructive ml-1">*</span>
-						</p>
+        <form className="mt-10 flex h-[92%] flex-col gap-5" onSubmit={handleCreateSlackBot}>
+          <label className="flex flex-col gap-1">
+            <p className="pl-2">
+              Name
+              <span className="align-top text-sm text-destructive ml-1">*</span>
+            </p>
 
-						<Input name={BOT_NAME_INPUT_NAME} />
-					</label>
+            <Input name={BOT_NAME_INPUT_NAME} />
+          </label>
 
-					<label className="flex flex-col gap-1">
-						<p className="pl-2">Description</p>
+          <label className="flex flex-col gap-1">
+            <p className="pl-2">Description</p>
 
-						<StyledTextarea name={BOT_DESCRIPTION_INPUT_NAME} />
-					</label>
+            <StyledTextarea name={BOT_DESCRIPTION_INPUT_NAME} />
+          </label>
 
-					{/* <label className="flex flex-col gap-1">
+          {/* <label className="flex flex-col gap-1">
                         <p className="pl-2">Tags</p>
 
                         <TagGroup
@@ -190,19 +181,15 @@ export function CreateBotDialog({ connection }: Props) {
                         />
                     </label> */}
 
-					<DialogFooter className="">
-						<Button
-							variant={ButtonVariant.SUCCESS}
-							isLoading={isCreatingBot}
-							type="submit"
-						>
-							Creat{isCreatingBot ? "ing" : "e"} Bot{isCreatingBot ? "..." : ""}
-						</Button>
-					</DialogFooter>
-				</form>
-			</DialogContent>
-		</Dialog>
-	);
+          <DialogFooter className="">
+            <Button variant={ButtonVariant.SUCCESS} isLoading={isCreatingBot} type="submit">
+              Creat{isCreatingBot ? "ing" : "e"} Bot{isCreatingBot ? "..." : ""}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 // const renderBotTagItem: TagGroupProps<BotTag>['renderItem'] = (item, handleAddSelectedValue) => (

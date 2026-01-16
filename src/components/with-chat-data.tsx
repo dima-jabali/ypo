@@ -9,28 +9,28 @@ import { WithNotebookIdAndList } from "./with-notebook-id-and-list";
 import { WithSettings } from "./with-settings";
 
 export function WithChatData({
-	children,
-	fallback,
+  children,
+  fallback,
 }: React.PropsWithChildren<{ fallback?: React.ReactNode }>) {
-		if (typeof window === "undefined") {
-		return null;
-	}
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-	return (
-		<WithNotebookIdAndList>
-			<WithNotebook>
-				<WithSettings>
-					<WithBotConversationId fallback={fallback}>
-						<AssureNotebookBelongsToOrg>
-							<WithBotConversationMessageList>
-								<AssureBotConversationBelongsToNotebook>
-									{children}
-								</AssureBotConversationBelongsToNotebook>
-							</WithBotConversationMessageList>
-						</AssureNotebookBelongsToOrg>
-					</WithBotConversationId>
-				</WithSettings>
-			</WithNotebook>
-		</WithNotebookIdAndList>
-	);
+  return (
+    <WithNotebookIdAndList>
+      <WithNotebook>
+        <WithSettings>
+          <WithBotConversationId fallback={fallback}>
+            <AssureNotebookBelongsToOrg>
+              <WithBotConversationMessageList>
+                <AssureBotConversationBelongsToNotebook>
+                  {children}
+                </AssureBotConversationBelongsToNotebook>
+              </WithBotConversationMessageList>
+            </AssureNotebookBelongsToOrg>
+          </WithBotConversationId>
+        </WithSettings>
+      </WithNotebook>
+    </WithNotebookIdAndList>
+  );
 }

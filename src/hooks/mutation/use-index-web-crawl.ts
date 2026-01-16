@@ -11,24 +11,24 @@ type IndexWebCrawlResponse = WebCrawl;
 const mutationKey = queryKeyFactory.put["index-web-crawl"].queryKey;
 
 export const useIndexWebCrawl = () => {
-	const organizationId = generalContextStore.use.organizationId();
+  const organizationId = generalContextStore.use.organizationId();
 
-	return useMutation<IndexWebCrawlResponse, Error, IndexWebCrawlRequest>({
-		mutationKey,
+  return useMutation<IndexWebCrawlResponse, Error, IndexWebCrawlRequest>({
+    mutationKey,
 
-		mutationFn: async (webcrawlId: IndexWebCrawlRequest) => {
-			const path = `/organizations/${organizationId}/web-crawls/${webcrawlId}`;
+    mutationFn: async (webcrawlId: IndexWebCrawlRequest) => {
+      const path = `/organizations/${organizationId}/web-crawls/${webcrawlId}`;
 
-			const res = await clientAPI_V1.put<IndexWebCrawlResponse>(path, {
-				run: true,
-			});
+      const res = await clientAPI_V1.put<IndexWebCrawlResponse>(path, {
+        run: true,
+      });
 
-			return res.data;
-		},
+      return res.data;
+    },
 
-		meta: {
-			invalidateQuery: queryKeyFactory.get["web-crawls-page"](organizationId),
-			cancelQuery: queryKeyFactory.get["bots-page"](organizationId),
-		},
-	});
+    meta: {
+      invalidateQuery: queryKeyFactory.get["web-crawls-page"](organizationId),
+      cancelQuery: queryKeyFactory.get["bots-page"](organizationId),
+    },
+  });
 };

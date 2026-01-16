@@ -1,61 +1,54 @@
-import {
-	memo,
-	useEffect,
-	useState,
-	type ComponentProps,
-	type PropsWithChildren,
-} from "react";
+import { memo, useEffect, useState, type ComponentProps, type PropsWithChildren } from "react";
 
 type FakeAIStreamProps = {
-	enabled?: boolean;
-	fullText: string;
-	speed?: number; // milliseconds per character
+  enabled?: boolean;
+  fullText: string;
+  speed?: number; // milliseconds per character
 };
 
 export const FakeAIStream = memo(function FakeAIStream({
-	enabled = true,
-	speed = 40,
-	fullText,
-	children,
-	...props
+  enabled = true,
+  speed = 40,
+  fullText,
+  children,
+  ...props
 }: PropsWithChildren<FakeAIStreamProps & ComponentProps<"p">>) {
-	const [prevFullText, setPrevFullText] = useState(fullText);
-	const [displayedText, setDisplayedText] = useState("");
+  const [prevFullText, setPrevFullText] = useState(fullText);
+  const [displayedText, setDisplayedText] = useState("");
 
-	const shouldFakeStream =
-		enabled && prevFullText !== fullText && displayedText !== fullText;
+  const shouldFakeStream = enabled && prevFullText !== fullText && displayedText !== fullText;
 
-	useEffect(() => {
-		if (!shouldFakeStream) {
-			setDisplayedText(fullText);
-			setPrevFullText(fullText);
+  useEffect(() => {
+    if (!shouldFakeStream) {
+      setDisplayedText(fullText);
+      setPrevFullText(fullText);
 
-			return;
-		}
+      return;
+    }
 
-		let index = 0;
+    let index = 0;
 
-		const interval = setInterval(() => {
-			if (index <= fullText.length) {
-				const nextDisplayedText = fullText.slice(0, index);
+    const interval = setInterval(() => {
+      if (index <= fullText.length) {
+        const nextDisplayedText = fullText.slice(0, index);
 
-				setDisplayedText(nextDisplayedText);
+        setDisplayedText(nextDisplayedText);
 
-				++index;
-			} else {
-				setPrevFullText(fullText);
-				clearInterval(interval);
-			}
-		}, speed);
+        ++index;
+      } else {
+        setPrevFullText(fullText);
+        clearInterval(interval);
+      }
+    }, speed);
 
-		return () => clearInterval(interval); // cleanup if the component unmounts
-	}, [fullText, shouldFakeStream, speed]);
+    return () => clearInterval(interval); // cleanup if the component unmounts
+  }, [fullText, shouldFakeStream, speed]);
 
-	return (
-		<span {...props}>
-			{displayedText}
+  return (
+    <span {...props}>
+      {displayedText}
 
-			{children}
-		</span>
-	);
+      {children}
+    </span>
+  );
 });

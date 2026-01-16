@@ -1,25 +1,21 @@
 import { useState } from "react";
 
 export function ImgWithFallback({
-	src,
-	fallbackSrc,
-	fallbackNode,
-	...rest
+  src,
+  fallbackSrc,
+  fallbackNode,
+  ...rest
 }: React.ComponentProps<"img"> & {
-	fallbackNode?: React.ReactNode;
-	fallbackSrc?: string;
+  fallbackNode?: React.ReactNode;
+  fallbackSrc?: string;
 }) {
-	const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
-	const imgSrc = hasError || !src ? fallbackSrc : src;
+  const imgSrc = hasError || !src ? fallbackSrc : src;
 
-	function handleError() {
-		setHasError(true);
-	}
+  function handleError() {
+    setHasError(true);
+  }
 
-	return imgSrc === undefined ? (
-		fallbackNode
-	) : (
-		<img src={imgSrc} {...rest} onError={handleError} />
-	);
+  return imgSrc === undefined ? fallbackNode : <img src={imgSrc} {...rest} onError={handleError} />;
 }

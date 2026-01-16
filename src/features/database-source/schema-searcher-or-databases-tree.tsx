@@ -6,37 +6,36 @@ import { SchemaSearcher } from "../schema-tree/search-columns-or-dataframes/sche
 import { DatabasesTree } from "./databases-tree";
 
 export function SchemaSearcherOrDatabasesTree({
-	selectedDatabase,
+  selectedDatabase,
 }: {
-	selectedDatabase: NormalDatabaseConnection | null;
+  selectedDatabase: NormalDatabaseConnection | null;
 }) {
-	const [openView, setOpenView] = useState(OpenView.DatabasesTree);
+  const [openView, setOpenView] = useState(OpenView.DatabasesTree);
 
-	const databasesTree = useMemo(
-		() => (
-			<div className="simple-scrollbar flex scrollbar-stable min-h-min h-full">
-				<div className="w-full [&_div]:pl-5">
-					<DatabasesTree selectedDatabase={selectedDatabase} />
+  const databasesTree = useMemo(
+    () => (
+      <div className="simple-scrollbar flex scrollbar-stable min-h-min h-full">
+        <div className="w-full [&_div]:pl-5">
+          <DatabasesTree selectedDatabase={selectedDatabase} />
 
-					<div className="h-48" />
-				</div>
-			</div>
-		),
-		[selectedDatabase],
-	);
+          <div className="h-48" />
+        </div>
+      </div>
+    ),
+    [selectedDatabase],
+  );
 
-	return (
-		<>
-			<SchemaSearcher
-				selectedDatabase={selectedDatabase}
-				setOpenView={setOpenView}
-				openView={openView}
-			/>
+  return (
+    <>
+      <SchemaSearcher
+        selectedDatabase={selectedDatabase}
+        setOpenView={setOpenView}
+        openView={openView}
+      />
 
-			{openView === OpenView.SearchResultExpandedDatabaseTree ||
-			openView === OpenView.DatabasesTree
-				? databasesTree
-				: null}
-		</>
-	);
+      {openView === OpenView.SearchResultExpandedDatabaseTree || openView === OpenView.DatabasesTree
+        ? databasesTree
+        : null}
+    </>
+  );
 }

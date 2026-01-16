@@ -8,16 +8,16 @@ import { generalContextStore } from "#/contexts/general-ctx/general-context";
 export type FetchTagsResponse = { results: Array<NotebookTag> };
 
 export function useFetchOrganizationTags() {
-	const organizationId = generalContextStore.use.organizationId();
+  const organizationId = generalContextStore.use.organizationId();
 
-	const queryOptions = useMemo(
-		() => queryKeyFactory.get["organization-tag-list"](organizationId),
-		[organizationId],
-	);
+  const queryOptions = useMemo(
+    () => queryKeyFactory.get["organization-tag-list"](organizationId),
+    [organizationId],
+  );
 
-	return useQuery({
-		refetchOnWindowFocus: false,
-		refetchOnMount: false,
-		...queryOptions,
-	});
+  return useQuery({
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    ...queryOptions,
+  });
 }

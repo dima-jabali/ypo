@@ -3,10 +3,10 @@
 import { BrowserClerk } from "@clerk/nextjs";
 
 declare global {
-	type TODO = unknown;
+  type TODO = unknown;
 
-	interface Window {
-		SHOULD_LOG: boolean;
-		Clerk: BrowserClerk;
-	}
+  interface Window {
+    SHOULD_LOG: boolean;
+    Clerk: BrowserClerk;
+  }
 }

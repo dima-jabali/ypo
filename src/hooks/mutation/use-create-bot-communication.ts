@@ -6,9 +6,9 @@ import type { BotConversation } from "#/types/notebook";
 import { queryKeyFactory } from "../query-keys";
 
 export type CreateBotConversationRequest = {
-	title: string;
-	uuid?: string;
-	botId: BotId;
+  title: string;
+  uuid?: string;
+  botId: BotId;
 };
 
 export type CreateBotConversationResponse = BotConversation;
@@ -16,28 +16,21 @@ export type CreateBotConversationResponse = BotConversation;
 const mutationKey = queryKeyFactory.post["create-bot-communication"].queryKey;
 
 export const useCreateBotCommunication = () => {
-	return useMutation<
-		CreateBotConversationResponse,
-		Error,
-		CreateBotConversationRequest
-	>({
-		mutationKey,
+  return useMutation<CreateBotConversationResponse, Error, CreateBotConversationRequest>({
+    mutationKey,
 
-		mutationFn: async (args) => {
-			const { botId, ...body } = args;
+    mutationFn: async (args) => {
+      const { botId, ...body } = args;
 
-			const path = `/bots/${botId}/conversations`;
+      const path = `/bots/${botId}/conversations`;
 
-			const res = await clientAPI_V1.post<CreateBotConversationResponse>(
-				path,
-				body,
-			);
+      const res = await clientAPI_V1.post<CreateBotConversationResponse>(path, body);
 
-			return res.data;
-		},
+      return res.data;
+    },
 
-		meta: {
-			errorTitle: "Failed to create bot conversation!",
-		},
-	});
+    meta: {
+      errorTitle: "Failed to create bot conversation!",
+    },
+  });
 };

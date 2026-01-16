@@ -11,36 +11,35 @@ import { generalContextStore } from "#/contexts/general-ctx/general-context";
 type HasCreatedNotebook = boolean;
 
 export function useCreateNotebookIfOrgHasNone() {
-	
-	const organizationId = generalContextStore.use.organizationId();
-	const hasNotebooksInList = useHasNotebooksInList();
-	const createNotebook = useCreateNotebook();
+  const organizationId = generalContextStore.use.organizationId();
+  const hasNotebooksInList = useHasNotebooksInList();
+  const createNotebook = useCreateNotebook();
 
-	return useQuery({
-		queryKey: ["create-notebook-if-org-has-none", organizationId],
-		enabled: !hasNotebooksInList,
-		refetchOnMount: true,
-		throwOnError: false,
-		staleTime: 0, // Important
-		retry: true,
-		gcTime: 0, // Important
-		queryFn: async (): Promise<HasCreatedNotebook> => {
-			await createNotebook.mutateAsync({
-				metadata: {
-					status: NotebookStatus.NotStarted,
-					priority: NotebookImportance.Low,
-					uuid: createNotebookUuid(),
-					title: "New Chat",
-					favorited: false,
-					assigned_to: [],
-					description: "",
-					tags: [],
-				},
-				organizationId,
-				blocks: [],
-			});
+  return useQuery({
+    queryKey: ["create-notebook-if-org-has-none", organizationId],
+    enabled: !hasNotebooksInList,
+    refetchOnMount: true,
+    throwOnError: false,
+    staleTime: 0, // Important
+    retry: true,
+    gcTime: 0, // Important
+    queryFn: async (): Promise<HasCreatedNotebook> => {
+      await createNotebook.mutateAsync({
+        metadata: {
+          status: NotebookStatus.NotStarted,
+          priority: NotebookImportance.Low,
+          uuid: createNotebookUuid(),
+          title: "New Chat",
+          favorited: false,
+          assigned_to: [],
+          description: "",
+          tags: [],
+        },
+        organizationId,
+        blocks: [],
+      });
 
-			return true;
-		},
-	});
+      return true;
+    },
+  });
 }

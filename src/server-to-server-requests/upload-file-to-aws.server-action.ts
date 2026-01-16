@@ -1,108 +1,99 @@
 import { S3Client, S3ServiceException } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 
-import type {
-	AwsBucket,
-	AwsKey,
-} from "#/hooks/fetch/use-fetch-all-organizations";
+import type { AwsBucket, AwsKey } from "#/hooks/fetch/use-fetch-all-organizations";
 
 export const config = {
-	api: {
-		bodyParser: false, // Disable default Next.js body parser
-	},
+  api: {
+    bodyParser: false, // Disable default Next.js body parser
+  },
 };
 
 export async function uploadFileToAws({
-	region = "us-west-1",
-	fileMimeType,
-	awsBucket,
-	awsKey,
-	file,
+  region = "us-west-1",
+  fileMimeType,
+  awsBucket,
+  awsKey,
+  file,
 }: {
-	fileMimeType: string;
-	awsBucket: AwsBucket;
-	region?: string;
-	awsKey: AwsKey;
-	file: File;
+  fileMimeType: string;
+  awsBucket: AwsBucket;
+  region?: string;
+  awsKey: AwsKey;
+  file: File;
 }) {
-	if (!file) {
-		throw new Response("`file` is required.", {
-			status: 403,
-		});
-	}
+  if (!file) {
+    throw new Response("`file` is required.", {
+      status: 403,
+    });
+  }
 
-	if (
-		!awsBucket ||
-		!awsKey ||
-		awsBucket === "undefined" ||
-		awsBucket === "null" ||
-		awsKey === "undefined" ||
-		awsKey === "null"
-	) {
-		throw new Response(
-			"`aws_bucket` and `aws_key` query params are required.",
-			{
-				status: 403,
-			},
-		);
-	}
+  if (
+    !awsBucket ||
+    !awsKey ||
+    awsBucket === "undefined" ||
+    awsBucket === "null" ||
+    awsKey === "undefined" ||
+    awsKey === "null"
+  ) {
+    throw new Response("`aws_bucket` and `aws_key` query params are required.", {
+      status: 403,
+    });
+  }
 
-	try {
-		const s3 = new S3Client({ region });
+  try {
+    const s3 = new S3Client({ region });
 
-		const parallelUploads3 = new Upload({
-			client: s3,
-			params: {
-				ContentType: fileMimeType,
-				Body: file.stream(),
-				Bucket: awsBucket,
-				Key: awsKey,
-			},
-			// Stream in 10MB chunks to S3
-			partSize: 1024 * 1024 * 10,
-			queueSize: 4, // Upload 4 chunks in parallel
-		});
+    const parallelUploads3 = new Upload({
+      client: s3,
+      params: {
+        ContentType: fileMimeType,
+        Body: file.stream(),
+        Bucket: awsBucket,
+        Key: awsKey,
+      },
+      // Stream in 10MB chunks to S3
+      partSize: 1024 * 1024 * 10,
+      queueSize: 4, // Upload 4 chunks in parallel
+    });
 
-		console.log({
-			parallelUploads3,
-			eventListener: parallelUploads3.on("httpUploadProgress", (progress) => {
-				console.log({ progress });
-			}),
-		});
+    console.log({
+      parallelUploads3,
+      eventListener: parallelUploads3.on("httpUploadProgress", (progress) => {
+        console.log({ progress });
+      }),
+    });
 
-		await parallelUploads3.done();
+    await parallelUploads3.done();
 
-		console.log("File uploaded.", { parallelUploads3 });
+    console.log("File uploaded.", { parallelUploads3 });
 
-		return new Response("File uploaded to AWS successfully", {
-			headers: {
-				"Content-Type": "text/plain",
-			},
-			status: 200,
-		});
-	} catch (error) {
-		console.error("Failed to upload file to AWS", error);
+    return new Response("File uploaded to AWS successfully", {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      status: 200,
+    });
+  } catch (error) {
+    console.error("Failed to upload file to AWS", error);
 
-		if (
-			error instanceof S3ServiceException &&
-			error.name === "EntityTooLarge"
-		) {
-			console.error(
-				`Error from S3 while uploading object to ${awsBucket}. \
+    if (error instanceof S3ServiceException && error.name === "EntityTooLarge") {
+      console.error(
+        `Error from S3 while uploading object to ${awsBucket}. \
 The object was too large. To upload objects larger than 5GB, use the S3 console (160GB max) \
 or the multipart upload API (5TB max).`,
-			);
-		} else if (error instanceof S3ServiceException) {
-			console.error(
-				`Error from S3 while uploading object to ${awsBucket}.\n\n${error.name}: ${error.message}`,
-			);
-		}
+      );
+    } else if (error instanceof S3ServiceException) {
+      console.error(
+        `Error from S3 while uploading object to ${awsBucket}.\n\n${error.name}: ${error.message}`,
+      );
+    }
 
-		throw Response.json(error, {
-			headers: {
-				"Content-Type": "application/json",
-			},
-			status: 500,
-		});
-	}
+    throw Response.json(error, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      status: 500,
+    });
+  }
 }

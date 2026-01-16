@@ -12,315 +12,259 @@ import { Label } from "@/components/ui/label";
 import { useEvents, useMembers, useStore } from "@/lib/store";
 
 export default function SearchPage() {
-		if (typeof window === "undefined") {
-		return null;
-	}
-	
-	const members = useStore(useMembers);
-	const events = useStore(useEvents);
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-	// Member filters
-	const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
-	const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
-	const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
+  const members = useStore(useMembers);
+  const events = useStore(useEvents);
 
-	// Event filters
-	const [selectedEventCities, setSelectedEventCities] = useState<string[]>([]);
-	const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
+  // Member filters
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
 
-	// Content filters
-	const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>(
-		[],
-	);
+  // Event filters
+  const [selectedEventCities, setSelectedEventCities] = useState<string[]>([]);
+  const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
 
-	const uniqueCities = Array.from(
-		new Set(members.flatMap((m) => m.travelPattern)),
-	).sort();
-	const uniqueIndustries = Array.from(
-		new Set(members.map((m) => m.industry)),
-	).sort();
-	const uniqueChapters = Array.from(
-		new Set(members.map((m) => m.chapter)),
-	).sort();
-	const eventCities = Array.from(new Set(events.map((e) => e.city))).sort();
-	const eventTypes = ["GLC", "Forum", "Network", "Regional", "Chapter"];
-	const contentTypes = ["Talk", "Article", "Podcast", "Video"];
+  // Content filters
+  const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
 
-	const toggleFilter = (
-		value: string,
-		selected: string[],
-		setter: (v: string[]) => void,
-	) => {
-		setter(
-			selected.includes(value)
-				? selected.filter((v) => v !== value)
-				: [...selected, value],
-		);
-	};
+  const uniqueCities = Array.from(new Set(members.flatMap((m) => m.travelPattern))).sort();
+  const uniqueIndustries = Array.from(new Set(members.map((m) => m.industry))).sort();
+  const uniqueChapters = Array.from(new Set(members.map((m) => m.chapter))).sort();
+  const eventCities = Array.from(new Set(events.map((e) => e.city))).sort();
+  const eventTypes = ["GLC", "Forum", "Network", "Regional", "Chapter"];
+  const contentTypes = ["Talk", "Article", "Podcast", "Video"];
 
-	const clearAllFilters = () => {
-		setSelectedContentTypes([]);
-		setSelectedEventCities([]);
-		setSelectedIndustries([]);
-		setSelectedEventTypes([]);
-		setSelectedLocations([]);
-		setSelectedChapters([]);
-	};
+  const toggleFilter = (value: string, selected: string[], setter: (v: string[]) => void) => {
+    setter(selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value]);
+  };
 
-	const hasActiveFilters =
-		selectedIndustries.length > 0 ||
-		selectedLocations.length > 0 ||
-		selectedChapters.length > 0 ||
-		selectedEventTypes.length > 0 ||
-		selectedEventCities.length > 0 ||
-		selectedContentTypes.length > 0;
+  const clearAllFilters = () => {
+    setSelectedContentTypes([]);
+    setSelectedEventCities([]);
+    setSelectedIndustries([]);
+    setSelectedEventTypes([]);
+    setSelectedLocations([]);
+    setSelectedChapters([]);
+  };
 
-	return (
-		<main className="container mx-auto p-6">
-			<div className="flex flex-col lg:flex-row gap-6">
-				<aside className="w-full lg:w-72 space-y-4 lg:sticky lg:top-6 lg:self-start">
-					<Card>
-						<CardHeader>
-							<div className="flex items-center justify-between">
-								<CardTitle className="text-lg">Filters</CardTitle>
+  const hasActiveFilters =
+    selectedIndustries.length > 0 ||
+    selectedLocations.length > 0 ||
+    selectedChapters.length > 0 ||
+    selectedEventTypes.length > 0 ||
+    selectedEventCities.length > 0 ||
+    selectedContentTypes.length > 0;
 
-								{hasActiveFilters && (
-									<Button
-										variant="ghost"
-										size="sm"
-										onClick={clearAllFilters}
-										className="h-8 text-xs"
-									>
-										Clear All
-									</Button>
-								)}
-							</div>
-						</CardHeader>
+  return (
+    <main className="container mx-auto p-6">
+      <div className="flex flex-col lg:flex-row gap-6">
+        <aside className="w-full lg:w-72 space-y-4 lg:sticky lg:top-6 lg:self-start">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Filters</CardTitle>
 
-						<CardContent className="space-y-6">
-							{/* Member Filters */}
-							<div className="space-y-3">
-								<h4 className="font-semibold text-sm flex items-center gap-2">
-									<Users className="h-4 w-4" />
-									Members
-								</h4>
+                {hasActiveFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearAllFilters}
+                    className="h-8 text-xs"
+                  >
+                    Clear All
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
 
-								<div className="space-y-2">
-									<Label className="text-xs text-muted-foreground">
-										Industry
-									</Label>
+            <CardContent className="space-y-6">
+              {/* Member Filters */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Members
+                </h4>
 
-									<div className="space-y-2 max-h-40 simple-scrollbar">
-										{uniqueIndustries.slice(0, 8).map((industry) => (
-											<div
-												className="flex items-center space-x-2"
-												key={industry}
-											>
-												<Checkbox
-													checked={selectedIndustries.includes(industry)}
-													id={`industry-${industry}`}
-													onCheckedChange={() =>
-														toggleFilter(
-															industry,
-															selectedIndustries,
-															setSelectedIndustries,
-														)
-													}
-												/>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Industry</Label>
 
-												<label
-													className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-													htmlFor={`industry-${industry}`}
-												>
-													{industry}
-												</label>
-											</div>
-										))}
-									</div>
-								</div>
+                  <div className="space-y-2 max-h-40 simple-scrollbar">
+                    {uniqueIndustries.slice(0, 8).map((industry) => (
+                      <div className="flex items-center space-x-2" key={industry}>
+                        <Checkbox
+                          checked={selectedIndustries.includes(industry)}
+                          id={`industry-${industry}`}
+                          onCheckedChange={() =>
+                            toggleFilter(industry, selectedIndustries, setSelectedIndustries)
+                          }
+                        />
 
-								<div className="space-y-2">
-									<Label className="text-xs text-muted-foreground">
-										Location
-									</Label>
+                        <label
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          htmlFor={`industry-${industry}`}
+                        >
+                          {industry}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-									<div className="space-y-2 max-h-40 simple-scrollbar">
-										{uniqueCities.slice(0, 8).map((city) => (
-											<div key={city} className="flex items-center space-x-2">
-												<Checkbox
-													checked={selectedLocations.includes(city)}
-													id={`city-${city}`}
-													onCheckedChange={() =>
-														toggleFilter(
-															city,
-															selectedLocations,
-															setSelectedLocations,
-														)
-													}
-												/>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Location</Label>
 
-												<label
-													htmlFor={`city-${city}`}
-													className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-												>
-													{city}
-												</label>
-											</div>
-										))}
-									</div>
-								</div>
+                  <div className="space-y-2 max-h-40 simple-scrollbar">
+                    {uniqueCities.slice(0, 8).map((city) => (
+                      <div key={city} className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={selectedLocations.includes(city)}
+                          id={`city-${city}`}
+                          onCheckedChange={() =>
+                            toggleFilter(city, selectedLocations, setSelectedLocations)
+                          }
+                        />
 
-								<div className="space-y-2">
-									<Label className="text-xs text-muted-foreground">
-										Chapter
-									</Label>
+                        <label
+                          htmlFor={`city-${city}`}
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {city}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-									<div className="space-y-2 max-h-40 simple-scrollbar">
-										{uniqueChapters.slice(0, 6).map((chapter) => (
-											<div
-												key={chapter}
-												className="flex items-center space-x-2"
-											>
-												<Checkbox
-													checked={selectedChapters.includes(chapter)}
-													id={`chapter-${chapter}`}
-													onCheckedChange={() =>
-														toggleFilter(
-															chapter,
-															selectedChapters,
-															setSelectedChapters,
-														)
-													}
-												/>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Chapter</Label>
 
-												<label
-													htmlFor={`chapter-${chapter}`}
-													className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-												>
-													{chapter}
-												</label>
-											</div>
-										))}
-									</div>
-								</div>
-							</div>
+                  <div className="space-y-2 max-h-40 simple-scrollbar">
+                    {uniqueChapters.slice(0, 6).map((chapter) => (
+                      <div key={chapter} className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={selectedChapters.includes(chapter)}
+                          id={`chapter-${chapter}`}
+                          onCheckedChange={() =>
+                            toggleFilter(chapter, selectedChapters, setSelectedChapters)
+                          }
+                        />
 
-							{/* Event Filters */}
-							<div className="space-y-3 pt-4 border-t">
-								<h4 className="font-semibold text-sm flex items-center gap-2">
-									<Calendar className="h-4 w-4" />
-									Events
-								</h4>
+                        <label
+                          htmlFor={`chapter-${chapter}`}
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {chapter}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-								<div className="space-y-2">
-									<Label className="text-xs text-muted-foreground">
-										Event Type
-									</Label>
+              {/* Event Filters */}
+              <div className="space-y-3 pt-4 border-t">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Events
+                </h4>
 
-									<div className="space-y-2">
-										{eventTypes.map((type) => (
-											<div key={type} className="flex items-center space-x-2">
-												<Checkbox
-													checked={selectedEventTypes.includes(type)}
-													id={`event-${type}`}
-													onCheckedChange={() =>
-														toggleFilter(
-															type,
-															selectedEventTypes,
-															setSelectedEventTypes,
-														)
-													}
-												/>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Event Type</Label>
 
-												<label
-													htmlFor={`event-${type}`}
-													className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-												>
-													{type}
-												</label>
-											</div>
-										))}
-									</div>
-								</div>
+                  <div className="space-y-2">
+                    {eventTypes.map((type) => (
+                      <div key={type} className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={selectedEventTypes.includes(type)}
+                          id={`event-${type}`}
+                          onCheckedChange={() =>
+                            toggleFilter(type, selectedEventTypes, setSelectedEventTypes)
+                          }
+                        />
 
-								<div className="space-y-2">
-									<Label className="text-xs text-muted-foreground">City</Label>
+                        <label
+                          htmlFor={`event-${type}`}
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {type}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-									<div className="space-y-2 max-h-40 simple-scrollbar">
-										{eventCities.slice(0, 8).map((city) => (
-											<div key={city} className="flex items-center space-x-2">
-												<Checkbox
-													checked={selectedEventCities.includes(city)}
-													id={`event-city-${city}`}
-													onCheckedChange={() =>
-														toggleFilter(
-															city,
-															selectedEventCities,
-															setSelectedEventCities,
-														)
-													}
-												/>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">City</Label>
 
-												<label
-													className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-													htmlFor={`event-city-${city}`}
-												>
-													{city}
-												</label>
-											</div>
-										))}
-									</div>
-								</div>
-							</div>
+                  <div className="space-y-2 max-h-40 simple-scrollbar">
+                    {eventCities.slice(0, 8).map((city) => (
+                      <div key={city} className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={selectedEventCities.includes(city)}
+                          id={`event-city-${city}`}
+                          onCheckedChange={() =>
+                            toggleFilter(city, selectedEventCities, setSelectedEventCities)
+                          }
+                        />
 
-							{/* Content Filters */}
-							<div className="space-y-3 pt-4 border-t">
-								<h4 className="font-semibold text-sm flex items-center gap-2">
-									<BookOpen className="h-4 w-4" />
-									Content
-								</h4>
+                        <label
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          htmlFor={`event-city-${city}`}
+                        >
+                          {city}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-								<div className="space-y-2">
-									<Label className="text-xs text-muted-foreground">
-										Content Type
-									</Label>
+              {/* Content Filters */}
+              <div className="space-y-3 pt-4 border-t">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Content
+                </h4>
 
-									<div className="space-y-2">
-										{contentTypes.map((type) => (
-											<div key={type} className="flex items-center space-x-2">
-												<Checkbox
-													checked={selectedContentTypes.includes(type)}
-													id={`content-${type}`}
-													onCheckedChange={() =>
-														toggleFilter(
-															type,
-															selectedContentTypes,
-															setSelectedContentTypes,
-														)
-													}
-												/>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Content Type</Label>
 
-												<label
-													className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-													htmlFor={`content-${type}`}
-												>
-													{type}
-												</label>
-											</div>
-										))}
-									</div>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-				</aside>
+                  <div className="space-y-2">
+                    {contentTypes.map((type) => (
+                      <div key={type} className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={selectedContentTypes.includes(type)}
+                          id={`content-${type}`}
+                          onCheckedChange={() =>
+                            toggleFilter(type, selectedContentTypes, setSelectedContentTypes)
+                          }
+                        />
 
-				<div className="flex-1 min-w-0 max-h-[80vh]">
-					<WithOrganizationIdAndListBoundary failedText="Something went wrong at the main page!">
-						<ChatOrNotebook />
-					</WithOrganizationIdAndListBoundary>
-				</div>
-			</div>
-		</main>
-	);
+                        <label
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          htmlFor={`content-${type}`}
+                        >
+                          {type}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </aside>
+
+        <div className="flex-1 min-w-0 max-h-[80vh]">
+          <WithOrganizationIdAndListBoundary failedText="Something went wrong at the main page!">
+            <ChatOrNotebook />
+          </WithOrganizationIdAndListBoundary>
+        </div>
+      </div>
+    </main>
+  );
 }

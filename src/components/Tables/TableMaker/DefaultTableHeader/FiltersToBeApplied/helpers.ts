@@ -1,201 +1,189 @@
 import {
-	type ChildFilter,
-	type Filter,
-	type FilterGroup,
-	FilterOperator,
+  type ChildFilter,
+  type Filter,
+  type FilterGroup,
+  FilterOperator,
 } from "../../filters/utilityTypes";
 
 type HasChanged = boolean;
 
 export const modifyChildFilter = <
-	KeyToModify extends keyof ChildFilter,
-	NewValue extends ChildFilter[KeyToModify],
+  KeyToModify extends keyof ChildFilter,
+  NewValue extends ChildFilter[KeyToModify],
 >(
-	parentFilter: FilterGroup,
-	filterToBeModified: ChildFilter,
-	keyToModify: KeyToModify,
-	newValue: NewValue,
+  parentFilter: FilterGroup,
+  filterToBeModified: ChildFilter,
+  keyToModify: KeyToModify,
+  newValue: NewValue,
 ): HasChanged => {
-	let hasChanged = false;
+  let hasChanged = false;
 
-	for (const filter of parentFilter.children) {
-		if (hasChanged) break;
+  for (const filter of parentFilter.children) {
+    if (hasChanged) break;
 
-		const isFilterToBeModified = filter === filterToBeModified;
+    const isFilterToBeModified = filter === filterToBeModified;
 
-		if (isFilterToBeModified) {
-			filter[keyToModify] = newValue;
-			hasChanged = true;
+    if (isFilterToBeModified) {
+      filter[keyToModify] = newValue;
+      hasChanged = true;
 
-			break;
-		}
+      break;
+    }
 
-		if (isAParent(filter)) {
-			hasChanged = modifyChildFilter(
-				filter,
-				filterToBeModified,
-				keyToModify,
-				newValue,
-			);
-		}
-	}
+    if (isAParent(filter)) {
+      hasChanged = modifyChildFilter(filter, filterToBeModified, keyToModify, newValue);
+    }
+  }
 
-	return hasChanged;
+  return hasChanged;
 };
 
 export const withFilter = (
-	parentFilter: FilterGroup,
-	filterToAdd: Filter,
-	filterAbove?: Filter,
+  parentFilter: FilterGroup,
+  filterToAdd: Filter,
+  filterAbove?: Filter,
 ): HasChanged => {
-	if (!filterToAdd.parent) {
-		console.error("filterToAdd.parent is undefined");
+  if (!filterToAdd.parent) {
+    console.error("filterToAdd.parent is undefined");
 
-		return false;
-	}
+    return false;
+  }
 
-	const shouldAddAtOutermostParent = filterToAdd.parent === parentFilter;
+  const shouldAddAtOutermostParent = filterToAdd.parent === parentFilter;
 
-	if (shouldAddAtOutermostParent) {
-		if (filterAbove) {
-			const innerIndex = parentFilter.children.indexOf(filterAbove);
+  if (shouldAddAtOutermostParent) {
+    if (filterAbove) {
+      const innerIndex = parentFilter.children.indexOf(filterAbove);
 
-			if (innerIndex !== -1) {
-				parentFilter.children.splice(innerIndex + 1, 0, filterToAdd);
-			}
-		} else {
-			parentFilter.children.push(filterToAdd);
-		}
+      if (innerIndex !== -1) {
+        parentFilter.children.splice(innerIndex + 1, 0, filterToAdd);
+      }
+    } else {
+      parentFilter.children.push(filterToAdd);
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	let hasAdded = false;
+  let hasAdded = false;
 
-	for (const filter of parentFilter.children) {
-		if (hasAdded) break;
+  for (const filter of parentFilter.children) {
+    if (hasAdded) break;
 
-		if (isAParent(filter)) {
-			const isTheParentOfTheNewFilter = filter === filterToAdd.parent;
+    if (isAParent(filter)) {
+      const isTheParentOfTheNewFilter = filter === filterToAdd.parent;
 
-			if (isTheParentOfTheNewFilter) {
-				const innerIndex = filter.children.findIndex((f) => f === filterAbove);
+      if (isTheParentOfTheNewFilter) {
+        const innerIndex = filter.children.findIndex((f) => f === filterAbove);
 
-				if (innerIndex === -1) {
-					filter.children.push(filterToAdd);
-					hasAdded = true;
-				} else {
-					filter.children.splice(innerIndex + 1, 0, filterToAdd);
-					hasAdded = true;
-				}
-			} else {
-				hasAdded = withFilter(filter, filterToAdd, filterAbove);
-			}
-		}
-	}
+        if (innerIndex === -1) {
+          filter.children.push(filterToAdd);
+          hasAdded = true;
+        } else {
+          filter.children.splice(innerIndex + 1, 0, filterToAdd);
+          hasAdded = true;
+        }
+      } else {
+        hasAdded = withFilter(filter, filterToAdd, filterAbove);
+      }
+    }
+  }
 
-	return hasAdded;
+  return hasAdded;
 };
 
-export const withoutFilter = (
-	parentFilter: FilterGroup,
-	filterToRemove: Filter,
-): HasChanged => {
-	let hasRemoved = false;
-	let index = 0;
+export const withoutFilter = (parentFilter: FilterGroup, filterToRemove: Filter): HasChanged => {
+  let hasRemoved = false;
+  let index = 0;
 
-	const isOutermostFilter = filterToRemove === parentFilter;
+  const isOutermostFilter = filterToRemove === parentFilter;
 
-	if (isOutermostFilter) {
-		// @ts-expect-error => We want to delete it.
-		parentFilter = undefined;
+  if (isOutermostFilter) {
+    // @ts-expect-error => We want to delete it.
+    parentFilter = undefined;
 
-		return true;
-	}
+    return true;
+  }
 
-	if (filterToRemove.parent === parentFilter) {
-		const index = parentFilter.children.findIndex((f) => f === filterToRemove);
+  if (filterToRemove.parent === parentFilter) {
+    const index = parentFilter.children.findIndex((f) => f === filterToRemove);
 
-		if (index !== -1) {
-			parentFilter.children.splice(index, 1);
-		}
+    if (index !== -1) {
+      parentFilter.children.splice(index, 1);
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	for (const filter of parentFilter.children) {
-		if (hasRemoved) break;
+  for (const filter of parentFilter.children) {
+    if (hasRemoved) break;
 
-		if (isAParent(filter)) {
-			const isParentOfFilterToDelete = filter === filterToRemove.parent;
+    if (isAParent(filter)) {
+      const isParentOfFilterToDelete = filter === filterToRemove.parent;
 
-			if (isParentOfFilterToDelete) {
-				filter.children.splice(index, 1);
+      if (isParentOfFilterToDelete) {
+        filter.children.splice(index, 1);
 
-				hasRemoved = true;
-			}
+        hasRemoved = true;
+      }
 
-			hasRemoved = withoutFilter(filter, filterToRemove);
-		} else {
-			const isFilterToDelete = filter === filterToRemove;
+      hasRemoved = withoutFilter(filter, filterToRemove);
+    } else {
+      const isFilterToDelete = filter === filterToRemove;
 
-			if (isFilterToDelete) {
-				parentFilter.children.splice(index, 1);
-				hasRemoved = true;
-			}
-		}
+      if (isFilterToDelete) {
+        parentFilter.children.splice(index, 1);
+        hasRemoved = true;
+      }
+    }
 
-		++index;
-	}
+    ++index;
+  }
 
-	return hasRemoved;
+  return hasRemoved;
 };
 
 /** Change if it's with AND or OR */
 export const withFilterOperator = (
-	parentFilter: FilterGroup,
-	newFilterOperator: FilterOperator,
-	filterToBeModified: Filter,
+  parentFilter: FilterGroup,
+  newFilterOperator: FilterOperator,
+  filterToBeModified: Filter,
 ): HasChanged => {
-	if (!filterToBeModified.parent) {
-		console.error("filterToAdd.parent is undefined");
+  if (!filterToBeModified.parent) {
+    console.error("filterToAdd.parent is undefined");
 
-		return false;
-	}
+    return false;
+  }
 
-	if (filterToBeModified.parent === parentFilter) {
-		parentFilter.filterOperator = newFilterOperator;
+  if (filterToBeModified.parent === parentFilter) {
+    parentFilter.filterOperator = newFilterOperator;
 
-		return true;
-	}
+    return true;
+  }
 
-	let hasChanged = false;
+  let hasChanged = false;
 
-	for (const filter of parentFilter.children) {
-		if (hasChanged) break;
+  for (const filter of parentFilter.children) {
+    if (hasChanged) break;
 
-		if (isAParent(filter)) {
-			const isParentFilterToBeModified = filter === filterToBeModified.parent;
+    if (isAParent(filter)) {
+      const isParentFilterToBeModified = filter === filterToBeModified.parent;
 
-			if (isParentFilterToBeModified) {
-				filter.filterOperator = newFilterOperator;
-				hasChanged = true;
+      if (isParentFilterToBeModified) {
+        filter.filterOperator = newFilterOperator;
+        hasChanged = true;
 
-				break;
-			}
+        break;
+      }
 
-			hasChanged = withFilterOperator(
-				filter,
-				newFilterOperator,
-				filterToBeModified,
-			);
-		}
-	}
+      hasChanged = withFilterOperator(filter, newFilterOperator, filterToBeModified);
+    }
+  }
 
-	return hasChanged;
+  return hasChanged;
 };
 
 export const isAParent = (filter: Filter): filter is FilterGroup => {
-	// @ts-expect-error => if `filter.children` is undefined (does not exist), it will return false.
-	return Array.isArray(filter.children);
+  // @ts-expect-error => if `filter.children` is undefined (does not exist), it will return false.
+  return Array.isArray(filter.children);
 };

@@ -5,27 +5,23 @@ import type { BetterbrainUser } from "#/types/notebook";
 import { queryKeyFactory } from "../query-keys";
 
 type SearchForUserByEmailRequest = {
-	email: string;
+  email: string;
 };
 type SearchForUserByEmailResponse = {
-	results: BetterbrainUser[];
-	result_count: number;
+  results: BetterbrainUser[];
+  result_count: number;
 };
 
 const mutationKey = queryKeyFactory.get["search-user-by-email"].queryKey;
 
 export function useSearchUserByEmail() {
-	return useMutation<
-		SearchForUserByEmailResponse,
-		Error,
-		SearchForUserByEmailRequest
-	>({
-		mutationKey,
+  return useMutation<SearchForUserByEmailResponse, Error, SearchForUserByEmailRequest>({
+    mutationKey,
 
-		mutationFn: async (arg: SearchForUserByEmailRequest) => {
-			const path = `/users?user_email=${encodeURIComponent(arg.email.toLocaleLowerCase())}`;
+    mutationFn: async (arg: SearchForUserByEmailRequest) => {
+      const path = `/users?user_email=${encodeURIComponent(arg.email.toLocaleLowerCase())}`;
 
-			return (await clientAPI_V1.get<SearchForUserByEmailResponse>(path)).data;
-		},
-	});
+      return (await clientAPI_V1.get<SearchForUserByEmailResponse>(path)).data;
+    },
+  });
 }

@@ -1,22 +1,22 @@
-"use client"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useStore, useEvents } from "@/lib/store"
-import { Users, Sparkles, TrendingUp, MapPin, Calendar, Heart } from "lucide-react"
-import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { generateRecommendations, type Recommendation } from "@/lib/recommendations"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useMemo } from "react"
-import similarNodesData from "@/data/similar-nodes.json"
+"use client";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useStore, useEvents } from "@/lib/store";
+import { Users, Sparkles, TrendingUp, MapPin, Calendar, Heart } from "lucide-react";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { generateRecommendations, type Recommendation } from "@/lib/recommendations";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useMemo } from "react";
+import similarNodesData from "@/data/similar-nodes.json";
 import { ClientOnly } from "@/components/client-only";
 
 function Connections() {
-  const members = useMemo(() => similarNodesData, [])
-  const events = useStore(useEvents)
+  const members = useMemo(() => similarNodesData, []);
+  const events = useStore(useEvents);
 
-  const currentUser = members[0]
+  const currentUser = members[0];
 
   if (members.length === 0) {
     return (
@@ -28,27 +28,33 @@ function Connections() {
           </div>
         </div>
       </main>
-    )
+    );
   }
 
-  const allRecommendations = generateRecommendations(currentUser, members, 20)
+  const allRecommendations = generateRecommendations(currentUser, members, 20);
 
-  const topRecommendations = allRecommendations.slice(0, 6)
+  const topRecommendations = allRecommendations.slice(0, 6);
   const interestBased = allRecommendations
-    .filter((r) => r.reasons.some((reason) => reason.type === "interest" || reason.type === "expertise"))
-    .slice(0, 4)
+    .filter((r) =>
+      r.reasons.some((reason) => reason.type === "interest" || reason.type === "expertise"),
+    )
+    .slice(0, 4);
   const industryBased = allRecommendations
     .filter((r) => r.reasons.some((reason) => reason.type === "industry"))
-    .slice(0, 4)
+    .slice(0, 4);
   const locationBased = allRecommendations
-    .filter((r) => r.reasons.some((reason) => reason.type === "location" || reason.type === "travel"))
-    .slice(0, 4)
+    .filter((r) =>
+      r.reasons.some((reason) => reason.type === "location" || reason.type === "travel"),
+    )
+    .slice(0, 4);
   const lifestyleBased = allRecommendations
-    .filter((r) => r.reasons.some((reason) => reason.type === "ceoDNA" || reason.type === "leadership"))
-    .slice(0, 4)
+    .filter((r) =>
+      r.reasons.some((reason) => reason.type === "ceoDNA" || reason.type === "leadership"),
+    )
+    .slice(0, 4);
 
   const ConnectionCard = ({ recommendation }: { recommendation: Recommendation }) => {
-    const { member, score, reasons, sharedAttributes } = recommendation
+    const { member, score, reasons, sharedAttributes } = recommendation;
 
     return (
       <Link href={`/members/${member.id}`}>
@@ -109,8 +115,8 @@ function Connections() {
           </CardContent>
         </Card>
       </Link>
-    )
-  }
+    );
+  };
 
   return (
     <main className="container mx-auto p-6 space-y-8">
@@ -129,8 +135,8 @@ function Connections() {
             <CardTitle>AI-Powered Connections</CardTitle>
           </div>
           <CardDescription>
-            Our unified member brain analyzes your profile, interests, expertise, and activity to surface the most
-            valuable connections for you.
+            Our unified member brain analyzes your profile, interests, expertise, and activity to
+            surface the most valuable connections for you.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -141,7 +147,9 @@ function Connections() {
               </div>
               <div>
                 <p className="font-semibold text-sm mb-1">Similar Leadership DNA</p>
-                <p className="text-xs text-muted-foreground">Members who share your leadership traits</p>
+                <p className="text-xs text-muted-foreground">
+                  Members who share your leadership traits
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -159,7 +167,9 @@ function Connections() {
               </div>
               <div>
                 <p className="font-semibold text-sm mb-1">Proximity-Based</p>
-                <p className="text-xs text-muted-foreground">Members in your area or destinations</p>
+                <p className="text-xs text-muted-foreground">
+                  Members in your area or destinations
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -179,7 +189,9 @@ function Connections() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold">Top Recommendations For You</h2>
-            <p className="text-sm text-muted-foreground">Highest match scores based on multiple factors</p>
+            <p className="text-sm text-muted-foreground">
+              Highest match scores based on multiple factors
+            </p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -192,7 +204,9 @@ function Connections() {
       <Card>
         <CardHeader>
           <CardTitle>Browse by Connection Type</CardTitle>
-          <CardDescription>Explore recommendations categorized by what you have in common</CardDescription>
+          <CardDescription>
+            Explore recommendations categorized by what you have in common
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="interests" className="w-full">
@@ -252,7 +266,7 @@ function Connections() {
             {events.slice(0, 3).map((event) => {
               const eventRecommendations = allRecommendations
                 .filter((r) => r.reasons.some((reason) => reason.type === "event"))
-                .slice(0, 3)
+                .slice(0, 3);
 
               return (
                 <div key={event.id} className="p-4 rounded-lg border border-border">
@@ -266,7 +280,8 @@ function Connections() {
                     <Badge>{event.attendees.toLocaleString()} attending</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">
-                    You have {eventRecommendations.length} recommended connections attending this event
+                    You have {eventRecommendations.length} recommended connections attending this
+                    event
                   </p>
                   <Link href={`/events/${event.id}`}>
                     <Button variant="outline" size="sm">
@@ -274,13 +289,13 @@ function Connections() {
                     </Button>
                   </Link>
                 </div>
-              )
+              );
             })}
           </div>
         </CardContent>
       </Card>
     </main>
-  )
+  );
 }
 
 export default function ConnectionsPage() {
@@ -288,5 +303,5 @@ export default function ConnectionsPage() {
     <ClientOnly>
       <Connections />
     </ClientOnly>
-  )
+  );
 }

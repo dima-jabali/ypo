@@ -1,63 +1,58 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { api } from "#/api";
-import {
-	type PageLimit,
-	type PageOffset,
-} from "#/contexts/general-ctx/general-context";
+import { type PageLimit, type PageOffset } from "#/contexts/general-ctx/general-context";
 import type { OrgMemberWithRole } from "#/types/notebook";
 import { queryKeyFactory } from "../query-keys";
 import { useWithCurrentOrg } from "../use-current-organization";
 
 export type FetchOrganizationUsersRequest = {
-	sort_by?: "NAME" | "EMAIL";
-	offset: PageOffset;
-	limit: PageLimit;
-	query?: string;
+  sort_by?: "NAME" | "EMAIL";
+  offset: PageOffset;
+  limit: PageLimit;
+  query?: string;
 };
 
 export type FetchOrganizationUsersResponse = {
-	results: Array<OrgMemberWithRole>;
-	total_results: number;
-	offset: PageOffset;
-	limit: PageLimit;
+  results: Array<OrgMemberWithRole>;
+  total_results: number;
+  offset: PageOffset;
+  limit: PageLimit;
 };
 
 export function useFetchOrganizationUsersPage(enabled: boolean) {
-	const organization = useWithCurrentOrg();
+  const organization = useWithCurrentOrg();
 
-	const queryOptions = queryKeyFactory.get["organization-users"](
-		organization.id,
-	);
+  const queryOptions = queryKeyFactory.get["organization-users"](organization.id);
 
-	return useInfiniteQuery({
-		initialPageParam: {
-			offset: organization.members.offset,
-			limit: 100 as PageLimit,
-		},
-		staleTime: 5 * 60 * 1000, // 5 mins
-		gcTime: Infinity, // Maintain on cache
-		enabled,
+  return useInfiniteQuery({
+    initialPageParam: {
+      offset: organization.members.offset,
+      limit: 100 as PageLimit,
+    },
+    staleTime: 5 * 60 * 1000, // 5 mins
+    gcTime: Infinity, // Maintain on cache
+    enabled,
 
-		...queryOptions,
+    ...queryOptions,
 
-		queryFn: async ({ pageParam, client }) =>
-			await api.get["organization-users"](organization.id, pageParam, client),
+    queryFn: async ({ pageParam, client }) =>
+      await api.get["organization-users"](organization.id, pageParam, client),
 
-		getNextPageParam: (lastPage, _allPages, lastPageParams) => {
-			const nextOffset = lastPageParams.offset + lastPageParams.limit;
+    getNextPageParam: (lastPage, _allPages, lastPageParams) => {
+      const nextOffset = lastPageParams.offset + lastPageParams.limit;
 
-			if (lastPage && nextOffset > lastPage.total_results) return;
+      if (lastPage && nextOffset > lastPage.total_results) return;
 
-			return { ...lastPageParams, offset: nextOffset as PageOffset };
-		},
+      return { ...lastPageParams, offset: nextOffset as PageOffset };
+    },
 
-		getPreviousPageParam: (_firstPage, _allPages, firstPageParams) => {
-			const prevOffset = firstPageParams.offset - firstPageParams.limit;
+    getPreviousPageParam: (_firstPage, _allPages, firstPageParams) => {
+      const prevOffset = firstPageParams.offset - firstPageParams.limit;
 
-			if (prevOffset < 0) return;
+      if (prevOffset < 0) return;
 
-			return { ...firstPageParams, offset: prevOffset as PageOffset };
-		},
-	});
+      return { ...firstPageParams, offset: prevOffset as PageOffset };
+    },
+  });
 }

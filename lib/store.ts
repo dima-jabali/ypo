@@ -1,138 +1,138 @@
-import { create } from "zustand"
+import { create } from "zustand";
 
 export interface Member {
-  id: string
-  name: string
-  title: string
-  company: string
-  chapter: string
-  region: string
-  location: string
-  industry: string
-  expertise: string[]
-  interests: string[]
-  leadershipDNA: string[]
-  avatar: string
-  bio: string
-  linkedinBio?: string
-  yearsInYPO: number
-  forumName?: string
-  networkMemberships: string[]
-  recentEvents: string[]
-  languages: string[]
-  travelPattern: string[]
-  exitHistory?: string
-  socialScore: number
+  id: string;
+  name: string;
+  title: string;
+  company: string;
+  chapter: string;
+  region: string;
+  location: string;
+  industry: string;
+  expertise: string[];
+  interests: string[];
+  leadershipDNA: string[];
+  avatar: string;
+  bio: string;
+  linkedinBio?: string;
+  yearsInYPO: number;
+  forumName?: string;
+  networkMemberships: string[];
+  recentEvents: string[];
+  languages: string[];
+  travelPattern: string[];
+  exitHistory?: string;
+  socialScore: number;
   ceoDNA?: {
-    health?: string[]
-    wellness?: string[]
-    sports?: string[]
-    hobbies?: string[]
-  }
-  personalGoals?: string[]
-  connectionStrength?: number
+    health?: string[];
+    wellness?: string[];
+    sports?: string[];
+    hobbies?: string[];
+  };
+  personalGoals?: string[];
+  connectionStrength?: number;
 }
 
 export interface Event {
-  id: string
-  title: string
-  type: string
-  date: string
-  location: string
-  city: string
-  description: string
-  tags: string[]
-  attendees: number
-  capacity: number
-  image: string
-  timeZone?: string
-  locationType?: string
-  audience?: string[]
-  programFormat?: string
-  status?: string
-  focus?: string[]
-  url?: string
-  networks?: string[]
+  id: string;
+  title: string;
+  type: string;
+  date: string;
+  location: string;
+  city: string;
+  description: string;
+  tags: string[];
+  attendees: number;
+  capacity: number;
+  image: string;
+  timeZone?: string;
+  locationType?: string;
+  audience?: string[];
+  programFormat?: string;
+  status?: string;
+  focus?: string[];
+  url?: string;
+  networks?: string[];
 }
 
 export interface Content {
-  id: string
-  title: string
-  type: "Talk" | "Article" | "Podcast" | "Video"
-  author: string
-  authorId: string
-  date: string
-  tags: string[]
-  description: string
-  duration?: string
-  views: number
+  id: string;
+  title: string;
+  type: "Talk" | "Article" | "Podcast" | "Video";
+  author: string;
+  authorId: string;
+  date: string;
+  tags: string[];
+  description: string;
+  duration?: string;
+  views: number;
 }
 
 interface AppState {
-  members: Member[]
-  events: Event[]
-  content: Content[]
-  searchQuery: string
+  members: Member[];
+  events: Event[];
+  content: Content[];
+  searchQuery: string;
   selectedFilters: {
-    location?: string
-    industry?: string
-    expertise?: string
-    chapter?: string
-  }
-  currentLocation?: string
-  searchHistory: SearchHistoryItem[]
-  recommendations: Recommendation[]
-  chatMessages: ChatMessage[]
-  selectedYpoProfileId: number | null
-  impersonatedProfileId: number | null
-  setSearchQuery: (query: string) => void
-  setSelectedFilters: (filters: AppState["selectedFilters"]) => void
-  setCurrentLocation: (location: string | undefined) => void
-  addSearchHistory: (item: SearchHistoryItem) => void
-  addChatMessage: (message: ChatMessage) => void
-  clearChat: () => void
-  setSelectedYpoProfileId: (id: number | null) => void
-  setImpersonatedProfileId: (id: number | null) => void
+    location?: string;
+    industry?: string;
+    expertise?: string;
+    chapter?: string;
+  };
+  currentLocation?: string;
+  searchHistory: SearchHistoryItem[];
+  recommendations: Recommendation[];
+  chatMessages: ChatMessage[];
+  selectedYpoProfileId: number | null;
+  impersonatedProfileId: number | null;
+  setSearchQuery: (query: string) => void;
+  setSelectedFilters: (filters: AppState["selectedFilters"]) => void;
+  setCurrentLocation: (location: string | undefined) => void;
+  addSearchHistory: (item: SearchHistoryItem) => void;
+  addChatMessage: (message: ChatMessage) => void;
+  clearChat: () => void;
+  setSelectedYpoProfileId: (id: number | null) => void;
+  setImpersonatedProfileId: (id: number | null) => void;
 }
 
 export interface SearchHistoryItem {
-  id: string
-  query: string
-  timestamp: Date
-  results: number
+  id: string;
+  query: string;
+  timestamp: Date;
+  results: number;
 }
 
 export interface Recommendation {
-  member: Member
-  reason: string
-  score: number
-  sharedAttributes: string[]
+  member: Member;
+  reason: string;
+  score: number;
+  sharedAttributes: string[];
 }
 
 export interface ChatMessage {
-  id: string
-  type: "user" | "assistant"
-  content: string
-  timestamp: Date
+  id: string;
+  type: "user" | "assistant";
+  content: string;
+  timestamp: Date;
   results?: {
-    members?: Member[]
-    events?: Event[]
-    content?: Content[]
-  }
+    members?: Member[];
+    events?: Event[];
+    content?: Content[];
+  };
 }
 
 // Selectors
-export const useSearchQuery = (state: AppState) => state.searchQuery
-export const useSelectedFilters = (state: AppState) => state.selectedFilters
-export const useMembers = (state: AppState) => state.members
-export const useEvents = (state: AppState) => state.events
-export const useContent = (state: AppState) => state.content
-export const useCurrentLocation = (state: AppState) => state.currentLocation
-export const useSearchHistory = (state: AppState) => state.searchHistory
-export const useRecommendations = (state: AppState) => state.recommendations
-export const useChatMessages = (state: AppState) => state.chatMessages
-export const useSelectedYpoProfileId = (state: AppState) => state.selectedYpoProfileId
-export const useImpersonatedProfileId = (state: AppState) => state.impersonatedProfileId
+export const useSearchQuery = (state: AppState) => state.searchQuery;
+export const useSelectedFilters = (state: AppState) => state.selectedFilters;
+export const useMembers = (state: AppState) => state.members;
+export const useEvents = (state: AppState) => state.events;
+export const useContent = (state: AppState) => state.content;
+export const useCurrentLocation = (state: AppState) => state.currentLocation;
+export const useSearchHistory = (state: AppState) => state.searchHistory;
+export const useRecommendations = (state: AppState) => state.recommendations;
+export const useChatMessages = (state: AppState) => state.chatMessages;
+export const useSelectedYpoProfileId = (state: AppState) => state.selectedYpoProfileId;
+export const useImpersonatedProfileId = (state: AppState) => state.impersonatedProfileId;
 
 // Fake realistic data
 const generateEvents = (): Event[] => [
@@ -165,7 +165,8 @@ const generateEvents = (): Event[] => [
     date: "2025-01-20",
     location: "Silicon Valley",
     city: "San Francisco",
-    description: "Exclusive forum exploring AI transformation and its impact on business leadership.",
+    description:
+      "Exclusive forum exploring AI transformation and its impact on business leadership.",
     tags: ["AI", "Technology", "Future of Work", "Innovation"],
     attendees: 87,
     capacity: 100,
@@ -207,7 +208,8 @@ const generateEvents = (): Event[] => [
     date: "2025-01-25",
     location: "Napa Valley Resort",
     city: "San Francisco",
-    description: "Intimate retreat for women CEOs focused on authentic leadership and peer mentorship.",
+    description:
+      "Intimate retreat for women CEOs focused on authentic leadership and peer mentorship.",
     tags: ["Women Leaders", "Leadership", "Mentorship", "Wellness"],
     attendees: 42,
     capacity: 50,
@@ -249,7 +251,8 @@ const generateEvents = (): Event[] => [
     date: "2025-03-01",
     location: "Tokyo International Forum",
     city: "Tokyo",
-    description: "Asia Pacific technology leadership summit focused on innovation and digital transformation.",
+    description:
+      "Asia Pacific technology leadership summit focused on innovation and digital transformation.",
     tags: ["Technology", "Innovation", "Asia Pacific", "Digital"],
     attendees: 312,
     capacity: 400,
@@ -270,7 +273,8 @@ const generateEvents = (): Event[] => [
     date: "2025-02-15",
     location: "Los Angeles Convention Center",
     city: "Los Angeles",
-    description: "Forum dedicated to family business succession, governance, and generational transitions.",
+    description:
+      "Forum dedicated to family business succession, governance, and generational transitions.",
     tags: ["Family Business", "Succession", "Governance", "Legacy"],
     attendees: 189,
     capacity: 250,
@@ -305,7 +309,7 @@ const generateEvents = (): Event[] => [
     url: "https://www.ypointernational.org/impact-investing",
     networks: ["Impact Investment Forum"],
   },
-]
+];
 
 const generateContent = (): Content[] => [
   {
@@ -354,7 +358,8 @@ const generateContent = (): Content[] => [
     authorId: "4",
     date: "2024-11-08",
     tags: ["Branding", "Africa", "Global Markets", "Growth"],
-    description: "David shares his journey building consumer brands that bridge African markets with global consumers.",
+    description:
+      "David shares his journey building consumer brands that bridge African markets with global consumers.",
     duration: "35 min",
     views: 2641,
   },
@@ -404,11 +409,12 @@ const generateContent = (): Content[] => [
     authorId: "8",
     date: "2024-10-05",
     tags: ["Education", "EdTech", "Emerging Markets", "Social Impact"],
-    description: "Isabella shares insights on scaling education technology in resource-constrained environments.",
+    description:
+      "Isabella shares insights on scaling education technology in resource-constrained environments.",
     duration: "44 min",
     views: 2087,
   },
-]
+];
 
 export const useStore = create<AppState>((set, get) => ({
   members: [],
@@ -436,4 +442,4 @@ export const useStore = create<AppState>((set, get) => ({
   clearChat: () => set({ chatMessages: [] }),
   setSelectedYpoProfileId: (id) => set({ selectedYpoProfileId: id }),
   setImpersonatedProfileId: (id) => set({ impersonatedProfileId: id }),
-}))
+}));

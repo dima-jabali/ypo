@@ -3,43 +3,41 @@
 import { useCallback } from "react";
 
 import {
-	useFetchAllOrganizations,
-	type Organization,
+  useFetchAllOrganizations,
+  type Organization,
 } from "#/hooks/fetch/use-fetch-all-organizations";
 import { useSetOrgToFirst } from "./use-set-org-to-first";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 
 export function useCurrentOrganization() {
-				if (typeof window === "undefined") {
-		return null;
-	}
-	
-	const urlOrgId = generalContextStore.use.organizationId();
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-	useSetOrgToFirst();
+  const urlOrgId = generalContextStore.use.organizationId();
 
-	const selectCurrentOrganization = useCallback(
-		(allOrgs: Array<Organization>) => allOrgs.find(({ id }) => id === urlOrgId),
-		[urlOrgId],
-	);
+  useSetOrgToFirst();
 
-	const currentOrganization = useFetchAllOrganizations(
-		selectCurrentOrganization,
-	);
+  const selectCurrentOrganization = useCallback(
+    (allOrgs: Array<Organization>) => allOrgs.find(({ id }) => id === urlOrgId),
+    [urlOrgId],
+  );
 
-	return currentOrganization;
+  const currentOrganization = useFetchAllOrganizations(selectCurrentOrganization);
+
+  return currentOrganization;
 }
 
 export function useDownloadedOrganizationId() {
-	return useCurrentOrganization()?.id;
+  return useCurrentOrganization()?.id;
 }
 
 export function useWithCurrentOrg() {
-	const currentOrg = useCurrentOrganization();
+  const currentOrg = useCurrentOrganization();
 
-	if (!currentOrg) {
-		throw new Error("No current organization");
-	}
+  if (!currentOrg) {
+    throw new Error("No current organization");
+  }
 
-	return currentOrg;
+  return currentOrg;
 }

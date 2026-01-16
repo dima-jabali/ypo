@@ -1,216 +1,191 @@
 import { useState } from "react";
 
+import { CASE_SENSITIVE_KEY, COLUMN_KEY, VALUE_KEY, VALUE_OPERATOR_KEY } from "../filters/filters";
 import {
-	CASE_SENSITIVE_KEY,
-	COLUMN_KEY,
-	VALUE_KEY,
-	VALUE_OPERATOR_KEY,
-} from "../filters/filters";
-import {
-	type ChildFilter,
-	type ColumnInfo,
-	type Filter,
-	FilterOperator,
-	ValueOperator,
+  type ChildFilter,
+  type ColumnInfo,
+  type Filter,
+  FilterOperator,
+  ValueOperator,
 } from "../filters/utilityTypes";
 import {
-	modifyChildFilter,
-	withFilter,
-	withFilterOperator,
-	withoutFilter,
+  modifyChildFilter,
+  withFilter,
+  withFilterOperator,
+  withoutFilter,
 } from "./FiltersToBeApplied/helpers";
 import { useSetTableData } from "../tableDataContextUtils";
 
 export const useSelectColumnToFilter = () => {
-	const setTableData = useSetTableData();
+  const setTableData = useSetTableData();
 
-	const [{ selectFilterType }] = useState({
-		selectFilterType: (
-			filterToBeModified: ChildFilter,
-			newColumnInfo: ColumnInfo,
-		) => {
-			setTableData((oldTableData) => {
-				const newTableData = {
-					...oldTableData,
-					forceRender: !oldTableData.forceRender,
-				};
+  const [{ selectFilterType }] = useState({
+    selectFilterType: (filterToBeModified: ChildFilter, newColumnInfo: ColumnInfo) => {
+      setTableData((oldTableData) => {
+        const newTableData = {
+          ...oldTableData,
+          forceRender: !oldTableData.forceRender,
+        };
 
-				modifyChildFilter(
-					newTableData.groupOfFilters,
-					filterToBeModified,
-					COLUMN_KEY,
-					newColumnInfo,
-				);
+        modifyChildFilter(
+          newTableData.groupOfFilters,
+          filterToBeModified,
+          COLUMN_KEY,
+          newColumnInfo,
+        );
 
-				// Also, reset the `valueOperator` and `value` to `undefined`:
-				modifyChildFilter(
-					newTableData.groupOfFilters,
-					filterToBeModified,
-					VALUE_OPERATOR_KEY,
-					undefined,
-				);
+        // Also, reset the `valueOperator` and `value` to `undefined`:
+        modifyChildFilter(
+          newTableData.groupOfFilters,
+          filterToBeModified,
+          VALUE_OPERATOR_KEY,
+          undefined,
+        );
 
-				modifyChildFilter(
-					newTableData.groupOfFilters,
-					filterToBeModified,
-					VALUE_KEY,
-					undefined,
-				);
+        modifyChildFilter(newTableData.groupOfFilters, filterToBeModified, VALUE_KEY, undefined);
 
-				return newTableData;
-			});
-		},
-	});
+        return newTableData;
+      });
+    },
+  });
 
-	return selectFilterType;
+  return selectFilterType;
 };
 
 export const useSetValueOperator = () => {
-	const setTableData = useSetTableData();
+  const setTableData = useSetTableData();
 
-	const [{ setValueOperator }] = useState({
-		setValueOperator: (
-			filterToBeModified: ChildFilter,
-			newValueOperator: ValueOperator,
-		) =>
-			setTableData((oldTableData) => {
-				const newTableData = {
-					...oldTableData,
-					forceRender: !oldTableData.forceRender,
-				};
+  const [{ setValueOperator }] = useState({
+    setValueOperator: (filterToBeModified: ChildFilter, newValueOperator: ValueOperator) =>
+      setTableData((oldTableData) => {
+        const newTableData = {
+          ...oldTableData,
+          forceRender: !oldTableData.forceRender,
+        };
 
-				modifyChildFilter(
-					newTableData.groupOfFilters,
-					filterToBeModified,
-					VALUE_OPERATOR_KEY,
-					newValueOperator,
-				);
+        modifyChildFilter(
+          newTableData.groupOfFilters,
+          filterToBeModified,
+          VALUE_OPERATOR_KEY,
+          newValueOperator,
+        );
 
-				return newTableData;
-			}),
-	});
+        return newTableData;
+      }),
+  });
 
-	return setValueOperator;
+  return setValueOperator;
 };
 
 export const useSetAnd_or_Or = () => {
-	const setTableData = useSetTableData();
+  const setTableData = useSetTableData();
 
-	const [{ setAnd_or_Or }] = useState({
-		setAnd_or_Or: (filter: Filter, newFilterOperator: FilterOperator) => {
-			setTableData((oldTableData) => {
-				const newTableData = {
-					...oldTableData,
-					forceRender: !oldTableData.forceRender,
-				};
+  const [{ setAnd_or_Or }] = useState({
+    setAnd_or_Or: (filter: Filter, newFilterOperator: FilterOperator) => {
+      setTableData((oldTableData) => {
+        const newTableData = {
+          ...oldTableData,
+          forceRender: !oldTableData.forceRender,
+        };
 
-				withFilterOperator(
-					newTableData.groupOfFilters,
-					newFilterOperator,
-					filter,
-				);
+        withFilterOperator(newTableData.groupOfFilters, newFilterOperator, filter);
 
-				return newTableData;
-			});
-		},
-	});
+        return newTableData;
+      });
+    },
+  });
 
-	return setAnd_or_Or;
+  return setAnd_or_Or;
 };
 
 export const useAddFilter = () => {
-	const setTableData = useSetTableData();
+  const setTableData = useSetTableData();
 
-	const [{ addFilter }] = useState({
-		addFilter: (newFilter: Filter, filterAbove?: Filter) => {
-			setTableData((oldTableData) => {
-				const newTableData = {
-					...oldTableData,
-					forceRender: !oldTableData.forceRender,
-				};
+  const [{ addFilter }] = useState({
+    addFilter: (newFilter: Filter, filterAbove?: Filter) => {
+      setTableData((oldTableData) => {
+        const newTableData = {
+          ...oldTableData,
+          forceRender: !oldTableData.forceRender,
+        };
 
-				withFilter(newTableData.groupOfFilters, newFilter, filterAbove);
+        withFilter(newTableData.groupOfFilters, newFilter, filterAbove);
 
-				return newTableData;
-			});
-		},
-	});
+        return newTableData;
+      });
+    },
+  });
 
-	return addFilter;
+  return addFilter;
 };
 
 export const useDeleteFilter = () => {
-	const setTableData = useSetTableData();
+  const setTableData = useSetTableData();
 
-	const [{ deleteFilter }] = useState({
-		deleteFilter: (filterToDelete: Filter) => {
-			setTableData((oldTableData) => {
-				const newTableData = {
-					...oldTableData,
-					forceRender: !oldTableData.forceRender,
-				};
+  const [{ deleteFilter }] = useState({
+    deleteFilter: (filterToDelete: Filter) => {
+      setTableData((oldTableData) => {
+        const newTableData = {
+          ...oldTableData,
+          forceRender: !oldTableData.forceRender,
+        };
 
-				withoutFilter(oldTableData.groupOfFilters, filterToDelete);
+        withoutFilter(oldTableData.groupOfFilters, filterToDelete);
 
-				return newTableData;
-			});
-		},
-	});
+        return newTableData;
+      });
+    },
+  });
 
-	return deleteFilter;
+  return deleteFilter;
 };
 
 export const useSetFilterValue = () => {
-	const setTableData = useSetTableData();
+  const setTableData = useSetTableData();
 
-	const [{ setFilterValue }] = useState({
-		setFilterValue: (
-			newValue: string | { from: string; to: string } | number | undefined,
-			filterToBeModified: ChildFilter,
-		) => {
-			setTableData((oldTableData) => {
-				const newTableData = {
-					...oldTableData,
-					forceRender: !oldTableData.forceRender,
-				};
+  const [{ setFilterValue }] = useState({
+    setFilterValue: (
+      newValue: string | { from: string; to: string } | number | undefined,
+      filterToBeModified: ChildFilter,
+    ) => {
+      setTableData((oldTableData) => {
+        const newTableData = {
+          ...oldTableData,
+          forceRender: !oldTableData.forceRender,
+        };
 
-				modifyChildFilter(
-					newTableData.groupOfFilters,
-					filterToBeModified,
-					VALUE_KEY,
-					newValue,
-				);
+        modifyChildFilter(newTableData.groupOfFilters, filterToBeModified, VALUE_KEY, newValue);
 
-				return newTableData;
-			});
-		},
-	});
+        return newTableData;
+      });
+    },
+  });
 
-	return setFilterValue;
+  return setFilterValue;
 };
 
 export const useSetCaseSensitive = () => {
-	const setTableData = useSetTableData();
+  const setTableData = useSetTableData();
 
-	const [{ setCaseSensitive }] = useState({
-		setCaseSensitive: (newValue: boolean, filterToBeModified: ChildFilter) => {
-			setTableData((oldTableData) => {
-				const newTableData = {
-					...oldTableData,
-					forceRender: !oldTableData.forceRender,
-				};
+  const [{ setCaseSensitive }] = useState({
+    setCaseSensitive: (newValue: boolean, filterToBeModified: ChildFilter) => {
+      setTableData((oldTableData) => {
+        const newTableData = {
+          ...oldTableData,
+          forceRender: !oldTableData.forceRender,
+        };
 
-				modifyChildFilter(
-					newTableData.groupOfFilters,
-					filterToBeModified,
-					CASE_SENSITIVE_KEY,
-					newValue,
-				);
+        modifyChildFilter(
+          newTableData.groupOfFilters,
+          filterToBeModified,
+          CASE_SENSITIVE_KEY,
+          newValue,
+        );
 
-				return newTableData;
-			});
-		},
-	});
+        return newTableData;
+      });
+    },
+  });
 
-	return setCaseSensitive;
+  return setCaseSensitive;
 };

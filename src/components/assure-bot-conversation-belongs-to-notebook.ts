@@ -8,57 +8,48 @@ import { useFetchNotebookListPage } from "#/hooks/fetch/use-fetch-notebook-list-
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 
 export const AssureBotConversationBelongsToNotebook = memo(
-	function AssureBotConversationBelongsToNotebook({
-		children,
-	}: React.PropsWithChildren) {
-				if (typeof window === "undefined") {
-		return null;
-	}
-		
-		const botConversationFromDownloadedNotebook =
-			useDownloadedNotebookBotConversationId();
-		const botConversationIdFromGeneralStore =
-			generalContextStore.use.botConversationId();
-		const notebookList = useFetchNotebookListPage();
+  function AssureBotConversationBelongsToNotebook({ children }: React.PropsWithChildren) {
+    if (typeof window === "undefined") {
+      return null;
+    }
 
-		if (
-			!isValidNumber(botConversationIdFromGeneralStore) ||
-			!isValidNumber(botConversationFromDownloadedNotebook)
-		) {
-			console.log("Notebook or current bot conversation is not defined.", {
-				botConversationFromDownloadedNotebook,
-				botConversationIdFromGeneralStore,
-			});
+    const botConversationFromDownloadedNotebook = useDownloadedNotebookBotConversationId();
+    const botConversationIdFromGeneralStore = generalContextStore.use.botConversationId();
+    const notebookList = useFetchNotebookListPage();
 
-			return null;
-		}
+    if (
+      !isValidNumber(botConversationIdFromGeneralStore) ||
+      !isValidNumber(botConversationFromDownloadedNotebook)
+    ) {
+      console.log("Notebook or current bot conversation is not defined.", {
+        botConversationFromDownloadedNotebook,
+        botConversationIdFromGeneralStore,
+      });
 
-		if (
-			botConversationFromDownloadedNotebook !==
-			botConversationIdFromGeneralStore
-		) {
-			let msg = "Bot conversation does not belong to the current notebook.";
+      return null;
+    }
 
-			const notebookBotConversationBelongsTo = notebookList.data.pages
-				.flatMap((page) => page.results)
-				.find(
-					(notebook) =>
-						notebook.bot_conversation?.id ===
-						botConversationFromDownloadedNotebook,
-				);
+    if (botConversationFromDownloadedNotebook !== botConversationIdFromGeneralStore) {
+      let msg = "Bot conversation does not belong to the current notebook.";
 
-			if (notebookBotConversationBelongsTo) {
-				msg += `\nThis bot conversation belongs to notebook "${notebookBotConversationBelongsTo.title} (${notebookBotConversationBelongsTo.id})", to which you have access to.\nChange notebook in the top right corner to access it.`;
-			}
+      const notebookBotConversationBelongsTo = notebookList.data.pages
+        .flatMap((page) => page.results)
+        .find(
+          (notebook) => notebook.bot_conversation?.id === botConversationFromDownloadedNotebook,
+        );
 
-			console.log({
-				botConversationFromDownloadedNotebook,
-				botConversationIdFromGeneralStore,
-			});
+      if (notebookBotConversationBelongsTo) {
+        msg += `\nThis bot conversation belongs to notebook "${notebookBotConversationBelongsTo.title} (${notebookBotConversationBelongsTo.id})", to which you have access to.\nChange notebook in the top right corner to access it.`;
+      }
 
-			throw new Error(msg);
-		}
+      console.log({
+        botConversationFromDownloadedNotebook,
+        botConversationIdFromGeneralStore,
+      });
 
-		return children;
-	},
+      throw new Error(msg);
+    }
+
+    return children;
+  },
 );

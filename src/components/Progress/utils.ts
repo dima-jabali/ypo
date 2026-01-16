@@ -1,4 +1,4 @@
 export enum ProgressType {
-	RunningWithoutProgress,
-	UploadWithProgress,
+  RunningWithoutProgress,
+  UploadWithProgress,
 }

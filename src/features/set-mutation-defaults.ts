@@ -4,7 +4,7 @@ import { setMutationDefaults_markGoodBadResponse } from "#/hooks/mutation/use-ma
 import { setMutationDefaults_patchNotebookBlocks } from "#/hooks/mutation/use-patch-notebook-blocks";
 
 export function setMutationDefaults(queryClient: QueryClient) {
-	setMutationDefaults_markGoodBadResponse(queryClient);
+  setMutationDefaults_markGoodBadResponse(queryClient);
 
-	setMutationDefaults_patchNotebookBlocks(queryClient);
+  setMutationDefaults_patchNotebookBlocks(queryClient);
 }

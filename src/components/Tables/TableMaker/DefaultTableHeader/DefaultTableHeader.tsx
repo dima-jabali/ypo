@@ -10,121 +10,121 @@ import { cn } from "#/helpers/class-names";
 import { noop } from "#/helpers/utils";
 
 type Props = {
-	showResetFiltersButton?: boolean;
-	showFiltersButton?: boolean;
-	showDisplayButton?: boolean;
-	showExpandButton?: boolean;
-	showSortButton?: boolean;
-	className?: string;
+  showResetFiltersButton?: boolean;
+  showFiltersButton?: boolean;
+  showDisplayButton?: boolean;
+  showExpandButton?: boolean;
+  showSortButton?: boolean;
+  className?: string;
 };
 
 function DefaultTableHeader({
-	showResetFiltersButton = true,
-	showDisplayButton = true,
-	showFiltersButton = true,
-	showExpandButton = true,
-	showSortButton = true,
-	className,
+  showResetFiltersButton = true,
+  showDisplayButton = true,
+  showFiltersButton = true,
+  showExpandButton = true,
+  showSortButton = true,
+  className,
 }: Props) {
-	const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true);
 
-	const { reload, tableWrapperRef } = useTableData((store) => ({
-		tableWrapperRef: store.tableWrapperRef,
-		reload: store.reload,
-	}));
-	const setTableData = useSetTableData();
+  const { reload, tableWrapperRef } = useTableData((store) => ({
+    tableWrapperRef: store.tableWrapperRef,
+    reload: store.reload,
+  }));
+  const setTableData = useSetTableData();
 
-	useLayoutEffect(() => {
-		if (!tableWrapperRef?.current) return;
+  useLayoutEffect(() => {
+    if (!tableWrapperRef?.current) return;
 
-		const linearGradientDiv = tableWrapperRef.current.getElementsByClassName(
-			"table-linear-gradient",
-		)?.[0] as HTMLDivElement | null;
+    const linearGradientDiv = tableWrapperRef.current.getElementsByClassName(
+      "table-linear-gradient",
+    )?.[0] as HTMLDivElement | null;
 
-		if (!linearGradientDiv) return;
+    if (!linearGradientDiv) return;
 
-		Object.assign(tableWrapperRef.current.style, {
-			height: isExpanded ? "" : "6rem",
-		} as CSSStyleDeclaration);
+    Object.assign(tableWrapperRef.current.style, {
+      height: isExpanded ? "" : "6rem",
+    } as CSSStyleDeclaration);
 
-		Object.assign(linearGradientDiv.style, {
-			display: isExpanded ? "none" : "block",
-			top: "30px",
-		} as CSSStyleDeclaration);
-	}, [isExpanded, tableWrapperRef]);
+    Object.assign(linearGradientDiv.style, {
+      display: isExpanded ? "none" : "block",
+      top: "30px",
+    } as CSSStyleDeclaration);
+  }, [isExpanded, tableWrapperRef]);
 
-	const reloadTableData = () => {
-		setTableData((prev) => ({
-			groupOfFilters: makeDefaultGroupOfFilters(),
-			forceRender: !prev.forceRender,
-		}));
+  const reloadTableData = () => {
+    setTableData((prev) => ({
+      groupOfFilters: makeDefaultGroupOfFilters(),
+      forceRender: !prev.forceRender,
+    }));
 
-		requestAnimationFrame(() => {
-			reload?.().catch(noop);
-		});
-	};
+    requestAnimationFrame(() => {
+      reload?.().catch(noop);
+    });
+  };
 
-	const handleResetModifiers = () => {
-		setTableData((prev) => ({
-			blockFilterAndSort: {
-				filters: undefined,
-				sort_by: undefined,
-			},
-			groupOfFilters: makeDefaultGroupOfFilters(),
-			forceRender: !prev.forceRender,
-		}));
-	};
+  const handleResetModifiers = () => {
+    setTableData((prev) => ({
+      blockFilterAndSort: {
+        filters: undefined,
+        sort_by: undefined,
+      },
+      groupOfFilters: makeDefaultGroupOfFilters(),
+      forceRender: !prev.forceRender,
+    }));
+  };
 
-	return (
-		<header
-			className={cn(
-				"relative flex justify-between items-center h-[30px] flex-none w-full bg-transparent border-border-smooth border-0 border-b-[1px] py-0 px-1",
-				className,
-			)}
-		>
-			<div className="flex items-center justify-center h-full">
-				{showFiltersButton ? <FiltersButtonForPopover /> : null}
+  return (
+    <header
+      className={cn(
+        "relative flex justify-between items-center h-[30px] flex-none w-full bg-transparent border-border-smooth border-0 border-b-[1px] py-0 px-1",
+        className,
+      )}
+    >
+      <div className="flex items-center justify-center h-full">
+        {showFiltersButton ? <FiltersButtonForPopover /> : null}
 
-				{showSortButton ? <SortingPopover /> : null}
-			</div>
+        {showSortButton ? <SortingPopover /> : null}
+      </div>
 
-			<div className="flex items-center justify-center h-full">
-				{showResetFiltersButton ? (
-					<button
-						className="text-xs border border-transparent button-hover px-2 py-0.5 rounded-sm text-muted-foreground"
-						title="Clear all filters and sorting"
-						onClick={handleResetModifiers}
-					>
-						Reset filters
-					</button>
-				) : null}
+      <div className="flex items-center justify-center h-full">
+        {showResetFiltersButton ? (
+          <button
+            className="text-xs border border-transparent button-hover px-2 py-0.5 rounded-sm text-muted-foreground"
+            title="Clear all filters and sorting"
+            onClick={handleResetModifiers}
+          >
+            Reset filters
+          </button>
+        ) : null}
 
-				{reload ? (
-					<button
-						className="text-xs border border-transparent button-hover px-2 py-0.5 rounded-sm text-muted-foreground"
-						onClick={reloadTableData}
-					>
-						Reload
-					</button>
-				) : null}
+        {reload ? (
+          <button
+            className="text-xs border border-transparent button-hover px-2 py-0.5 rounded-sm text-muted-foreground"
+            onClick={reloadTableData}
+          >
+            Reload
+          </button>
+        ) : null}
 
-				{showDisplayButton ? <PopoverForColumnChooser /> : null}
+        {showDisplayButton ? <PopoverForColumnChooser /> : null}
 
-				{showExpandButton ? (
-					<button
-						className="text-xs border border-transparent button-hover aspect-square p-0.5 flex items-center justify-center rounded-sm text-muted-foreground"
-						onClick={() => setIsExpanded((prev) => !prev)}
-						title="Toggle expand table"
-					>
-						<ChevronDownIcon
-							className="data-[is-expanded=true]:rotate-180 stroke-muted-foreground size-4"
-							data-is-expanded={isExpanded}
-						/>
-					</button>
-				) : null}
-			</div>
-		</header>
-	);
+        {showExpandButton ? (
+          <button
+            className="text-xs border border-transparent button-hover aspect-square p-0.5 flex items-center justify-center rounded-sm text-muted-foreground"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            title="Toggle expand table"
+          >
+            <ChevronDownIcon
+              className="data-[is-expanded=true]:rotate-180 stroke-muted-foreground size-4"
+              data-is-expanded={isExpanded}
+            />
+          </button>
+        ) : null}
+      </div>
+    </header>
+  );
 }
 
 export const MemoDefaultTableHeader = memo(DefaultTableHeader);

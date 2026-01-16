@@ -1,12 +1,12 @@
 import {
-	CheckIcon,
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	ChevronsLeftIcon,
-	ChevronsRightIcon,
-	ClipboardIcon,
-	Download,
-	X,
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+  ClipboardIcon,
+  Download,
+  X,
 } from "lucide-react";
 import { AxiosError } from "axios";
 import { memo, useLayoutEffect, useReducer, useRef, useState } from "react";
@@ -15,14 +15,14 @@ import { BlockType } from "#//types/notebook";
 import { LOADER } from "#/components/Button";
 import { Popover, PopoverContent, PopoverTrigger } from "#/components/Popover";
 import {
-	HEADER_AND_FOOTER_HEIGHT,
-	TABLE_CELL_MIN_HEIGHT,
+  HEADER_AND_FOOTER_HEIGHT,
+  TABLE_CELL_MIN_HEIGHT,
 } from "#/components/Tables/TableMaker/TanStackTable/helpers";
 import { areFiltersEqual } from "#/components/Tables/TableMaker/filters/filters";
 import {
-	useImmediateTableData,
-	useSetTableData,
-	useTableData,
+  useImmediateTableData,
+  useSetTableData,
+  useTableData,
 } from "#/components/Tables/TableMaker/tableDataContextUtils";
 import { DATA_ID_KEY } from "#/components/Tables/TableMaker/utils";
 import { ToastAction } from "#/components/Toast";
@@ -35,704 +35,667 @@ import { useDownloadSql } from "#/hooks/mutation/use-download-sql";
 const FIRST_PAGE = 1;
 
 function DefaultTableFooter() {
-	const setTableData = useSetTableData();
-	const {
-		dataComesFromDataPreview,
-		numberOfRowsPerPage,
-		blockFilterAndSort,
-		totalNumberOfRows,
-		initialPageNumber,
-		tableWrapperRef,
-		groupOfFilters,
-		isFetchingData,
-		isSortingData,
-		isNewSource,
-		currPage,
-		setNumberOfRowsPerPage,
-		setIsNewSource,
-		fetchMore,
-	} = useTableData((state) => ({
-		dataComesFromDataPreview: state.dataComesFromDataPreview,
-		numberOfRowsPerPage: state.numberOfRowsPerPage,
-		blockFilterAndSort: state.blockFilterAndSort,
-		totalNumberOfRows: state.totalNumberOfRows,
-		initialPageNumber: state.initialPageNumber,
-		tableWrapperRef: state.tableWrapperRef,
-		groupOfFilters: state.groupOfFilters,
-		isFetchingData: state.isFetchingData,
-		isSortingData: state.isSortingData,
-		isNewSource: state.isNewSource,
-		currPage: state.currPage,
-		setNumberOfRowsPerPage: state.setNumberOfRowsPerPage,
-		setIsNewSource: state.setIsNewSource,
-		fetchMore: state.fetchMore,
-	}));
+  const setTableData = useSetTableData();
+  const {
+    dataComesFromDataPreview,
+    numberOfRowsPerPage,
+    blockFilterAndSort,
+    totalNumberOfRows,
+    initialPageNumber,
+    tableWrapperRef,
+    groupOfFilters,
+    isFetchingData,
+    isSortingData,
+    isNewSource,
+    currPage,
+    setNumberOfRowsPerPage,
+    setIsNewSource,
+    fetchMore,
+  } = useTableData((state) => ({
+    dataComesFromDataPreview: state.dataComesFromDataPreview,
+    numberOfRowsPerPage: state.numberOfRowsPerPage,
+    blockFilterAndSort: state.blockFilterAndSort,
+    totalNumberOfRows: state.totalNumberOfRows,
+    initialPageNumber: state.initialPageNumber,
+    tableWrapperRef: state.tableWrapperRef,
+    groupOfFilters: state.groupOfFilters,
+    isFetchingData: state.isFetchingData,
+    isSortingData: state.isSortingData,
+    isNewSource: state.isNewSource,
+    currPage: state.currPage,
+    setNumberOfRowsPerPage: state.setNumberOfRowsPerPage,
+    setIsNewSource: state.setIsNewSource,
+    fetchMore: state.fetchMore,
+  }));
 
-	const prevFiltersToSendToServerRef = useRef(blockFilterAndSort);
+  const prevFiltersToSendToServerRef = useRef(blockFilterAndSort);
 
-	const totalPageCount =
-		Math.ceil((totalNumberOfRows ?? 0) / numberOfRowsPerPage) || 1;
+  const totalPageCount = Math.ceil((totalNumberOfRows ?? 0) / numberOfRowsPerPage) || 1;
 
-	const isGoToNextPageDisabled =
-		currPage >= totalPageCount || isFetchingData || isSortingData;
-	const isGoToLastPageDisabled =
-		currPage >= totalPageCount || isFetchingData || isSortingData;
-	const isGoToPreviousPageDisabled =
-		currPage <= 1 || isFetchingData || isSortingData;
-	const isGoToFirstPageDisabled =
-		currPage <= 1 || isFetchingData || isSortingData;
+  const isGoToNextPageDisabled = currPage >= totalPageCount || isFetchingData || isSortingData;
+  const isGoToLastPageDisabled = currPage >= totalPageCount || isFetchingData || isSortingData;
+  const isGoToPreviousPageDisabled = currPage <= 1 || isFetchingData || isSortingData;
+  const isGoToFirstPageDisabled = currPage <= 1 || isFetchingData || isSortingData;
 
-	const isAnythingLoading = isFetchingData;
+  const isAnythingLoading = isFetchingData;
 
-	const goToFirstPage = () => {
-		if (isGoToFirstPageDisabled) return;
+  const goToFirstPage = () => {
+    if (isGoToFirstPageDisabled) return;
 
-		const startIndex = 0;
-		const endIndex = numberOfRowsPerPage;
+    const startIndex = 0;
+    const endIndex = numberOfRowsPerPage;
 
-		fetchMore?.({
-			filters: blockFilterAndSort,
-			startIndex,
-			endIndex,
-			onComplete: () => setTableData({ currPage: FIRST_PAGE }),
-			onFetchFinish: noop,
-		}).catch(noop);
-	};
+    fetchMore?.({
+      filters: blockFilterAndSort,
+      startIndex,
+      endIndex,
+      onComplete: () => setTableData({ currPage: FIRST_PAGE }),
+      onFetchFinish: noop,
+    }).catch(noop);
+  };
 
-	const goToPreviousPage = () => {
-		if (isGoToPreviousPageDisabled) return;
+  const goToPreviousPage = () => {
+    if (isGoToPreviousPageDisabled) return;
 
-		const prevPage = currPage - 1;
-		const startIndex = prevPage * numberOfRowsPerPage;
-		const endIndex = prevPage * numberOfRowsPerPage - numberOfRowsPerPage;
+    const prevPage = currPage - 1;
+    const startIndex = prevPage * numberOfRowsPerPage;
+    const endIndex = prevPage * numberOfRowsPerPage - numberOfRowsPerPage;
 
-		fetchMore?.({
-			filters: blockFilterAndSort,
-			startIndex,
-			endIndex,
-			onComplete: () => setTableData({ currPage: prevPage }),
-			onFetchFinish: noop,
-		}).catch(noop);
-	};
+    fetchMore?.({
+      filters: blockFilterAndSort,
+      startIndex,
+      endIndex,
+      onComplete: () => setTableData({ currPage: prevPage }),
+      onFetchFinish: noop,
+    }).catch(noop);
+  };
 
-	const goToNextPage = () => {
-		if (isGoToNextPageDisabled) return;
+  const goToNextPage = () => {
+    if (isGoToNextPageDisabled) return;
 
-		const nextPage = currPage + 1;
-		const startIndex = nextPage * numberOfRowsPerPage - numberOfRowsPerPage;
-		const endIndex = nextPage * numberOfRowsPerPage;
+    const nextPage = currPage + 1;
+    const startIndex = nextPage * numberOfRowsPerPage - numberOfRowsPerPage;
+    const endIndex = nextPage * numberOfRowsPerPage;
 
-		fetchMore?.({
-			filters: blockFilterAndSort,
-			startIndex,
-			endIndex,
-			onComplete: () => setTableData({ currPage: nextPage }),
-			onFetchFinish: noop,
-		}).catch(noop);
-	};
+    fetchMore?.({
+      filters: blockFilterAndSort,
+      startIndex,
+      endIndex,
+      onComplete: () => setTableData({ currPage: nextPage }),
+      onFetchFinish: noop,
+    }).catch(noop);
+  };
 
-	const goToLastPage = () => {
-		if (isGoToLastPageDisabled || !totalNumberOfRows) return;
+  const goToLastPage = () => {
+    if (isGoToLastPageDisabled || !totalNumberOfRows) return;
 
-		const startIndex = totalNumberOfRows - numberOfRowsPerPage;
-		const endIndex = totalNumberOfRows - 1;
+    const startIndex = totalNumberOfRows - numberOfRowsPerPage;
+    const endIndex = totalNumberOfRows - 1;
 
-		fetchMore?.({
-			filters: blockFilterAndSort,
-			startIndex,
-			endIndex,
-			onComplete: () => setTableData({ currPage: totalPageCount }),
-			onFetchFinish: noop,
-		}).catch(noop);
-	};
+    fetchMore?.({
+      filters: blockFilterAndSort,
+      startIndex,
+      endIndex,
+      onComplete: () => setTableData({ currPage: totalPageCount }),
+      onFetchFinish: noop,
+    }).catch(noop);
+  };
 
-	/** On resize height of table, recalculate number of rows per page. */
-	useLayoutEffect(() => {
-		const handleResizeStop = async () => {
-			const newHeightOfTableWrapper = tableWrapperRef?.current?.clientHeight;
+  /** On resize height of table, recalculate number of rows per page. */
+  useLayoutEffect(() => {
+    const handleResizeStop = async () => {
+      const newHeightOfTableWrapper = tableWrapperRef?.current?.clientHeight;
 
-			if (newHeightOfTableWrapper === undefined) return;
+      if (newHeightOfTableWrapper === undefined) return;
 
-			// The extra `4` is to account for borders:
-			const newUsefulHeight =
-				newHeightOfTableWrapper -
-				2 * HEADER_AND_FOOTER_HEIGHT -
-				4 -
-				TABLE_CELL_MIN_HEIGHT; /* Header row */
+      // The extra `4` is to account for borders:
+      const newUsefulHeight =
+        newHeightOfTableWrapper -
+        2 * HEADER_AND_FOOTER_HEIGHT -
+        4 -
+        TABLE_CELL_MIN_HEIGHT; /* Header row */
 
-			const newNumberOfRowsPerPage =
-				Math.floor(newUsefulHeight / TABLE_CELL_MIN_HEIGHT) - 1;
+      const newNumberOfRowsPerPage = Math.floor(newUsefulHeight / TABLE_CELL_MIN_HEIGHT) - 1;
 
-			const endIndex = newNumberOfRowsPerPage;
-			const startIndex = 0;
+      const endIndex = newNumberOfRowsPerPage;
+      const startIndex = 0;
 
-			setNumberOfRowsPerPage?.(newNumberOfRowsPerPage);
+      setNumberOfRowsPerPage?.(newNumberOfRowsPerPage);
 
-			fetchMore?.({
-				filters: blockFilterAndSort,
-				startIndex,
-				endIndex,
-				onFetchFinish: () => setTableData({ currPage: FIRST_PAGE }),
-				onComplete: noop,
-			}).catch(noop);
-		};
+      fetchMore?.({
+        filters: blockFilterAndSort,
+        startIndex,
+        endIndex,
+        onFetchFinish: () => setTableData({ currPage: FIRST_PAGE }),
+        onComplete: noop,
+      }).catch(noop);
+    };
 
-		setTableData({ handleResizeStop });
-	}, [
-		blockFilterAndSort,
-		tableWrapperRef,
-		groupOfFilters,
-		currPage,
-		setNumberOfRowsPerPage,
-		setTableData,
-		fetchMore,
-	]);
+    setTableData({ handleResizeStop });
+  }, [
+    blockFilterAndSort,
+    tableWrapperRef,
+    groupOfFilters,
+    currPage,
+    setNumberOfRowsPerPage,
+    setTableData,
+    fetchMore,
+  ]);
 
-	/** Fetch with new filters when they change. */
-	useLayoutEffect(() => {
-		const prev = prevFiltersToSendToServerRef.current;
-		const curr = blockFilterAndSort;
+  /** Fetch with new filters when they change. */
+  useLayoutEffect(() => {
+    const prev = prevFiltersToSendToServerRef.current;
+    const curr = blockFilterAndSort;
 
-		if (areFiltersEqual(prev, curr)) return;
+    if (areFiltersEqual(prev, curr)) return;
 
-		prevFiltersToSendToServerRef.current = blockFilterAndSort;
+    prevFiltersToSendToServerRef.current = blockFilterAndSort;
 
-		if (fetchMore) {
-			setTableData({ isSortingData: true });
-			setIsNewSource?.(true);
+    if (fetchMore) {
+      setTableData({ isSortingData: true });
+      setIsNewSource?.(true);
 
-			fetchMore({
-				endIndex: numberOfRowsPerPage,
-				filters: blockFilterAndSort,
-				startIndex: 0,
-				onComplete: () => setTableData({ isSortingData: false }),
-				onFetchFinish: noop,
-			}).catch(noop);
-		}
-	}, [
-		numberOfRowsPerPage,
-		blockFilterAndSort,
-		setIsNewSource,
-		setTableData,
-		fetchMore,
-	]);
+      fetchMore({
+        endIndex: numberOfRowsPerPage,
+        filters: blockFilterAndSort,
+        startIndex: 0,
+        onComplete: () => setTableData({ isSortingData: false }),
+        onFetchFinish: noop,
+      }).catch(noop);
+    }
+  }, [numberOfRowsPerPage, blockFilterAndSort, setIsNewSource, setTableData, fetchMore]);
 
-	/** Handle when the source is new. */
-	useLayoutEffect(() => {
-		if (isNewSource && setIsNewSource) {
-			setIsNewSource(false);
+  /** Handle when the source is new. */
+  useLayoutEffect(() => {
+    if (isNewSource && setIsNewSource) {
+      setIsNewSource(false);
 
-			setTableData({
-				currPage: dataComesFromDataPreview ? initialPageNumber : FIRST_PAGE,
-			});
-		}
-	}, [
-		dataComesFromDataPreview,
-		initialPageNumber,
-		isNewSource,
-		setIsNewSource,
-		setTableData,
-	]);
+      setTableData({
+        currPage: dataComesFromDataPreview ? initialPageNumber : FIRST_PAGE,
+      });
+    }
+  }, [dataComesFromDataPreview, initialPageNumber, isNewSource, setIsNewSource, setTableData]);
 
-	return (
-		<footer className="bottom-0 flex h-[30px] w-full items-center justify-between border-t border-border-smooth  bg-[var(--table-footer-bg)] tracking-wide [&_svg]:size-4 text-muted-foreground stroke-muted-foreground">
-			<section className="flex h-full items-center justify-center gap-1 px-1">
-				<div className="flex items-center justify-start">
-					<button
-						className="button-hover flex items-center justify-center rounded-sm p-[3px] text-xs"
-						aria-disabled={isGoToFirstPageDisabled || isAnythingLoading}
-						onPointerDown={goToFirstPage}
-						title="Go to first page"
-					>
-						<ChevronsLeftIcon className="stroke-muted-foreground stroke-1" />
-					</button>
+  return (
+    <footer className="bottom-0 flex h-[30px] w-full items-center justify-between border-t border-border-smooth  bg-[var(--table-footer-bg)] tracking-wide [&_svg]:size-4 text-muted-foreground stroke-muted-foreground">
+      <section className="flex h-full items-center justify-center gap-1 px-1">
+        <div className="flex items-center justify-start">
+          <button
+            className="button-hover flex items-center justify-center rounded-sm p-[3px] text-xs"
+            aria-disabled={isGoToFirstPageDisabled || isAnythingLoading}
+            onPointerDown={goToFirstPage}
+            title="Go to first page"
+          >
+            <ChevronsLeftIcon className="stroke-muted-foreground stroke-1" />
+          </button>
 
-					<button
-						className="button-hover flex items-center justify-center rounded-sm p-[3px] text-xs"
-						aria-disabled={isGoToPreviousPageDisabled || isAnythingLoading}
-						onPointerDown={goToPreviousPage}
-						title="Go to previous page"
-					>
-						<ChevronLeftIcon className="stroke-muted-foreground stroke-1" />
-					</button>
+          <button
+            className="button-hover flex items-center justify-center rounded-sm p-[3px] text-xs"
+            aria-disabled={isGoToPreviousPageDisabled || isAnythingLoading}
+            onPointerDown={goToPreviousPage}
+            title="Go to previous page"
+          >
+            <ChevronLeftIcon className="stroke-muted-foreground stroke-1" />
+          </button>
 
-					<span className="px-2 text-xs tabular-nums leading-[30px]">
-						Page&nbsp;{currPage}&nbsp;of&nbsp;
-						{totalPageCount}
-					</span>
+          <span className="px-2 text-xs tabular-nums leading-[30px]">
+            Page&nbsp;{currPage}&nbsp;of&nbsp;
+            {totalPageCount}
+          </span>
 
-					<button
-						className="button-hover flex items-center justify-center rounded-sm p-[3px] text-xs"
-						aria-disabled={isGoToNextPageDisabled || isAnythingLoading}
-						onPointerDown={goToNextPage}
-						title="Go to next page"
-					>
-						<ChevronRightIcon className="stroke-muted-foreground stroke-1" />
-					</button>
+          <button
+            className="button-hover flex items-center justify-center rounded-sm p-[3px] text-xs"
+            aria-disabled={isGoToNextPageDisabled || isAnythingLoading}
+            onPointerDown={goToNextPage}
+            title="Go to next page"
+          >
+            <ChevronRightIcon className="stroke-muted-foreground stroke-1" />
+          </button>
 
-					<button
-						className="button-hover flex items-center justify-center rounded-sm p-[3px] text-xs"
-						aria-disabled={isGoToLastPageDisabled || isAnythingLoading}
-						onPointerDown={goToLastPage}
-						title="Go to last page"
-					>
-						<ChevronsRightIcon className="stroke-muted-foreground stroke-1" />
-					</button>
-				</div>
+          <button
+            className="button-hover flex items-center justify-center rounded-sm p-[3px] text-xs"
+            aria-disabled={isGoToLastPageDisabled || isAnythingLoading}
+            onPointerDown={goToLastPage}
+            title="Go to last page"
+          >
+            <ChevronsRightIcon className="stroke-muted-foreground stroke-1" />
+          </button>
+        </div>
 
-				<div className="mx-5 h-[70%] w-[1px] bg-border-smooth"></div>
-			</section>
+        <div className="mx-5 h-[70%] w-[1px] bg-border-smooth"></div>
+      </section>
 
-			<section className="flex h-full items-center justify-center gap-1 px-1">
-				<div className="flex aspect-square h-[29px] w-[29px] items-center justify-center">
-					{isAnythingLoading ? LOADER : null}
-				</div>
+      <section className="flex h-full items-center justify-center gap-1 px-1">
+        <div className="flex aspect-square h-[29px] w-[29px] items-center justify-center">
+          {isAnythingLoading ? LOADER : null}
+        </div>
 
-				<ViewPopover />
+        <ViewPopover />
 
-				<CopyTableButton />
+        <CopyTableButton />
 
-				<DownloadAsCSVButton />
+        <DownloadAsCSVButton />
 
-				{Number.isFinite(totalNumberOfRows) ? (
-					<span className="px-2 text-xs tabular-nums leading-[30px]">
-						{totalNumberOfRows} rows
-					</span>
-				) : null}
-			</section>
-		</footer>
-	);
+        {Number.isFinite(totalNumberOfRows) ? (
+          <span className="px-2 text-xs tabular-nums leading-[30px]">{totalNumberOfRows} rows</span>
+        ) : null}
+      </section>
+    </footer>
+  );
 }
 
 function DownloadAsCSVButton() {
-	const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
-	const [wasDownloadedSuccessfully, setWasDownloadedSuccessfully] = useReducer(
-		(_prev: boolean | null, next: boolean | null): boolean | null => {
-			if (next !== null) {
-				setTimeout(() => {
-					setWasDownloadedSuccessfully(null);
-				}, 2_000);
-			}
+  const [wasDownloadedSuccessfully, setWasDownloadedSuccessfully] = useReducer(
+    (_prev: boolean | null, next: boolean | null): boolean | null => {
+      if (next !== null) {
+        setTimeout(() => {
+          setWasDownloadedSuccessfully(null);
+        }, 2_000);
+      }
 
-			return next;
-		},
-		null,
-	);
+      return next;
+    },
+    null,
+  );
 
-	const { getState: getTableData, setState: setTableData } =
-		useImmediateTableData();
-	const downloadCsv = useDownloadCsv();
-	const downloadSql = useDownloadSql();
+  const { getState: getTableData, setState: setTableData } = useImmediateTableData();
+  const downloadCsv = useDownloadCsv();
+  const downloadSql = useDownloadSql();
 
-	const handleDownloadAsCSV = async () => {
-		if (isDownloading) return;
+  const handleDownloadAsCSV = async () => {
+    if (isDownloading) return;
 
-		const { blockFilterAndSort, block } = getTableData();
+    const { blockFilterAndSort, block } = getTableData();
 
-		if (!block?.uuid) {
-			console.error("Uuid is undefined", { block });
+    if (!block?.uuid) {
+      console.error("Uuid is undefined", { block });
 
-			toast({
-				description:
-					"This block has no uuid. This should not happen! Try refreshing the page!",
-				variant: ToastVariant.Destructive,
-				title: "Can't download file",
-			});
+      toast({
+        description: "This block has no uuid. This should not happen! Try refreshing the page!",
+        variant: ToastVariant.Destructive,
+        title: "Can't download file",
+      });
 
-			return;
-		}
+      return;
+    }
 
-		const variable_name =
-			block?.write_variables?.[0]?.name || block?.write_variables;
+    const variable_name = block?.write_variables?.[0]?.name || block?.write_variables;
 
-		if (!variable_name) {
-			console.error("Can't download table. No variable name.", { block });
+    if (!variable_name) {
+      console.error("Can't download table. No variable name.", { block });
 
-			toast({
-				variant: ToastVariant.Destructive,
-				description: "No variable name.",
-				title: "Download failed",
-			});
+      toast({
+        variant: ToastVariant.Destructive,
+        description: "No variable name.",
+        title: "Download failed",
+      });
 
-			return;
-		}
+      return;
+    }
 
-		try {
-			setTableData({ isFetchingData: true });
-			setIsDownloading(true);
+    try {
+      setTableData({ isFetchingData: true });
+      setIsDownloading(true);
 
-			const blockType = block.type.toLowerCase();
+      const blockType = block.type.toLowerCase();
 
-			const reponse =
-				blockType === BlockType.Table.toLowerCase() ||
-				blockType === BlockType.Csv.toLowerCase()
-					? await downloadCsv.mutateAsync({
-							action_info: {
-								filters: blockFilterAndSort,
-							},
-							blockUuid: block.uuid,
-						})
-					: await downloadSql.mutateAsync({
-							action_info: {
-								filters: blockFilterAndSort,
-							},
-							blockUuid: block.uuid,
-						});
+      const reponse =
+        blockType === BlockType.Table.toLowerCase() || blockType === BlockType.Csv.toLowerCase()
+          ? await downloadCsv.mutateAsync({
+              action_info: {
+                filters: blockFilterAndSort,
+              },
+              blockUuid: block.uuid,
+            })
+          : await downloadSql.mutateAsync({
+              action_info: {
+                filters: blockFilterAndSort,
+              },
+              blockUuid: block.uuid,
+            });
 
-			const url = URL.createObjectURL(await reponse.blob());
+      const url = URL.createObjectURL(await reponse.blob());
 
-			const a = document.createElement("a");
-			a.download = `${variable_name}.csv`;
-			a.href = url;
+      const a = document.createElement("a");
+      a.download = `${variable_name}.csv`;
+      a.href = url;
 
-			document.body.appendChild(a);
+      document.body.appendChild(a);
 
-			a.click();
+      a.click();
 
-			// clean up "a" element & remove ObjectURL
-			document.body.removeChild(a);
-			URL.revokeObjectURL(url);
+      // clean up "a" element & remove ObjectURL
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
-			setWasDownloadedSuccessfully(true);
-		} catch (error) {
-			console.error(error);
+      setWasDownloadedSuccessfully(true);
+    } catch (error) {
+      console.error(error);
 
-			setWasDownloadedSuccessfully(false);
+      setWasDownloadedSuccessfully(false);
 
-			if (error instanceof AxiosError) {
-				const description =
-					error.response?.data.error ||
-					"An error occurred while trying to download the file.";
+      if (error instanceof AxiosError) {
+        const description =
+          error.response?.data.error || "An error occurred while trying to download the file.";
 
-				toast({
-					variant: ToastVariant.Destructive,
-					title: "Download failed",
-					description,
-					action: (
-						<ToastAction onPointerUp={handleDownloadAsCSV} altText="Try again">
-							Try again
-						</ToastAction>
-					),
-				});
-			}
-		} finally {
-			setTableData({ isFetchingData: false });
-			setIsDownloading(false);
-		}
-	};
+        toast({
+          variant: ToastVariant.Destructive,
+          title: "Download failed",
+          description,
+          action: (
+            <ToastAction onPointerUp={handleDownloadAsCSV} altText="Try again">
+              Try again
+            </ToastAction>
+          ),
+        });
+      }
+    } finally {
+      setTableData({ isFetchingData: false });
+      setIsDownloading(false);
+    }
+  };
 
-	return (
-		<button
-			className="button-hover flex h-[70%] items-center justify-center rounded-sm p-2.5 text-xs text-muted-foreground"
-			onPointerDown={handleDownloadAsCSV}
-			title={
-				wasDownloadedSuccessfully === true
-					? "Success downloading as CSV"
-					: wasDownloadedSuccessfully === false
-						? "Failed downloading as CSV"
-						: isDownloading
-							? "Downloading as CSV..."
-							: "Download as CSV"
-			}
-		>
-			{isDownloading ? (
-				LOADER
-			) : wasDownloadedSuccessfully === true ? (
-				<CheckIcon className="size-5 stroke-positive stroke-1" />
-			) : wasDownloadedSuccessfully === false ? (
-				<X className="size-5 stroke-destructive stroke-1" />
-			) : (
-				<Download className="size-5 stroke-muted-foreground stroke-1" />
-			)}
-		</button>
-	);
+  return (
+    <button
+      className="button-hover flex h-[70%] items-center justify-center rounded-sm p-2.5 text-xs text-muted-foreground"
+      onPointerDown={handleDownloadAsCSV}
+      title={
+        wasDownloadedSuccessfully === true
+          ? "Success downloading as CSV"
+          : wasDownloadedSuccessfully === false
+            ? "Failed downloading as CSV"
+            : isDownloading
+              ? "Downloading as CSV..."
+              : "Download as CSV"
+      }
+    >
+      {isDownloading ? (
+        LOADER
+      ) : wasDownloadedSuccessfully === true ? (
+        <CheckIcon className="size-5 stroke-positive stroke-1" />
+      ) : wasDownloadedSuccessfully === false ? (
+        <X className="size-5 stroke-destructive stroke-1" />
+      ) : (
+        <Download className="size-5 stroke-muted-foreground stroke-1" />
+      )}
+    </button>
+  );
 }
 
 function CopyTableButton() {
-	const [isCopying, setIsCopying] = useState(false);
-	const [isOpen, setIsOpen] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-	const [wasCopiedSuccessfully, setWasCopiedSuccessfully] = useReducer(
-		(_prev: boolean | null, next: boolean | null): boolean | null => {
-			if (next !== null) {
-				setTimeout(() => {
-					setWasCopiedSuccessfully(null);
-				}, 2_000);
-			}
+  const [wasCopiedSuccessfully, setWasCopiedSuccessfully] = useReducer(
+    (_prev: boolean | null, next: boolean | null): boolean | null => {
+      if (next !== null) {
+        setTimeout(() => {
+          setWasCopiedSuccessfully(null);
+        }, 2_000);
+      }
 
-			return next;
-		},
-		null,
-	);
+      return next;
+    },
+    null,
+  );
 
-	const { getState: getTableData, setState: setTableData } =
-		useImmediateTableData();
-	const downloadCsv = useDownloadCsv();
-	const downloadSql = useDownloadSql();
+  const { getState: getTableData, setState: setTableData } = useImmediateTableData();
+  const downloadCsv = useDownloadCsv();
+  const downloadSql = useDownloadSql();
 
-	async function handleCopyTable() {
-		setIsOpen(false);
+  async function handleCopyTable() {
+    setIsOpen(false);
 
-		if (isCopying) return;
+    if (isCopying) return;
 
-		const { block, blockFilterAndSort } = getTableData();
+    const { block, blockFilterAndSort } = getTableData();
 
-		if (!block?.uuid) {
-			console.error("Block uuid is undefined", { block });
+    if (!block?.uuid) {
+      console.error("Block uuid is undefined", { block });
 
-			return;
-		}
+      return;
+    }
 
-		const variable_name =
-			block?.write_variables?.[0]?.name || block?.write_variables;
+    const variable_name = block?.write_variables?.[0]?.name || block?.write_variables;
 
-		if (!variable_name) {
-			console.error("Can't copy table. No variable name.", { block });
+    if (!variable_name) {
+      console.error("Can't copy table. No variable name.", { block });
 
-			toast({
-				variant: ToastVariant.Destructive,
-				description: "No variable name.",
-				title: "Copy failed",
-			});
+      toast({
+        variant: ToastVariant.Destructive,
+        description: "No variable name.",
+        title: "Copy failed",
+      });
 
-			return;
-		}
+      return;
+    }
 
-		try {
-			setTableData({ isFetchingData: true });
-			setIsCopying(true);
+    try {
+      setTableData({ isFetchingData: true });
+      setIsCopying(true);
 
-			const blockType = block.type.toLowerCase();
+      const blockType = block.type.toLowerCase();
 
-			const response =
-				blockType === BlockType.Table.toLowerCase() ||
-				blockType === BlockType.Csv.toLowerCase()
-					? await downloadCsv.mutateAsync({
-							action_info: {
-								filters: blockFilterAndSort,
-							},
-							blockUuid: block.uuid,
-						})
-					: await downloadSql.mutateAsync({
-							action_info: {
-								filters: blockFilterAndSort,
-							},
-							blockUuid: block.uuid,
-						});
+      const response =
+        blockType === BlockType.Table.toLowerCase() || blockType === BlockType.Csv.toLowerCase()
+          ? await downloadCsv.mutateAsync({
+              action_info: {
+                filters: blockFilterAndSort,
+              },
+              blockUuid: block.uuid,
+            })
+          : await downloadSql.mutateAsync({
+              action_info: {
+                filters: blockFilterAndSort,
+              },
+              blockUuid: block.uuid,
+            });
 
-			try {
-				await navigator.clipboard.writeText(await response.text());
-			} catch (error) {
-				console.log("Failed to copy text to clipboard", error);
+      try {
+        await navigator.clipboard.writeText(await response.text());
+      } catch (error) {
+        console.log("Failed to copy text to clipboard", error);
 
-				// In case it is a window focus error, write to clipboard on next window focus:
-				const writeToClipboardOnWindowFocus = () => {
-					return new Promise<void>((resolve, reject) => {
-						const _asyncCopyFn = async () => {
-							try {
-								await navigator.clipboard.writeText(await response.text());
+        // In case it is a window focus error, write to clipboard on next window focus:
+        const writeToClipboardOnWindowFocus = () => {
+          return new Promise<void>((resolve, reject) => {
+            const _asyncCopyFn = async () => {
+              try {
+                await navigator.clipboard.writeText(await response.text());
 
-								resolve();
-							} catch (e) {
-								reject(e);
-							}
-						};
+                resolve();
+              } catch (e) {
+                reject(e);
+              }
+            };
 
-						window.addEventListener("focus", _asyncCopyFn, { once: true });
-					});
-				};
+            window.addEventListener("focus", _asyncCopyFn, { once: true });
+          });
+        };
 
-				await writeToClipboardOnWindowFocus();
-			}
+        await writeToClipboardOnWindowFocus();
+      }
 
-			setWasCopiedSuccessfully(true);
-		} catch (error) {
-			setWasCopiedSuccessfully(false);
+      setWasCopiedSuccessfully(true);
+    } catch (error) {
+      setWasCopiedSuccessfully(false);
 
-			console.error(error);
+      console.error(error);
 
-			if (error instanceof AxiosError) {
-				const description =
-					error.response?.data.error ||
-					"An error occurred while trying to download the file.";
+      if (error instanceof AxiosError) {
+        const description =
+          error.response?.data.error || "An error occurred while trying to download the file.";
 
-				toast({
-					variant: ToastVariant.Destructive,
-					title: "Download failed",
-					description,
-					action: (
-						<ToastAction onPointerUp={handleCopyTable} altText="Try again">
-							Try again
-						</ToastAction>
-					),
-				});
-			}
-		} finally {
-			setTableData({ isFetchingData: false });
-			setIsCopying(false);
-		}
-	}
+        toast({
+          variant: ToastVariant.Destructive,
+          title: "Download failed",
+          description,
+          action: (
+            <ToastAction onPointerUp={handleCopyTable} altText="Try again">
+              Try again
+            </ToastAction>
+          ),
+        });
+      }
+    } finally {
+      setTableData({ isFetchingData: false });
+      setIsCopying(false);
+    }
+  }
 
-	async function handleCopyPage() {
-		setIsOpen(false);
+  async function handleCopyPage() {
+    setIsOpen(false);
 
-		if (isCopying) return;
+    if (isCopying) return;
 
-		const { currPage, numberOfRowsPerPage, allData } = getTableData();
-		const pageData = [];
+    const { currPage, numberOfRowsPerPage, allData } = getTableData();
+    const pageData = [];
 
-		const initialRowIndex = (currPage - 1) * numberOfRowsPerPage;
-		const lastRowIndex = initialRowIndex + numberOfRowsPerPage;
+    const initialRowIndex = (currPage - 1) * numberOfRowsPerPage;
+    const lastRowIndex = initialRowIndex + numberOfRowsPerPage;
 
-		for (const [rowIndex, row] of allData) {
-			if (rowIndex < initialRowIndex) {
-				continue;
-			} else if (rowIndex > lastRowIndex) {
-				break;
-			}
+    for (const [rowIndex, row] of allData) {
+      if (rowIndex < initialRowIndex) {
+        continue;
+      } else if (rowIndex > lastRowIndex) {
+        break;
+      }
 
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { [DATA_ID_KEY]: _ignore, ...originalData } = row;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [DATA_ID_KEY]: _ignore, ...originalData } = row;
 
-			pageData.push(originalData);
-		}
+      pageData.push(originalData);
+    }
 
-		const dataAsCSV = convertArrayOfObjectsToCSV(pageData);
+    const dataAsCSV = convertArrayOfObjectsToCSV(pageData);
 
-		try {
-			await navigator.clipboard.writeText(dataAsCSV);
+    try {
+      await navigator.clipboard.writeText(dataAsCSV);
 
-			setWasCopiedSuccessfully(true);
-		} catch {
-			setWasCopiedSuccessfully(false);
-		}
-	}
+      setWasCopiedSuccessfully(true);
+    } catch {
+      setWasCopiedSuccessfully(false);
+    }
+  }
 
-	return (
-		<Popover onOpenChange={setIsOpen} open={isOpen}>
-			<PopoverTrigger
-				className="flex h-[70%] items-center justify-center rounded-sm px-2.5 disabled:pointer-events-none button-hover"
-				disabled={isCopying}
-				title={
-					wasCopiedSuccessfully === true
-						? "Success copying table or page"
-						: wasCopiedSuccessfully === false
-							? "Failed copying table or page"
-							: isCopying
-								? "Copying table or page..."
-								: "Copy table or page"
-				}
-			>
-				{isCopying ? (
-					LOADER
-				) : wasCopiedSuccessfully === true ? (
-					<CheckIcon className="size-5 stroke-positive stroke-1" />
-				) : wasCopiedSuccessfully === false ? (
-					<X className="size-5 stroke-destructive stroke-1" />
-				) : (
-					<ClipboardIcon className="size-5 stroke-muted-foreground stroke-1" />
-				)}
-			</PopoverTrigger>
+  return (
+    <Popover onOpenChange={setIsOpen} open={isOpen}>
+      <PopoverTrigger
+        className="flex h-[70%] items-center justify-center rounded-sm px-2.5 disabled:pointer-events-none button-hover"
+        disabled={isCopying}
+        title={
+          wasCopiedSuccessfully === true
+            ? "Success copying table or page"
+            : wasCopiedSuccessfully === false
+              ? "Failed copying table or page"
+              : isCopying
+                ? "Copying table or page..."
+                : "Copy table or page"
+        }
+      >
+        {isCopying ? (
+          LOADER
+        ) : wasCopiedSuccessfully === true ? (
+          <CheckIcon className="size-5 stroke-positive stroke-1" />
+        ) : wasCopiedSuccessfully === false ? (
+          <X className="size-5 stroke-destructive stroke-1" />
+        ) : (
+          <ClipboardIcon className="size-5 stroke-muted-foreground stroke-1" />
+        )}
+      </PopoverTrigger>
 
-			<PopoverContent
-				className="z-10 flex flex-col text-sm shadow-lg"
-				sideOffset={5}
-				side="top"
-				slot="ul"
-			>
-				<button
-					className="flex items-center justify-start rounded-sm p-2 text-sm button-hover"
-					onClick={handleCopyTable}
-				>
-					Copy table
-				</button>
+      <PopoverContent
+        className="z-10 flex flex-col text-sm shadow-lg"
+        sideOffset={5}
+        side="top"
+        slot="ul"
+      >
+        <button
+          className="flex items-center justify-start rounded-sm p-2 text-sm button-hover"
+          onClick={handleCopyTable}
+        >
+          Copy table
+        </button>
 
-				<button
-					className="flex items-center justify-start rounded-sm p-2 text-sm button-hover"
-					onClick={handleCopyPage}
-				>
-					Copy page
-				</button>
-			</PopoverContent>
-		</Popover>
-	);
+        <button
+          className="flex items-center justify-start rounded-sm p-2 text-sm button-hover"
+          onClick={handleCopyPage}
+        >
+          Copy page
+        </button>
+      </PopoverContent>
+    </Popover>
+  );
 }
 
 function ViewPopover() {
-	const setTableData = useSetTableData();
-	const {
-		numberOfRowsPerPage,
-		blockFilterAndSort,
-		table,
-		setNumberOfRowsPerPage,
-		fetchMore,
-	} = useTableData((store) => ({
-		numberOfRowsPerPage: store.numberOfRowsPerPage,
-		blockFilterAndSort: store.blockFilterAndSort,
-		table: store.table,
-		setNumberOfRowsPerPage: store.setNumberOfRowsPerPage,
-		fetchMore: store.fetchMore,
-	}));
+  const setTableData = useSetTableData();
+  const { numberOfRowsPerPage, blockFilterAndSort, table, setNumberOfRowsPerPage, fetchMore } =
+    useTableData((store) => ({
+      numberOfRowsPerPage: store.numberOfRowsPerPage,
+      blockFilterAndSort: store.blockFilterAndSort,
+      table: store.table,
+      setNumberOfRowsPerPage: store.setNumberOfRowsPerPage,
+      fetchMore: store.fetchMore,
+    }));
 
-	const [newNumberOfRows, setNewNumberOfRows] = useState(numberOfRowsPerPage);
+  const [newNumberOfRows, setNewNumberOfRows] = useState(numberOfRowsPerPage);
 
-	const [isOpen, setIsOpen] = useReducer((prev: boolean, next: boolean) => {
-		const isClosing = next === false && prev === true;
+  const [isOpen, setIsOpen] = useReducer((prev: boolean, next: boolean) => {
+    const isClosing = next === false && prev === true;
 
-		if (isClosing) {
-			const shouldChangeValue =
-				numberOfRowsPerPage !== newNumberOfRows &&
-				Number.isFinite(newNumberOfRows);
+    if (isClosing) {
+      const shouldChangeValue =
+        numberOfRowsPerPage !== newNumberOfRows && Number.isFinite(newNumberOfRows);
 
-			if (shouldChangeValue) {
-				fetchMore?.({
-					filters: blockFilterAndSort,
-					endIndex: newNumberOfRows,
-					startIndex: 0,
-					onFetchFinish: noop,
-					onComplete: noop,
-				}).catch(noop);
+      if (shouldChangeValue) {
+        fetchMore?.({
+          filters: blockFilterAndSort,
+          endIndex: newNumberOfRows,
+          startIndex: 0,
+          onFetchFinish: noop,
+          onComplete: noop,
+        }).catch(noop);
 
-				setNumberOfRowsPerPage?.(newNumberOfRows);
-				table?.setPageSize(newNumberOfRows);
-				setTableData({ currPage: 1 });
-			}
-		}
+        setNumberOfRowsPerPage?.(newNumberOfRows);
+        table?.setPageSize(newNumberOfRows);
+        setTableData({ currPage: 1 });
+      }
+    }
 
-		return next;
-	}, false);
+    return next;
+  }, false);
 
-	return (
-		<Popover onOpenChange={setIsOpen} open={isOpen}>
-			<PopoverTrigger
-				className="button-hover flex h-[70%] items-center justify-center rounded-sm p-2.5 text-xs text-muted-foreground"
-				title="Change view options"
-			>
-				View
-			</PopoverTrigger>
+  return (
+    <Popover onOpenChange={setIsOpen} open={isOpen}>
+      <PopoverTrigger
+        className="button-hover flex h-[70%] items-center justify-center rounded-sm p-2.5 text-xs text-muted-foreground"
+        title="Change view options"
+      >
+        View
+      </PopoverTrigger>
 
-			<PopoverContent
-				className="z-10 flex flex-col p-2 text-sm shadow-lg"
-				sideOffset={5}
-				side="top"
-			>
-				<section className="flex items-center justify-center gap-2">
-					<p>Rows per page:</p>
+      <PopoverContent
+        className="z-10 flex flex-col p-2 text-sm shadow-lg"
+        sideOffset={5}
+        side="top"
+      >
+        <section className="flex items-center justify-center gap-2">
+          <p>Rows per page:</p>
 
-					<input
-						onChange={(e) =>
-							setNewNumberOfRows(Math.max(e.target.valueAsNumber, 1))
-						}
-						className="w-10 bg-popover outline-hidden"
-						defaultValue={numberOfRowsPerPage}
-						type="number"
-						min={1}
-					/>
-				</section>
-			</PopoverContent>
-		</Popover>
-	);
+          <input
+            onChange={(e) => setNewNumberOfRows(Math.max(e.target.valueAsNumber, 1))}
+            className="w-10 bg-popover outline-hidden"
+            defaultValue={numberOfRowsPerPage}
+            type="number"
+            min={1}
+          />
+        </section>
+      </PopoverContent>
+    </Popover>
+  );
 }
 
 export const MemoDefaultTableFooter = memo(DefaultTableFooter);

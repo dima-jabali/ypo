@@ -8,27 +8,27 @@ import { useEffect, useRef } from "react";
  * @param cleanup A function containing the cleanup logic (runs on unmount).
  */
 export function useOnMount(
-	setup: React.RefObject<() => void>,
-	cleanup: React.RefObject<() => void>,
+  setup: React.RefObject<() => void>,
+  cleanup: React.RefObject<() => void>,
 ) {
-	// 1. Use a ref to track if the effect has already run once successfully.
-	const mounted = useRef(false);
+  // 1. Use a ref to track if the effect has already run once successfully.
+  const mounted = useRef(false);
 
-	useEffect(() => {
-		// 2. Check if this is the first real mount (after potential simulation).
-		if (!mounted.current) {
-			mounted.current = true;
-			// Run the single-time setup logic
-			setup.current();
+  useEffect(() => {
+    // 2. Check if this is the first real mount (after potential simulation).
+    if (!mounted.current) {
+      mounted.current = true;
+      // Run the single-time setup logic
+      setup.current();
 
-			return;
-		}
+      return;
+    }
 
-		// AND on the final, real unmount.
-		return () => {
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-			cleanup.current();
-		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+    // AND on the final, real unmount.
+    return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      cleanup.current();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 }

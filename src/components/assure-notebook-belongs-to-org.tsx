@@ -7,44 +7,42 @@ import { useFetchAllOrganizations } from "#/hooks/fetch/use-fetch-all-organizati
 import { useDownloadedNotebookOrganizationId } from "#/hooks/fetch/use-fetch-notebook";
 import { useDownloadedOrganizationId } from "#/hooks/use-current-organization";
 
-export const AssureNotebookBelongsToOrg = memo(
-	function AssureNotebookBelongsToOrg({ children }: React.PropsWithChildren) {
-				if (typeof window === "undefined") {
-		return null;
-	}
-	
-		const notebookOrganizationId = useDownloadedNotebookOrganizationId();
-		const orgId = useDownloadedOrganizationId();
-		const orgs = useFetchAllOrganizations();
+export const AssureNotebookBelongsToOrg = memo(function AssureNotebookBelongsToOrg({
+  children,
+}: React.PropsWithChildren) {
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-		if (!isValidNumber(notebookOrganizationId) || !isValidNumber(orgId)) {
-			console.log("Notebook or current organization is not defined.", {
-				notebookOrganizationId,
-				orgId,
-			});
+  const notebookOrganizationId = useDownloadedNotebookOrganizationId();
+  const orgId = useDownloadedOrganizationId();
+  const orgs = useFetchAllOrganizations();
 
-			return null;
-		}
+  if (!isValidNumber(notebookOrganizationId) || !isValidNumber(orgId)) {
+    console.log("Notebook or current organization is not defined.", {
+      notebookOrganizationId,
+      orgId,
+    });
 
-		if (notebookOrganizationId !== orgId) {
-			let msg = "Notebook does not belong to the current organization.";
+    return null;
+  }
 
-			const orgNotebookBelongsTo = orgs.find(
-				(org) => org.id === notebookOrganizationId,
-			);
+  if (notebookOrganizationId !== orgId) {
+    let msg = "Notebook does not belong to the current organization.";
 
-			if (orgNotebookBelongsTo) {
-				msg += `\nThis notebook belongs to the organization "${orgNotebookBelongsTo.name} (${orgNotebookBelongsTo.id})", to which you belong to.\nChange organization in the top right corner to access it.`;
-			}
+    const orgNotebookBelongsTo = orgs.find((org) => org.id === notebookOrganizationId);
 
-			console.log({
-				notebookOrganizationId,
-				orgId,
-			});
+    if (orgNotebookBelongsTo) {
+      msg += `\nThis notebook belongs to the organization "${orgNotebookBelongsTo.name} (${orgNotebookBelongsTo.id})", to which you belong to.\nChange organization in the top right corner to access it.`;
+    }
 
-			throw new Error(msg);
-		}
+    console.log({
+      notebookOrganizationId,
+      orgId,
+    });
 
-		return children;
-	},
-);
+    throw new Error(msg);
+  }
+
+  return children;
+});

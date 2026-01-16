@@ -7,11 +7,11 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-	--simple-scrollbar-width: 12px;
+  --simple-scrollbar-width: 12px;
 }
 
 @layer base {
-	button,
+  button,
 	a[href],
 	input:not([type="checkbox"]):not([type="radio"]),
 	select,
@@ -19,10 +19,10 @@
 	textarea,
 	/* data-[slot="select-item"], */
 		.textarea {
-		@apply base-ring data-[state=open]:base-ring;
-	}
+    @apply base-ring data-[state=open]:base-ring;
+  }
 
-	  * {
+  * {
     @apply border-border outline-ring/50;
   }
   body {
@@ -31,375 +31,367 @@
 }
 
 @utility base-ring {
-	@apply ring-offset-popover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 aria-invalid:ring-destructive/20;
+  @apply ring-offset-popover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 aria-invalid:ring-destructive/20;
 }
 
 @utility no-ring {
-	@apply focus-visible:ring-0 focus-visible:ring-offset-0;
+  @apply focus-visible:ring-0 focus-visible:ring-offset-0;
 }
 
 @utility chat-md-grid {
-	--gap: calc(var(--spacing) * 4); /* gap-4 */
-	--full: minmax(0, 1fr);
-	--content: calc(((min(48rem, 100% - var(--gap) * 4)) / 2) - (var(--gap) / 2));
-	--parallel: minmax(0, 1fr);
+  --gap: calc(var(--spacing) * 4); /* gap-4 */
+  --full: minmax(0, 1fr);
+  --content: calc(((min(48rem, 100% - var(--gap) * 4)) / 2) - (var(--gap) / 2));
+  --parallel: minmax(0, 1fr);
 
-	display: grid;
+  display: grid;
 
-	grid-template-columns: [full-start] var(--full) [parallel-one-start] var(
-			--parallel
-		) [content-start] var(--content) [parallel-one-end gap-start] var(--gap) [gap-end parallel-two-start] var(
-			--content
-		) [content-end] var(--parallel) [parallel-two-end] var(--full) [full-end];
+  grid-template-columns:
+    [full-start] var(--full) [parallel-one-start] var(--parallel)
+    [content-start] var(--content) [parallel-one-end gap-start] var(--gap)
+    [gap-end parallel-two-start] var(--content)
+    [content-end] var(--parallel) [parallel-two-end] var(--full) [full-end];
 }
 
 @utility chat-sm-grid {
-	--gap: 9px;
-	--full: minmax(0, 1fr);
-	--content: calc(((min(48rem, 100% - var(--gap) * 4)) / 2) - (var(--gap) / 2));
-	--parallel: minmax(0, 1fr);
+  --gap: 9px;
+  --full: minmax(0, 1fr);
+  --content: calc(((min(48rem, 100% - var(--gap) * 4)) / 2) - (var(--gap) / 2));
+  --parallel: minmax(0, 1fr);
 
-	display: grid;
+  display: grid;
 
-	grid-template-columns: [full-start] var(--full) [parallel-one-start] var(
-			--parallel
-		) [content-start] var(--content) [parallel-one-end gap-start] var(--gap) [gap-end parallel-two-start] var(
-			--content
-		) [content-end] var(--parallel) [parallel-two-end] var(--full) [full-end];
+  grid-template-columns:
+    [full-start] var(--full) [parallel-one-start] var(--parallel)
+    [content-start] var(--content) [parallel-one-end gap-start] var(--gap)
+    [gap-end parallel-two-start] var(--content)
+    [content-end] var(--parallel) [parallel-two-end] var(--full) [full-end];
 }
 
 @utility chat-content {
-	grid-column: content-start / content-end;
+  grid-column: content-start / content-end;
 }
 
 @utility chat-parallel-one {
-	grid-column: parallel-one-start / parallel-one-end;
+  grid-column: parallel-one-start / parallel-one-end;
 }
 
 @utility chat-parallel-two {
-	grid-column: parallel-two-start / parallel-two-end;
+  grid-column: parallel-two-start / parallel-two-end;
 }
 
 @utility chat-parallel-msgs {
-	grid-column: parallel-one-start / parallel-two-end;
+  grid-column: parallel-one-start / parallel-two-end;
 }
 
 @utility chat-full {
-	grid-column: full-start / full-end;
+  grid-column: full-start / full-end;
 }
 
 @utility notebook-grid {
-	--gap: calc(var(--spacing) * 4); /* gap-4 */
-	--full: minmax(0, 1fr);
-	--content: calc(((min(48rem, 100% - var(--gap) * 4)) / 2) - (var(--gap) / 2));
-	--parallel: minmax(0, 1fr);
+  --gap: calc(var(--spacing) * 4); /* gap-4 */
+  --full: minmax(0, 1fr);
+  --content: calc(((min(48rem, 100% - var(--gap) * 4)) / 2) - (var(--gap) / 2));
+  --parallel: minmax(0, 1fr);
 
-	display: grid;
+  display: grid;
 
-	grid-template-columns: [full-start] var(--full) [parallel-one-start] var(
-			--parallel
-		) [content-start] var(--content) [parallel-one-end gap-start] var(--gap) [gap-end parallel-two-start] var(
-			--content
-		) [content-end] var(--parallel) [parallel-two-end] var(--full) [full-end];
+  grid-template-columns:
+    [full-start] var(--full) [parallel-one-start] var(--parallel)
+    [content-start] var(--content) [parallel-one-end gap-start] var(--gap)
+    [gap-end parallel-two-start] var(--content)
+    [content-end] var(--parallel) [parallel-two-end] var(--full) [full-end];
 }
 
 @utility notebook-content {
-	grid-column: content-start / content-end;
+  grid-column: content-start / content-end;
 }
 
 @utility slash-grid {
-	--max-column-width: calc(
-		100% /
-		var(--auto-grid-max-columns, infinity) -
-		var(--auto-grid-gap)
-	);
-	--column-width: max(
-		var(--max-column-width),
-		min(var(--auto-grid-min-size, 10rem), 100%)
-	);
+  --max-column-width: calc(100% / var(--auto-grid-max-columns, infinity) - var(--auto-grid-gap));
+  --column-width: max(var(--max-column-width), min(var(--auto-grid-min-size, 10rem), 100%));
 
-	display: grid;
+  display: grid;
 
-	grid-template-columns: repeat(auto-fit, minmax(var(--column-width), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--column-width), 1fr));
 
-	/* vertical gap falls back to general gap then falls back to 1rem*/
-	gap: var(--auto-grid-gap-vertical, var(--auto-grid-gap, 1rem))
-		var(--auto-grid-gap, 1rem);
+  /* vertical gap falls back to general gap then falls back to 1rem*/
+  gap: var(--auto-grid-gap-vertical, var(--auto-grid-gap, 1rem)) var(--auto-grid-gap, 1rem);
 }
 
 @utility responsive-w {
-	@apply sm:max-w-[512px] md:max-w-[640px] lg:max-w-[640px];
+  @apply sm:max-w-[512px] md:max-w-[640px] lg:max-w-[640px];
 }
 
 @utility border-white-gradient {
-	border-width: 1px;
-	border-style: solid;
-	border-image: linear-gradient(
-			340deg,
-			color-mix(in oklab, var(--color-primary) 20%, transparent),
-			color-mix(in oklab, var(--color-primary) 60%, transparent),
-			color-mix(in oklab, var(--color-primary) 20%, transparent)
-		)
-		1;
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(
+      340deg,
+      color-mix(in oklab, var(--color-primary) 20%, transparent),
+      color-mix(in oklab, var(--color-primary) 60%, transparent),
+      color-mix(in oklab, var(--color-primary) 20%, transparent)
+    )
+    1;
 
-	animation: move-gradient 6s infinite ease-in-out;
+  animation: move-gradient 6s infinite ease-in-out;
 }
 
 @keyframes move-gradient {
-	0% {
-		border-image: linear-gradient(
-				359deg,
-				color-mix(in oklab, var(--color-primary) 20%, transparent),
-				color-mix(in oklab, var(--color-primary) 60%, transparent),
-				color-mix(in oklab, var(--color-primary) 20%, transparent)
-			)
-			1;
-	}
-	50% {
-		border-image: linear-gradient(
-				1deg,
-				color-mix(in oklab, var(--color-primary) 20%, transparent),
-				color-mix(in oklab, var(--color-primary) 60%, transparent),
-				color-mix(in oklab, var(--color-primary) 20%, transparent)
-			)
-			1;
-	}
-	100% {
-		border-image: linear-gradient(
-				359deg,
-				color-mix(in oklab, var(--color-primary) 20%, transparent),
-				color-mix(in oklab, var(--color-primary) 60%, transparent),
-				color-mix(in oklab, var(--color-primary) 20%, transparent)
-			)
-			1;
-	}
+  0% {
+    border-image: linear-gradient(
+        359deg,
+        color-mix(in oklab, var(--color-primary) 20%, transparent),
+        color-mix(in oklab, var(--color-primary) 60%, transparent),
+        color-mix(in oklab, var(--color-primary) 20%, transparent)
+      )
+      1;
+  }
+  50% {
+    border-image: linear-gradient(
+        1deg,
+        color-mix(in oklab, var(--color-primary) 20%, transparent),
+        color-mix(in oklab, var(--color-primary) 60%, transparent),
+        color-mix(in oklab, var(--color-primary) 20%, transparent)
+      )
+      1;
+  }
+  100% {
+    border-image: linear-gradient(
+        359deg,
+        color-mix(in oklab, var(--color-primary) 20%, transparent),
+        color-mix(in oklab, var(--color-primary) 60%, transparent),
+        color-mix(in oklab, var(--color-primary) 20%, transparent)
+      )
+      1;
+  }
 }
 
 @utility filters-grid {
-	grid-template-columns:
-		[boolean-start] 66px [boolean-end property-start] minmax(min-content, 120px)
-		[property-end operator-start] 120px
-		[operator-end value-start] auto [value-end menu-start] 40px [menu-end];
+  grid-template-columns:
+    [boolean-start] 66px [boolean-end property-start] minmax(min-content, 120px)
+    [property-end operator-start] 120px
+    [operator-end value-start] auto [value-end menu-start] 40px [menu-end];
 }
 
 @utility run-button-animation {
-	> svg {
-		--ease: cubic-bezier(0.2, 1, 0.3, 1);
+  > svg {
+    --ease: cubic-bezier(0.2, 1, 0.3, 1);
 
-		polygon,
-		path {
-			transition: all 1s var(--ease);
-		}
-		.runArrowArrow {
-			animation: arrow-anim 2.5s var(--ease) infinite;
-		}
-		.runArrowArrowFixed {
-			animation: arrow-fixed-anim 2.5s var(--ease) infinite;
-		}
-	}
+    polygon,
+    path {
+      transition: all 1s var(--ease);
+    }
+    .runArrowArrow {
+      animation: arrow-anim 2.5s var(--ease) infinite;
+    }
+    .runArrowArrowFixed {
+      animation: arrow-fixed-anim 2.5s var(--ease) infinite;
+    }
+  }
 }
 
 @utility simple-scrollbar {
-	overflow: auto;
+  overflow: auto;
 
-	&::-webkit-scrollbar {
-		height: var(--simple-scrollbar-width);
-		width: var(--simple-scrollbar-width);
-		background: transparent;
-	}
+  &::-webkit-scrollbar {
+    height: var(--simple-scrollbar-width);
+    width: var(--simple-scrollbar-width);
+    background: transparent;
+  }
 
-	&::-webkit-scrollbar-track {
-		border-radius: var(--simple-scrollbar-width);
-		background: transparent;
-	}
+  &::-webkit-scrollbar-track {
+    border-radius: var(--simple-scrollbar-width);
+    background: transparent;
+  }
 
-	&::-webkit-scrollbar-thumb {
-		background: content-box var(--simple-scrollbar-thumb-color);
-		border-radius: var(--simple-scrollbar-width);
-		border: 2px solid transparent;
-	}
+  &::-webkit-scrollbar-thumb {
+    background: content-box var(--simple-scrollbar-thumb-color);
+    border-radius: var(--simple-scrollbar-width);
+    border: 2px solid transparent;
+  }
 
-	&::-webkit-scrollbar-thumb:active {
-		background: content-box var(--simple-scrollbar-active-thumb-color);
-	}
+  &::-webkit-scrollbar-thumb:active {
+    background: content-box var(--simple-scrollbar-active-thumb-color);
+  }
 
-	&::-webkit-scrollbar-thumb:hover {
-		background: content-box var(--simple-scrollbar-active-thumb-color);
-	}
+  &::-webkit-scrollbar-thumb:hover {
+    background: content-box var(--simple-scrollbar-active-thumb-color);
+  }
 
-	&::-webkit-scrollbar-corner {
-		background: transparent;
-	}
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
 @utility scrollbar-gutter-auto {
-	scrollbar-gutter: auto;
+  scrollbar-gutter: auto;
 }
 
 @utility scrollbar-stable {
-	scrollbar-gutter: stable var(--scrollbar-gutter-modifier);
+  scrollbar-gutter: stable var(--scrollbar-gutter-modifier);
 }
 
 @utility scrollbar-both-edges {
-	--scrollbar-gutter-modifier: both-edges;
+  --scrollbar-gutter-modifier: both-edges;
 }
 
 @utility scrollbar-width-2 {
-	--simple-scrollbar-width: 6px;
+  --simple-scrollbar-width: 6px;
 }
 
 @utility dot-with-animation {
-	display: inline-block;
-	width: 3px;
-	height: 3px;
-	border-radius: 50%;
-	margin-right: 3px;
-	animation: wave 1.3s linear infinite;
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  margin-right: 3px;
+  animation: wave 1.3s linear infinite;
 
-	&:nth-child(2) {
-		animation-delay: -1.1s;
-	}
+  &:nth-child(2) {
+    animation-delay: -1.1s;
+  }
 
-	&:nth-child(3) {
-		animation-delay: -0.9s;
-	}
+  &:nth-child(3) {
+    animation-delay: -0.9s;
+  }
 }
 
 @utility sources-wrapper {
-	counter-reset: source;
+  counter-reset: source;
 
-	li::before {
-		content: counter(source) ".";
-		color: var(--color-muted);
+  li::before {
+    content: counter(source) ".";
+    color: var(--color-muted);
 
-		counter-increment: source;
-	}
+    counter-increment: source;
+  }
 }
 
 @keyframes wave {
-	0%,
-	60%,
-	100% {
-		transform: initial;
-	}
+  0%,
+  60%,
+  100% {
+    transform: initial;
+  }
 
-	30% {
-		transform: translateY(-15px);
-	}
+  30% {
+    transform: translateY(-15px);
+  }
 }
 
 @utility font-features-inter {
-	font-feature-settings:
-		"liga" 1,
-		"calt" 1,
-		"dlig" 1,
-		"case" 1,
-		"zero" 1,
-		"ss02" 1,
-		"GRAD" 150;
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1,
+    "dlig" 1,
+    "case" 1,
+    "zero" 1,
+    "ss02" 1,
+    "GRAD" 150;
 }
 
 @utility text-loading {
-	--current-text-color: currentColor;
+  --current-text-color: currentColor;
 
-	background: linear-gradient(
-		90deg,
-		var(--current-text-color) 25%,
-		var(--color-highlight) 50%,
-		var(--current-text-color) 75%
-	);
-	background-size: 200% 100%;
-	color: var(
-		--color-primary
-	); /* adjust the color to be visible on both highlight and normal background */
-	background-clip: text;
-	-webkit-text-fill-color: transparent; /* make the text transparent to show the background */
-	animation: text-highlight-loading 3s linear infinite;
+  background: linear-gradient(
+    90deg,
+    var(--current-text-color) 25%,
+    var(--color-highlight) 50%,
+    var(--current-text-color) 75%
+  );
+  background-size: 200% 100%;
+  color: var(
+    --color-primary
+  ); /* adjust the color to be visible on both highlight and normal background */
+  background-clip: text;
+  -webkit-text-fill-color: transparent; /* make the text transparent to show the background */
+  animation: text-highlight-loading 3s linear infinite;
 }
 
 @keyframes text-highlight-loading {
-	0% {
-		background-position: -200% 0;
-	}
-	100% {
-		background-position: 200% 0;
-	}
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @utility json-editor {
-	.jer-clickzone {
-		@apply border-l border-border-smooth/50;
-	}
+  .jer-clickzone {
+    @apply border-l border-border-smooth/50;
+  }
 
-	textarea,
-	input {
-		@apply text-primary! simple-scrollbar border-border-smooth! px-1 tabular-nums font-mono;
-	}
+  textarea,
+  input {
+    @apply text-primary! simple-scrollbar border-border-smooth! px-1 tabular-nums font-mono;
+  }
 }
 
 @utility button-hover {
-	@apply hover:bg-button-hover active:bg-button-active disabled:opacity-50;
+  @apply hover:bg-button-hover active:bg-button-active disabled:opacity-50;
 }
 
 @utility link {
-	@apply text-link hover:text-link-hover active:text-link-active visited:text-link-visited;
+  @apply text-link hover:text-link-hover active:text-link-active visited:text-link-visited;
 }
 
 @theme {
-	--color-button-active: rgb(0 0 0 / 20%);
-	--color-button-hover: rgb(0 0 0 / 10%);
+  --color-button-active: rgb(0 0 0 / 20%);
+  --color-button-hover: rgb(0 0 0 / 10%);
 
-	--color-border-smooth: rgb(0 0 0 / 30%);
-	--color-accent-strong: hsl(260, 78%, 50%);
-	--color-accent: hsl(251, 100%, 64%);
-	--color-ring: #6947ff;
-	--color-accent-foreground: #fff;
-	--color-parallel-msg: rgb(246 248 250);
+  --color-border-smooth: rgb(0 0 0 / 30%);
+  --color-accent-strong: hsl(260, 78%, 50%);
+  --color-accent: hsl(251, 100%, 64%);
+  --color-ring: #6947ff;
+  --color-accent-foreground: #fff;
+  --color-parallel-msg: rgb(246 248 250);
 
-	--color-badge-primary: hsl(223deg 98.61% 67.41%);
-	--color-badge-orange-foreground: rgb(164, 117, 0);
-	--color-badge-orange: rgb(255, 255, 255);
+  --color-badge-primary: hsl(223deg 98.61% 67.41%);
+  --color-badge-orange-foreground: rgb(164, 117, 0);
+  --color-badge-orange: rgb(255, 255, 255);
 
-	--color-muted-foreground: hsl(215, 13%, 35%);
-	--color-warning: #2b2904;
-	--color-bg-muted: hsl(0, 5%, 88%);
-	--color-destructive: hsl(0 62.8% 30.6%);
-	--color-muted: rgb(0 0 0 / 70%);
-	--color-muted-strong: #cecece;
-	--color-attention: oklch(0.66 0.18 59.15);
-	--color-attention-strong: oklch(0.44 0.12 61.56);
+  --color-muted-foreground: hsl(215, 13%, 35%);
+  --color-warning: #2b2904;
+  --color-bg-muted: hsl(0, 5%, 88%);
+  --color-destructive: hsl(0 62.8% 30.6%);
+  --color-muted: rgb(0 0 0 / 70%);
+  --color-muted-strong: #cecece;
+  --color-attention: oklch(0.66 0.18 59.15);
+  --color-attention-strong: oklch(0.44 0.12 61.56);
 
-	--color-positive: #2b7a47;
-	--color-secondary: #fff;
-	--color-primary: #000;
+  --color-positive: #2b7a47;
+  --color-secondary: #fff;
+  --color-primary: #000;
 
-	--color-popover: #fff;
-	--color-notebook: #fff;
-	--color-link: hsl(240deg 92.98% 54.72%);
-	--color-link-hover: hsl(184.74deg 51.33% 15.43%);
-	--color-link-active: hsl(243deg 93.91% 16.94%);
-	--color-link-visited: hsl(268.12deg 100% 32.39%);
+  --color-popover: #fff;
+  --color-notebook: #fff;
+  --color-link: hsl(240deg 92.98% 54.72%);
+  --color-link-hover: hsl(184.74deg 51.33% 15.43%);
+  --color-link-active: hsl(243deg 93.91% 16.94%);
+  --color-link-visited: hsl(268.12deg 100% 32.39%);
 
-	--color-user-sources: rgb(246 248 250);
-	--color-alt-row: rgba(0 0 0 / 0.1);
-	--color-default-badge: hsl(223, 53%, 7%);
-	--color-highlight: hsl(251, 100%, 64%);
-	--color-aside: rgb(246 248 250);
-	--color-mention: rgba(0 0 0 / 0.17);
+  --color-user-sources: rgb(246 248 250);
+  --color-alt-row: rgba(0 0 0 / 0.1);
+  --color-default-badge: hsl(223, 53%, 7%);
+  --color-highlight: hsl(251, 100%, 64%);
+  --color-aside: rgb(246 248 250);
+  --color-mention: rgba(0 0 0 / 0.17);
 
-	--simple-scrollbar-active-thumb-color: #7e7e7e;
-	--simple-scrollbar-thumb-color: #a4a4a4;
+  --simple-scrollbar-active-thumb-color: #7e7e7e;
+  --simple-scrollbar-thumb-color: #a4a4a4;
 
-	/* [START] Sapien */
+  /* [START] Sapien */
 
-	/* The header background color when its column contains the selected cell: */
-	--color-bg-header-has-focus: rgb(200 200 200);
-	/* The header background color when it is hovered: */
-	--color-bg-header-hovered: rgb(220 220 220);
-	/* The header text color: */
-	--color-text-header-color: rgb(50 50 50);
+  /* The header background color when its column contains the selected cell: */
+  --color-bg-header-has-focus: rgb(200 200 200);
+  /* The header background color when it is hovered: */
+  --color-bg-header-hovered: rgb(220 220 220);
+  /* The header text color: */
+  --color-text-header-color: rgb(50 50 50);
 
-	/* [END] Sapien */
+  /* [END] Sapien */
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.098 0 0);
@@ -435,7 +427,7 @@
   --sidebar-border: oklch(0.922 0.004 265.755);
   --sidebar-ring: oklch(0.286 0.067 265.755);
 
-	  --color-background: var(--background);
+  --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -475,143 +467,143 @@
 
 html,
 body {
-	font-family: InterVariable, Inter, sans-serif;
-	font-feature-settings:
-		"liga" 1,
-		"calt" 1,
-		"dlig" 1,
-		"case" 1,
-		"zero" 1,
-		"ss01" 1,
-		"ss02" 1,
-		"GRAD" 150;
-	-webkit-font-smoothing: antialiased;
-	border-color: var(--color-border-smooth);
+  font-family: InterVariable, Inter, sans-serif;
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1,
+    "dlig" 1,
+    "case" 1,
+    "zero" 1,
+    "ss01" 1,
+    "ss02" 1,
+    "GRAD" 150;
+  -webkit-font-smoothing: antialiased;
+  border-color: var(--color-border-smooth);
 
-	@apply tabular-nums;
+  @apply tabular-nums;
 
-	@media (width >= 80rem /* 1280px */) {
-		--open-sidebar-width: 300px;
-	}
+  @media (width >= 80rem /* 1280px */) {
+    --open-sidebar-width: 300px;
+  }
 
-	color: var(--color-primary);
-	height: 100%;
-	width: 100%;
+  color: var(--color-primary);
+  height: 100%;
+  width: 100%;
 
-	::selection {
-		background-color: var(--color-accent);
-		color: #fff;
-	}
+  ::selection {
+    background-color: var(--color-accent);
+    color: #fff;
+  }
 
-	content-visibility: auto;
-	/* the element will start out with a 1000px intrinsic sizing in each dimension, but once the element's contents are rendered, it will retain the rendered intrinsic size. Any subsequent rendering size changes will also be remembered. In practice, this means that if you scroll an element with content-visibility: auto applied, and then scroll it back offscreen, it will automatically retain its ideal width and height, and not revert to the placeholder sizing. This feature is especially useful for infinite scrollers, which can now automatically improve sizing estimation over time as the user explores the page. */
-	contain-intrinsic-size: auto 1000px;
+  content-visibility: auto;
+  /* the element will start out with a 1000px intrinsic sizing in each dimension, but once the element's contents are rendered, it will retain the rendered intrinsic size. Any subsequent rendering size changes will also be remembered. In practice, this means that if you scroll an element with content-visibility: auto applied, and then scroll it back offscreen, it will automatically retain its ideal width and height, and not revert to the placeholder sizing. This feature is especially useful for infinite scrollers, which can now automatically improve sizing estimation over time as the user explores the page. */
+  contain-intrinsic-size: auto 1000px;
 }
 
 /* For some reason, Monaco suggest window is too small and looks weird. This fixes it: */
 .editor-widget.suggest-widget {
-	min-height: 27px;
+  min-height: 27px;
 }
 
 /* If there is no suggestions on Monaco editor, do not show the 'No suggestions' widget: */
 .editor-widget:has(.monaco-list-rows:empty) {
-	display: none !important;
+  display: none !important;
 }
 
 /* Do not display 'No account? Sign up' button on Clerk's login component because it does not work very well with the way we structure our current sign in/up setup.  */
 .cl-footerAction {
-	display: none;
+  display: none;
 }
 
 @keyframes background-move {
-	0%,
-	100% {
-		background-position: 0% 50%;
-	}
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
 
-	50% {
-		background-position: 100% 50%;
-	}
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @utility loader-ai-thinking {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	border-radius: 50%;
-	animation: rotate_3922 1.2s linear infinite;
-	background-color: #9b59b6;
-	background-image: linear-gradient(#9b59b6, #84cdfa, #5ad1cd);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  animation: rotate_3922 1.2s linear infinite;
+  background-color: #9b59b6;
+  background-image: linear-gradient(#9b59b6, #84cdfa, #5ad1cd);
 
-	& span {
-		position: absolute;
-		border-radius: 50%;
-		height: 100%;
-		width: 100%;
-		background-color: #9b59b6;
-		background-image: linear-gradient(#9b59b6, #84cdfa, #5ad1cd);
-	}
+  & span {
+    position: absolute;
+    border-radius: 50%;
+    height: 100%;
+    width: 100%;
+    background-color: #9b59b6;
+    background-image: linear-gradient(#9b59b6, #84cdfa, #5ad1cd);
+  }
 
-	& span:nth-of-type(1) {
-		filter: blur(5px);
-	}
+  & span:nth-of-type(1) {
+    filter: blur(5px);
+  }
 
-	& span:nth-of-type(2) {
-		filter: blur(10px);
-	}
+  & span:nth-of-type(2) {
+    filter: blur(10px);
+  }
 
-	& span:nth-of-type(3) {
-		filter: blur(25px);
-	}
+  & span:nth-of-type(3) {
+    filter: blur(25px);
+  }
 
-	& span:nth-of-type(4) {
-		filter: blur(50px);
-	}
+  & span:nth-of-type(4) {
+    filter: blur(50px);
+  }
 
-	&::after {
-		content: "";
-		position: absolute;
-		top: 2px;
-		left: 2px;
-		right: 2px;
-		bottom: 2px;
-		background-color: var(--color-secondary);
-		border: solid 5px var(--color-secondary);
-		border-radius: 50%;
-	}
+  &::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    background-color: var(--color-secondary);
+    border: solid 5px var(--color-secondary);
+    border-radius: 50%;
+  }
 }
 
 @keyframes rotate_3922 {
-	from {
-		transform: translate(-50%, -50%) rotate(0deg);
-	}
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
 
-	to {
-		transform: translate(-50%, -50%) rotate(360deg);
-	}
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 @utility button-hover-accent {
-	@apply hover:bg-accent hover:text-accent-foreground hover:stroke-accent-foreground active:bg-accent-strong disabled:opacity-50;
+  @apply hover:bg-accent hover:text-accent-foreground hover:stroke-accent-foreground active:bg-accent-strong disabled:opacity-50;
 }
 
 /* [START] For Sapien */
 .dvn-scroller {
-	@apply simple-scrollbar;
+  @apply simple-scrollbar;
 }
 /* [END] For Sapien */
 
 [data-delete-block-before="true"] {
-	@apply relative before:absolute;
+  @apply relative before:absolute;
 
-	&::before {
-		@apply -right-10 w-10 top-0 bottom-0;
-	}
+  &::before {
+    @apply -right-10 w-10 top-0 bottom-0;
+  }
 }
 
 @utility bot-plan-counter {
-	&::before {
-		counter-increment: index;
-		content: counters(index, ".") ".";
-	}
+  &::before {
+    counter-increment: index;
+    content: counters(index, ".") ".";
+  }
 }
