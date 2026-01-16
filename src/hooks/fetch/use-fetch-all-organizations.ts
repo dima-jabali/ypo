@@ -62,6 +62,10 @@ export function useFetchAllOrganizations<
 		SelectedData
 	>,
 ) {
+				if (typeof window === "undefined") {
+		return null;
+	}
+	
 	useFetchBetterbrainUser();
 
 	return useSuspenseQuery({
@@ -73,8 +77,12 @@ export function useFetchAllOrganizations<
 }
 
 export function useOrgMember(enabled: boolean) {
+				if (typeof window === "undefined") {
+		return null;
+	}
+	
 	const organizationId = useWithOrganizationId();
-	const user = useFetchBetterbrainUser();
+	const user = useFetchBetterbrainUser()!;
 
 	const queryOptions = useMemo(
 		() => queryKeyFactory.get["org-member"](organizationId, user.id),
@@ -98,7 +106,7 @@ export function useOrgMember(enabled: boolean) {
 
 export function useUserRoleInCurrOrg() {
 	const organizationId = useWithOrganizationId();
-	const userId = useFetchBetterbrainUser().id;
+	const userId = useFetchBetterbrainUser()!.id;
 
 	const selectUserRoleInOrg = useCallback(
 		(data: GetOrganizationsResponse["results"]) => {

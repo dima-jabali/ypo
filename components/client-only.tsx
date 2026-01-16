@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 
 export function ClientOnly({ children }: React.PropsWithChildren) {
+			if (typeof window === "undefined") {
+		return null;
+	}
+	
 	const [hasMounted, setHasMounted] = useState(false);
 
 	useEffect(() => {

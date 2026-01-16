@@ -20,6 +20,10 @@ const cancelQueriesParams: QueryFilters = {
 };
 
 export const useCreateOrganization = () => {
+				if (typeof window === "undefined") {
+		return null;
+	}
+	
 	return useMutation<
 		CreateOrganizationResponse | null,
 		Error,

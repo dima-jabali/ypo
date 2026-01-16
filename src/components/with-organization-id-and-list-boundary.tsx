@@ -12,6 +12,10 @@ export function WithOrganizationIdAndListBoundary({
 	withLoader?: boolean;
 	failedText: string;
 }>) {
+			if (typeof window === "undefined") {
+		return null;
+	}
+	
 	const organizationId = generalContextStore.use.organizationId();
 
 	return (

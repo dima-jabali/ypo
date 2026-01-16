@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -8,7 +10,9 @@ import { authStore } from "#/contexts/auth/auth";
 export type FetchBetterbrainUserResponse = BetterbrainUser;
 
 export function useFetchBetterbrainUser() {
-
+			if (typeof window === "undefined") {
+		return null;
+	}
 	
 	const isUsingLocalClerk = authStore.use.isUsingLocalClerk();
 	const clerkApiToken = authStore.use.token();

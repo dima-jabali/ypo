@@ -13,6 +13,10 @@ const SELECT_NOTEBOOK_WITH_BOT_CONVERSATION = (
 function TriggerSuspenseToHaveBotConversationIdFromDownloadedNotebook(
 	props: React.PropsWithChildren<{ fallback?: React.ReactNode }>,
 ) {
+			if (typeof window === "undefined") {
+		return null;
+	}
+	
 	const notebook = useFetchNotebook(); // This is the call that triggers Suspense
 
 	const botConversationIdFromNotebook = notebook.metadata.bot_conversation?.id;
@@ -36,6 +40,10 @@ function TriggerSuspenseToHaveBotConversationIdFromDownloadedNotebook(
 export function WithBotConversationId(
 	props: React.PropsWithChildren<{ fallback: React.ReactNode }>,
 ) {
+			if (typeof window === "undefined") {
+		return null;
+	}
+	
 	const notebookMetadataBotConversationId =
 		generalContextStore.use.botConversationId();
 

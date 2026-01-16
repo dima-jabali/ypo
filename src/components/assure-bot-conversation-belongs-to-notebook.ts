@@ -11,6 +11,10 @@ export const AssureBotConversationBelongsToNotebook = memo(
 	function AssureBotConversationBelongsToNotebook({
 		children,
 	}: React.PropsWithChildren) {
+				if (typeof window === "undefined") {
+		return null;
+	}
+		
 		const botConversationFromDownloadedNotebook =
 			useDownloadedNotebookBotConversationId();
 		const botConversationIdFromGeneralStore =

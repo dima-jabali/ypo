@@ -133,6 +133,10 @@ export const DefaultSuspenseAndErrorBoundary = memo(
 		fallbackFor: string;
 		failedText: string;
 	}>) {
+				if (typeof window === "undefined") {
+		return null;
+	}
+		
 		const [error, setError] = useState<Error | undefined>(undefined);
 
 		if (error) {

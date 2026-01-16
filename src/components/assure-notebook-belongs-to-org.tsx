@@ -9,6 +9,10 @@ import { useDownloadedOrganizationId } from "#/hooks/use-current-organization";
 
 export const AssureNotebookBelongsToOrg = memo(
 	function AssureNotebookBelongsToOrg({ children }: React.PropsWithChildren) {
+				if (typeof window === "undefined") {
+		return null;
+	}
+	
 		const notebookOrganizationId = useDownloadedNotebookOrganizationId();
 		const orgId = useDownloadedOrganizationId();
 		const orgs = useFetchAllOrganizations();

@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
@@ -6,9 +8,13 @@ import { useFetchAllOrganizations } from "./fetch/use-fetch-all-organizations";
 import { useCreateOrganization } from "./mutation/use-create-organization";
 
 export function useSetOrgToFirst() {
+				if (typeof window === "undefined") {
+		return null;
+	}
+	
 	const urlOrgId = generalContextStore.use.organizationId();
-	const allOrgs = useFetchAllOrganizations();
-	const createOrg = useCreateOrganization();
+	const allOrgs = useFetchAllOrganizations()!;
+	const createOrg = useCreateOrganization()!;
 
 	useQuery({
 		enabled: allOrgs.length > 0 && !isValidNumber(urlOrgId),

@@ -5,6 +5,10 @@ import { useFetchBotConversationMessageListPage } from "#/hooks/fetch/use-fetch-
 export function WithBotConversationMessageList({
 	children,
 }: React.PropsWithChildren) {
+			if (typeof window === "undefined") {
+		return null;
+	}
+	
 	return (
 		<WithBotConversationMessageList_>
 			{children}
@@ -15,6 +19,10 @@ export function WithBotConversationMessageList({
 function WithBotConversationMessageList_({
 	children,
 }: React.PropsWithChildren) {
+			if (typeof window === "undefined") {
+		return null;
+	}
+	
 	// Destructure to not trigger a re-render when the value changes:
 	const { isEnabled: isFetchBotConversationMessageListPageEnabled } =
 		useFetchBotConversationMessageListPage(); // This will trigger a Suspense.
