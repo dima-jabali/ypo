@@ -1,3 +1,4 @@
+'use client'
 import { memo } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
@@ -20,6 +21,10 @@ type Message = BotConversationMessage & {
 };
 
 export const SourcesMessage = memo(function SourcesMessage({ msg }: Props) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const showIntermediateMessage = generalContextStore.use.showIntermediateMessages();
   const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);
 

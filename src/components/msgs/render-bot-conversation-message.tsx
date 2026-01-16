@@ -35,6 +35,10 @@ type NormalizedBotConversationMessageWithParallelMessages = NormalizedBotConvers
 export function renderBotConversationMessage(
   normalizedBotConversationMessage: NormalizedBotConversationMessage,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   if (normalizedBotConversationMessage.parallelMessages) {
     // Show parallel messages side by side:
     return handleParallelMessages(
@@ -53,6 +57,10 @@ export function renderBotConversationMessage(
 function handleParallelMessages(
   normalizedBotConversationMessage: NormalizedBotConversationMessageWithParallelMessages,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const mapFn = (message: BotConversationMessage) =>
     handleNormalMessages(message, normalizedBotConversationMessage.withNotebookBlocks);
   const msgNodes = Array.from({
@@ -125,6 +133,10 @@ function handleNormalMessages(
   message: NonNullable<NormalizedBotConversationMessage["message"]>,
   withNotebookBlocks: boolean,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  
   let msgNode = null;
 
   switch (message.message_type) {

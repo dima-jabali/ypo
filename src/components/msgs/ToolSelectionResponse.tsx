@@ -1,3 +1,4 @@
+'use client'
 import { memo, useEffect, useRef, useState } from "react";
 import { titleCase } from "scule";
 
@@ -40,6 +41,9 @@ const getSelectedResponse = (message: ToolSelectionResponseMessage) => {
 };
 
 export const ToolSelectionResponse = memo(function ToolSelectionResponse({ msg }: Props) {
+  if (typeof window === "undefined") {
+    return null;
+  }
   const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
 
   const detailsInitialProps = useState(isMessageComplete ? undefined : { open: true })[0];
