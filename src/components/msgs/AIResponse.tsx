@@ -1,31 +1,42 @@
-import { memo } from "react";
+import { memo } from "react"
 
-import { generalContextStore } from "#/contexts/general-ctx/general-context";
-import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
-import { messageDateFormatter } from "#/helpers/utils";
-import { useShouldShowSources } from "#/hooks/use-should-show-sources";
-import type { BotConversationMessage, BotConversationMessageType } from "#/types/chat";
-import { Markdown } from "../Markdown/Markdown";
-import { BOT_IMG } from "./messageHelpers";
-import { MessageWrapper } from "./MessageWrapper";
-import { OptionsButtons } from "./OptionsButton";
+import { generalContextStore } from "#/contexts/general-ctx/general-context"
+import { messageDateFormatter } from "#/helpers/utils"
+import { useShouldShowSources } from "#/hooks/use-should-show-sources"
+import type { BotConversationMessage, BotConversationMessageType } from "#/types/chat"
+import { Markdown } from "../Markdown/Markdown"
+import { BOT_IMG } from "./messageHelpers"
+import { MessageWrapper } from "./MessageWrapper"
+import { OptionsButtons } from "./OptionsButton"
+import { YpoProfilesCarousel } from "./ypo-profiles-carousel"
+import { SourcesForUser } from "#/features/sources-for-user/sources-for-user"
+
+const REGEX = /YPO_PROFILE_(\d+)/g
+
+function extractYpoProfileIds(text?: string): number[] {
+  if (!text) return []
+
+  return [...text.matchAll(REGEX)].map((match) => Number(match[1]))
+}
 
 type Props = {
-  msg: Message;
-};
+  msg: Message
+}
 
 type Message = BotConversationMessage & {
-  message_type: BotConversationMessageType.AI_Response;
-};
+  message_type: BotConversationMessageType.AI_Response
+}
 
 export const AIResponse = memo(function AIResponse({ msg }: Props) {
-  const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);
-  const botName = generalContextStore.use.chatBotAgentName();
+  const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id)
+  const botName = generalContextStore.use.chatBotAgentName()
 
   const userInfo = msg.sender.sender_info
     ? `${msg.sender.sender_info.first_name} ${msg.sender.sender_info.last_name}\n${msg.sender.sender_info.email}`
-    : undefined;
-  const createdAt = messageDateFormatter.format(new Date(msg.created_at));
+    : undefined
+  const createdAt = messageDateFormatter.format(new Date(msg.created_at))
+
+  const ypoProfileIds = extractYpoProfileIds(msg.text ?? "")
 
   return (
     <MessageWrapper title="AI Response" data-ai-response data-id={msg.id}>
@@ -46,6 +57,12 @@ export const AIResponse = memo(function AIResponse({ msg }: Props) {
 
         <div className="pl-10 text-base">{msg.text ? <Markdown text={msg.text} /> : null}</div>
 
+        {ypoProfileIds.length > 0 && (
+          <div className="pl-10">
+            <YpoProfilesCarousel profileIds={ypoProfileIds} />
+          </div>
+        )}
+
         <div className="pl-10 pt-1.5">
           <OptionsButtons message={msg} />
         </div>
@@ -53,7 +70,7 @@ export const AIResponse = memo(function AIResponse({ msg }: Props) {
         <SourcesForUser sources={msg.sources} shouldShow={shouldShowSources} />
       </div>
     </MessageWrapper>
-  );
-});
+  )
+})
 
-AIResponse.whyDidYouRender = true;
+AIResponse.whyDidYouRender = true
