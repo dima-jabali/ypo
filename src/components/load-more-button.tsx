@@ -1,9 +1,15 @@
+"use client";
+
 import { memo } from "react";
 
 import { useFetchBotConversationMessageListPage } from "#/hooks/fetch/use-fetch-bot-conversation-message-list-page";
 import { LOADER } from "./Button";
 
 export const LoadMoreButton = memo(function LoadMoreButton() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const botConversationMessageListPageInfiniteQuery = useFetchBotConversationMessageListPage();
 
   if (!botConversationMessageListPageInfiniteQuery.hasNextPage) {

@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronRight } from "lucide-react";
 import { memo } from "react";
 
@@ -24,6 +26,7 @@ import { ToolResponse } from "./ToolResponse";
 import { ToolSelectionResponse } from "./ToolSelectionResponse";
 import { UserMessage } from "./UserMessage";
 import { getMapFirstValue } from "#/helpers/utils";
+import { ClientOnly } from "@/components/client-only";
 
 type NormalizedBotConversationMessageWithParallelMessages = NormalizedBotConversationMessage & {
   parallelMessages: NonNullable<NormalizedBotConversationMessage["parallelMessages"]>;
@@ -92,6 +95,10 @@ function handleParallelMessages(
 
 // eslint-disable-next-line react-refresh/only-export-components
 const ParallelMsgDetails = memo(function ParallelMsgDetails({ children }: React.PropsWithChildren) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const isStreaming = useIsStreaming();
 
   return (
@@ -247,7 +254,7 @@ function handleNormalMessages(
       failedClassName="chat-content"
       key={message.id}
     >
-      {msgNode}
+      <ClientOnly>{msgNode}</ClientOnly>
     </DefaultSuspenseAndErrorBoundary>
   );
 }

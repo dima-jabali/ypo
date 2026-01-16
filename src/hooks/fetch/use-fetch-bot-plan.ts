@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -23,9 +25,13 @@ export function useFetchBotPlan<SelectedData = GetBotPlanResponse["plan"]>(
     SelectedData
   >,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const botConversationId = useWithBotConversationId();
   const organizationId = useWithOrganizationId();
-  const notebookId = useDownloadedNotebookId();
+  const notebookId = useDownloadedNotebookId()!;
 
   const queryOptions = useMemo(
     () => queryKeyFactory.get["bot-plan"](botConversationId, organizationId, notebookId),

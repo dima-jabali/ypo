@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -49,6 +51,10 @@ export type GetConnectionDataRequest = {
 };
 
 export const useFetchConnectionData = (enabled: boolean, queryParams: GetConnectionDataRequest) => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const queryOptions = useMemo(
     () => queryKeyFactory.get["connection-data"](queryParams),
     [queryParams],

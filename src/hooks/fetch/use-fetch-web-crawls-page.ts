@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -22,6 +24,10 @@ export type GetWebCrawlsPageResponse = {
 export const DEFAULT_WEBCRAWLS: WebCrawl[] = [];
 
 export function useFetchWebCrawlsPage() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
 
   const { initialPageParam, queryOptions } = useMemo(() => {

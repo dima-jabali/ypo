@@ -1,3 +1,5 @@
+"use client";
+
 import { Bot, Database, MessageCircle } from "lucide-react";
 
 type EmptyDataProps = {
@@ -10,6 +12,10 @@ export function EmptyData({
   children,
   title,
 }: React.PropsWithChildren<EmptyDataProps>) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center gap-4 w-full h-full px-10 py-12">
       <section className="flex items-center justify-center gap-2">

@@ -55,6 +55,10 @@ export function useFetchBotConversationMessageListPage<
     SelectedData
   >,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   useFetchBotConversation();
 
   const botConversationId = generalContextStore.use.botConversationId();
@@ -127,8 +131,13 @@ export function selectHasAnyBotConversationMessage(
   return true;
 }
 
-export const useHasAnyMessage = () =>
-  useFetchBotConversationMessageListPage(selectHasAnyBotConversationMessage).data;
+export function useHasAnyMessage() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return useFetchBotConversationMessageListPage(selectHasAnyBotConversationMessage).data;
+}
 
 export type BotConversationMessageListPageInfiniteResponse = InfiniteData<
   GetBotConversationMessagesPageResponse,
@@ -206,6 +215,10 @@ export function selectNormalizedMessages(
 }
 
 export function useNormalizedMessages(withNotebookBlocks: boolean) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const toggleHideParallelAnswers = generalContextStore.use.toggleHideParallelAnswers();
 
   const msgs = useFetchBotConversationMessageListPage(
@@ -297,6 +310,10 @@ function selectAllChatSourcesMainValues(
   return arr;
 }
 export function useAllChatSourcesMainValues() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const onlyShowUsedReferences = generalContextStore.use.onlyShowUsedReferences();
 
   const select = useCallback(

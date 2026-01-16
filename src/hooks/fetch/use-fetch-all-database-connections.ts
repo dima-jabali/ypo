@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
@@ -55,6 +57,10 @@ export function useFetchAllDatabaseConnections<SelectedData = AllDatabaseConnect
     SelectedData
   >,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
 
   const queryOptions = useMemo(

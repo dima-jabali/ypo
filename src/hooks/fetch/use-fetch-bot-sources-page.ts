@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -24,6 +26,10 @@ export type GetAllBotSourcesResponse = {
 export const DEFAULT_BOT_SOURCES: BotSource[] = [];
 
 export function useFetchBotSourcesPage() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
 
   const { initialPageParam, queryOptions } = useMemo(() => {

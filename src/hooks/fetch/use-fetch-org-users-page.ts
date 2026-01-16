@@ -1,3 +1,5 @@
+"use client";
+
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { api } from "#/api";
@@ -21,6 +23,10 @@ export type FetchOrganizationUsersResponse = {
 };
 
 export function useFetchOrganizationUsersPage(enabled: boolean) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organization = useWithCurrentOrg();
 
   const queryOptions = queryKeyFactory.get["organization-users"](organization.id);

@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { invariant } from "es-toolkit";
@@ -156,6 +158,10 @@ export async function queryFnToFetchFileById({
 }
 
 export function useFetchFileById(props: Omit<FetchFileByIdProps, "submitActionPromise">) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   return useQuery({
     queryKey: [...queryKeyFactory.get["file-by-presigned-url"].queryKey, props],
     refetchOnWindowFocus: false,

@@ -1,3 +1,5 @@
+"use client";
+
 import { type InfiniteData, useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -22,6 +24,10 @@ export type GetPDFOrCSVFilesPageResponse = {
 };
 
 export function useFetchPDFOrCSVFilesPage(file_type: PDFOrCSVSourceType) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
 
   const { initialPageParam, queryOptions } = useMemo(() => {

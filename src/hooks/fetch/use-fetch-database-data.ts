@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -53,6 +55,10 @@ export type FetchSchemaResponse =
     };
 
 export const useFetchDatabaseData = (dbParams?: FetchDatabaseDataParams) => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const enabled = isValidNumber(dbParams?.db.id);
 
   // Using `!` here because the function won't run if `enabled` is `false`

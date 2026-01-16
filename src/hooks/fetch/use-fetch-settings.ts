@@ -150,6 +150,10 @@ type StringKeys = CamelCase<StringSettingsToBeSet>;
 export function useFetchSettings<SelectedData = SettingsReturnType>(
   selectFromParams?: (data: SettingsReturnType) => SelectedData,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
   const notebookId = generalContextStore.use.notebookId();
 

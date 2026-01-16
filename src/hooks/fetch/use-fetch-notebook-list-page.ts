@@ -38,6 +38,10 @@ export function useFetchNotebookListPage<SelectedData = FetchNotebookListPageInf
     SelectedData
   >,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const [{ initialPageParam, queryOptions }] = useState(() => {
     const { pageArchived, pageLimit, pageSort, organizationId } = generalContextStore.getState();
 
@@ -91,5 +95,5 @@ function selectHasNotebooksInList(data: FetchNotebookListPageInfiniteData) {
   return data.pages.some((page) => page.results.length > 0);
 }
 export function useHasNotebooksInList() {
-  return useFetchNotebookListPage(selectHasNotebooksInList).data;
+  return useFetchNotebookListPage(selectHasNotebooksInList)!.data;
 }

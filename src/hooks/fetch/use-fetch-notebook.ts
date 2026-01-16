@@ -25,6 +25,10 @@ export function useFetchNotebook<SelectedData = FetchNotebookResponse>(
     SelectedData
   >,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const notebookId = generalContextStore.use.notebookId();
 
   if (!isValidNumber(notebookId)) {

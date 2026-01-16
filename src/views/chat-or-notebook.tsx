@@ -8,7 +8,6 @@ import { EmptyData } from "#/components/empty-states/empty-data";
 import { DefaultSuspenseAndErrorBoundary } from "#/components/fallback-loader";
 import { LoadMoreButton } from "#/components/load-more-button";
 import { MessageInput } from "#/components/message-input";
-import { PlanMessage } from "#/components/msgs/PlanMessage/PlanMessage";
 import { renderBotConversationMessage } from "#/components/msgs/render-bot-conversation-message";
 import { ScrollToBottomButton } from "#/components/scroll-to-bottom-button";
 import { WithChatData } from "#/components/with-chat-data";
@@ -48,6 +47,10 @@ export const ChatOrNotebook = memo(function ChatOrNotebook() {
 });
 
 function Chat() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const hasAnyMessage = useHasAnyMessage();
   const chatStore = useChatStore();
 
@@ -71,25 +74,31 @@ function Chat() {
         <EmptyData title="No messages" description="Start a conversation" />
       )}
 
-      <PlanMessage />
-
       <div className="chat-sm-grid @3xl:chat-md-grid w-full relative pr-(--simple-scrollbar-width)">
         {hasAnyMessage ? <ScrollToBottomButton /> : null}
 
-        <PlateController>
-          <DefaultSuspenseAndErrorBoundary
-            failedText="Error in message input"
-            fallbackFor="message-input"
-          >
-            <MessageInput />
-          </DefaultSuspenseAndErrorBoundary>
-        </PlateController>
+        <ClientOnly>
+          <PlateController>
+            <ClientOnly>
+              <DefaultSuspenseAndErrorBoundary
+                failedText="Error in message input"
+                fallbackFor="message-input"
+              >
+                <ClientOnly>{/* <MessageInput /> */}</ClientOnly>
+              </DefaultSuspenseAndErrorBoundary>
+            </ClientOnly>
+          </PlateController>
+        </ClientOnly>
       </div>
     </div>
   );
 }
 
 function Messages() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const normalizedMsgs = useNormalizedMessages(true);
 
   return normalizedMsgs.map(renderBotConversationMessage);

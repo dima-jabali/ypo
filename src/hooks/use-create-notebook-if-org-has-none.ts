@@ -11,6 +11,10 @@ import { generalContextStore } from "#/contexts/general-ctx/general-context";
 type HasCreatedNotebook = boolean;
 
 export function useCreateNotebookIfOrgHasNone() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
   const hasNotebooksInList = useHasNotebooksInList();
   const createNotebook = useCreateNotebook();

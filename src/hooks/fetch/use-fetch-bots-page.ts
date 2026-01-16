@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -29,6 +31,10 @@ export function useFetchBotsPage<SelectedData = GetAllBotsInfiniteData>(
     SelectedData
   >,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
   const offset = generalContextStore.use.pageOffset();
   const pageSort = generalContextStore.use.pageSort();

@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -21,6 +23,10 @@ export type GetPresignedUrlByFileIdResponse = {
 };
 
 export function useFetchPdfFileById(enabled: boolean, fileId?: FileId | PdfId) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const canFetch = enabled && isValidNumber(fileId);
 
   const queryOptions = useMemo(() => queryKeyFactory.get["pdf-file-by-id"](fileId), [fileId]);

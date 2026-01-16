@@ -1,9 +1,15 @@
+"use client";
+
 import { memo, useEffect } from "react";
 
 import { useIsStreaming } from "#/hooks/fetch/use-fetch-bot-conversation";
 import { useChatStore } from "#/contexts/chat-context";
 
 export const AutoScrollIfOnBottom = memo(function AutoScrollIfOnBottom() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const scrollContainer = useChatStore().use.scrollContainer();
   const isStreaming = useIsStreaming();
 

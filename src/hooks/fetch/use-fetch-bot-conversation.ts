@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -11,6 +13,10 @@ export type GetBotConversationByIdResponse = BotConversation;
 export function useFetchBotConversation<SelectedData = BotConversation>(
   select: (data: BotConversation) => SelectedData = identity<BotConversation, SelectedData>,
 ) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const botConversationId = generalContextStore.use.botConversationId();
 
   if (!isValidNumber(botConversationId)) {
@@ -18,6 +24,8 @@ export function useFetchBotConversation<SelectedData = BotConversation>(
       "handleSendMessage must be used within a downloaded notebook so that botConversationId can be fetched.",
     );
   }
+
+  console.log({ botConversationId });
 
   const queryOptions = useMemo(
     () => queryKeyFactory.get["bot-conversation"](botConversationId),
@@ -33,5 +41,9 @@ export function useFetchBotConversation<SelectedData = BotConversation>(
 
 const selectIsStreaming = (data: BotConversation) => data.is_streaming;
 export function useIsStreaming() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   return useFetchBotConversation(selectIsStreaming);
 }

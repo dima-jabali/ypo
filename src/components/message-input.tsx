@@ -1,3 +1,5 @@
+"use client";
+
 import { ImagePlugin } from "@platejs/media/react";
 import { CircleStopIcon, Paperclip, Send, SlidersVertical, X } from "lucide-react";
 import { type ElementOrTextIn, NodeApi } from "platejs";
@@ -86,6 +88,10 @@ const MESSAGE_INPUT_EDITOR_OPTIONS = {
 } as const;
 
 export const MessageInput = memo(function MessageInput() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const [files, setFiles] = useState<Array<File>>([]);
   const [isSending, setIsSending] = useState(false);
 

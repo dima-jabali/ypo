@@ -1,3 +1,5 @@
+"use client";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -36,6 +38,10 @@ export type GetOrganizationFilesResponse = {
 };
 
 export function useFetchAllOrganizationFilesQueryKey() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const googleDriveConnectionId = useOrganizationFilesStore().use.googleDriveConnectionId();
   const googleDriveParentId = useOrganizationFilesStore().use.googleDriveParentId();
   const vespaSourceId = useOrganizationFilesStore().use.vespaSourceId();
@@ -72,7 +78,11 @@ export function useFetchAllOrganizationFilesQueryKey() {
 }
 
 export function useFetchAllOrganizationFilesPage() {
-  const { queryOptions } = useFetchAllOrganizationFilesQueryKey();
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const { queryOptions } = useFetchAllOrganizationFilesQueryKey()!;
 
   return useSuspenseQuery({
     staleTime: 10 * 60 * 1_000, // 10 mins
