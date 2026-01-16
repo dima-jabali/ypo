@@ -29,6 +29,10 @@ export function useCurrentOrganization() {
 }
 
 export function useDownloadedOrganizationId() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   return useCurrentOrganization()?.id;
 }
 

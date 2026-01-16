@@ -394,6 +394,10 @@ export function useWithBatchTableId() {
 }
 
 export function useUserChatTools() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const org = useWithCurrentOrg();
 
   return generalContextStore.use.userChatTools()[org.id] ?? org.default_chat_tools;

@@ -7,7 +7,6 @@ import { AutoScrollIfOnBottom } from "#/components/auto-scroll-if-on-bottom";
 import { EmptyData } from "#/components/empty-states/empty-data";
 import { DefaultSuspenseAndErrorBoundary } from "#/components/fallback-loader";
 import { LoadMoreButton } from "#/components/load-more-button";
-import { MessageInput } from "#/components/message-input";
 import { renderBotConversationMessage } from "#/components/msgs/render-bot-conversation-message";
 import { ScrollToBottomButton } from "#/components/scroll-to-bottom-button";
 import { WithChatData } from "#/components/with-chat-data";
@@ -20,6 +19,12 @@ import {
   useNormalizedMessages,
 } from "#/hooks/fetch/use-fetch-bot-conversation-message-list-page";
 import { ClientOnly } from "@/components/client-only";
+import dynamic from "next/dynamic";
+
+const MessageInput = dynamic(
+  () => import("#/components/message-input").then((mod) => mod.MessageInput),
+  { ssr: false },
+);
 
 export const ChatOrNotebook = memo(function ChatOrNotebook() {
   if (typeof window === "undefined") {
@@ -84,7 +89,9 @@ function Chat() {
                 failedText="Error in message input"
                 fallbackFor="message-input"
               >
-                <ClientOnly>{/* <MessageInput /> */}</ClientOnly>
+                <ClientOnly>
+                  <MessageInput />
+                </ClientOnly>
               </DefaultSuspenseAndErrorBoundary>
             </ClientOnly>
           </PlateController>

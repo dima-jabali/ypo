@@ -1,3 +1,5 @@
+"use client";
+
 import { useIsMutating } from "@tanstack/react-query";
 
 import { queryKeyFactory } from "#/hooks/query-keys";

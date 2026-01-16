@@ -1,9 +1,15 @@
+"use client";
+
 import { useCallback, useSyncExternalStore } from "react";
 
 const getClientSnapshot = () => navigator.onLine;
 const getServerSnapshot = () => true;
 
 export function useIsOnline() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const subscribe = useCallback((callback: () => void) => {
     const abortController = new AbortController();
     const options: AddEventListenerOptions = {

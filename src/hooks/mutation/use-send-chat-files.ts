@@ -1,3 +1,5 @@
+"use client";
+
 import { useMutation } from "@tanstack/react-query";
 
 import { type PromiseToWaitForFileToBeUploaded, droppedFiles } from "#/contexts/dropped-files";
@@ -37,6 +39,10 @@ type SendChatFilesRequest = {
 const mutationKey = queryKeyFactory.post["send-chat-files"].queryKey;
 
 export function useSendChatFiles() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const patchNotebookBlocks = usePatchNotebookBlocks();
   const botConversationId = useWithBotConversationId();
   const betterbrainUser = useFetchBetterbrainUser();

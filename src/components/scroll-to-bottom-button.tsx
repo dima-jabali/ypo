@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronDownIcon } from "lucide-react";
 import { memo, useEffect, useState } from "react";
 
@@ -15,6 +17,10 @@ function scrollToBottom(scrollContainer: HTMLOListElement | null) {
 }
 
 export const ScrollToBottomButton = memo(function ScrollToBottomButton() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const [button, setButton] = useState<HTMLButtonElement | null>(null);
 
   const scrollContainer = useChatStore().use.scrollContainer();
