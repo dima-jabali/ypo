@@ -20,6 +20,8 @@ import {
 } from "#/hooks/fetch/use-fetch-bot-conversation-message-list-page";
 import { ClientOnly } from "@/components/client-only";
 import dynamic from "next/dynamic";
+import { EmptyFallbackSuspense } from "#/components/empty-fallback-suspense";
+import { AllSourcesInChatSidebar } from "#/features/all-sources-in-chat-sidebar";
 
 const MessageInput = dynamic(
   () => import("#/components/message-input").then((mod) => mod.MessageInput),
@@ -34,6 +36,18 @@ export const ChatOrNotebook = memo(function ChatOrNotebook() {
   return (
     <ClientOnly>
       <SourceCitationContextProvider>
+        <header className="@container flex items-center gap-4 justify-between w-full px-1 h-fit bg-transparent print:hidden">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center">
+              <EmptyFallbackSuspense>
+                <WithChatData>
+                  <AllSourcesInChatSidebar />
+                </WithChatData>
+              </EmptyFallbackSuspense>
+            </div>
+          </div>
+        </header>
+
         <DefaultSuspenseAndErrorBoundary
           failedText="Something went wrong"
           fallbackFor="with-chat-data"
@@ -62,7 +76,7 @@ function Chat() {
   return (
     // `group/chat chat` are used to style text blocks:
 
-    <div className="@container/chat relative flex h-[calc(100%-38px)] @3xl:h-[calc(100%-46px)] flex-col justify-between overflow-hidden group/chat">
+    <div className="@container/chat relative flex h-full flex-col justify-between overflow-hidden group/chat w-full max-w-full">
       {hasAnyMessage ? (
         <ol
           className="chat-sm-grid @3xl:chat-md-grid max-h-full h-fit w-full max-w-full simple-scrollbar scrollbar-stable"
@@ -106,7 +120,7 @@ function Messages() {
     return null;
   }
 
-  const normalizedMsgs = useNormalizedMessages(true);
+  const normalizedMsgs = useNormalizedMessages(true)!;
 
   return normalizedMsgs.map(renderBotConversationMessage);
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { memo } from "react";
 
 import { DefaultSuspenseAndErrorBoundary } from "#/components/fallback-loader";
@@ -22,12 +24,20 @@ export const SourcesForUser = memo(function SourcesForUser({
   sources: SourceForUser[] | null;
   shouldShow: boolean;
 }) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   return sources && sources.length > 0 ? (
     <Sources sources={sources} shouldShow={shouldShow} />
   ) : null;
 });
 
 function Sources({ shouldShow, sources }: { sources: Array<SourceForUser>; shouldShow: boolean }) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const shouldShowAllSourcesSidebar = generalContextStore.use.showSourcesSidebar();
   const sourceCitationsStore = useSourceCitationContextStore();
 

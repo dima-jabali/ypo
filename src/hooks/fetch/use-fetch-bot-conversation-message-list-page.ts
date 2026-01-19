@@ -323,5 +323,5 @@ export function useAllChatSourcesMainValues() {
     [onlyShowUsedReferences],
   );
 
-  return useFetchBotConversationMessageListPage(select).data;
+  return useFetchBotConversationMessageListPage(select)!.data;
 }

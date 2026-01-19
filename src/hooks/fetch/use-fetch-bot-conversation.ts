@@ -25,8 +25,6 @@ export function useFetchBotConversation<SelectedData = BotConversation>(
     );
   }
 
-  console.log({ botConversationId });
-
   const queryOptions = useMemo(
     () => queryKeyFactory.get["bot-conversation"](botConversationId),
     [botConversationId],

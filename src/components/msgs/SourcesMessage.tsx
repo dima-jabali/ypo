@@ -1,4 +1,5 @@
-'use client'
+"use client";
+
 import { memo } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
@@ -21,6 +22,8 @@ type Message = BotConversationMessage & {
 };
 
 export const SourcesMessage = memo(function SourcesMessage({ msg }: Props) {
+  return null;
+
   if (typeof window === "undefined") {
     return null;
   }
@@ -55,5 +58,3 @@ export const SourcesMessage = memo(function SourcesMessage({ msg }: Props) {
     </MessageWrapper>
   );
 });
-
-SourcesMessage.whyDidYouRender = true;

@@ -194,6 +194,7 @@ export enum DocumentType {
   ClickUpDocument = "CLICKUP_DOCUMENT",
   ClickUpComment = "CLICKUP_COMMENT",
   ClickUpTask = "CLICKUP_TASK",
+  YpoProfile = "YPO_PROFILE",
 }
 
 export enum DocumentSubtype {
@@ -224,6 +225,7 @@ export type MinimalStandardDocumentSourceValues = {
     filename: string;
     group_id: string;
 
+    string_string_hard_filter_map?: Record<string, string>;
     document_type?: DocumentType | GeneralFileType;
     matchfeatures?: Record<string, unknown>;
     document_subtype?: DocumentSubtype;

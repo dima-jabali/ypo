@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { memo, useEffect, useRef, useState } from "react";
 import { titleCase } from "scule";
 

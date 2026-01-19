@@ -9,7 +9,7 @@ export function MessageWrapper({
   return (
     <li
       className={classNames(
-        "@container chat-content flex w-full list-none max-h-fit flex-col items-center justify-start py-1 text-sm text-primary empty:hidden",
+        "@container relative chat-content flex w-full list-none max-h-fit flex-col items-center justify-start py-1 text-sm text-primary empty:hidden",
         className,
       )}
       {...rest}

@@ -444,7 +444,7 @@ export const MessageInput = memo(function MessageInput() {
         data-is-streaming={isStreaming}
       >
         <div className="relative flex flex-col w-full h-full bg-secondary rounded-[calc(var(--radius-2xl)-6px)] p-2">
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex items-center justify-between gap-2 w-full">
             <PlateMessageInput editor={messageInputEditor} onKeyDown={handleOnKeyDown} />
 
             {files.length > 0 ? (
@@ -498,128 +498,7 @@ export const MessageInput = memo(function MessageInput() {
               </div>
             ) : null}
 
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <button
-                  className="flex aspect-square h-10 items-center justify-center rounded-lg button-hover disabled:opacity-50"
-                  disabled={isStreaming || isSending}
-                  type="button"
-                  onClick={() =>
-                    isStreaming || isSending ? undefined : addFilesInputRef.current?.click()
-                  }
-                  title={
-                    isStreaming
-                      ? "Cannot upload files while streaming"
-                      : "Click to add CSV/PDF files"
-                  }
-                >
-                  <Paperclip className="size-4" />
-
-                  <input
-                    onChange={handleShowFilesPreviewOnMessageInput}
-                    accept=".csv,.pdf,image/*"
-                    ref={addFilesInputRef}
-                    className="hidden"
-                    type="file"
-                    multiple
-                  />
-                </button>
-
-                {currentOrganization.all_tool_options && toolsToUse ? (
-                  toolSelectionType === ToolSelectionType.SINGLE_SELECT ? (
-                    <Select onValueChange={handleClickOnTool} value={toolsToUse[0]!}>
-                      <SelectTrigger
-                        className="flex items-center justify-center h-10 min-w-10 button-hover gap-2 p-2 text-sm rounded-lg border-none shadow-none"
-                        title="Mode"
-                      >
-                        {toolsToUse[0] ? (
-                          <>
-                            {matchIcon(toolsToUse[0])}
-
-                            <span className="capitalize text-xs text-muted">
-                              {titleCase(toolsToUse[0].toLowerCase())}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <SlidersVertical className="size-4 text-muted" />
-
-                            <span>Mode</span>
-                          </>
-                        )}
-                      </SelectTrigger>
-
-                      <SelectContent align="start">
-                        {currentOrganization.all_tool_options.map((tool) => (
-                          <SelectItem
-                            className="flex flex-row items-center gap-2 group"
-                            value={tool}
-                            key={tool}
-                          >
-                            <div className="flex flex-row items-center gap-2">
-                              {matchIcon(tool, "group-focus:stroke-accent-foreground")}
-
-                              <span className="capitalize">{titleCase(tool.toLowerCase())}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        className="flex items-center justify-center h-10 min-w-10 button-hover gap-2 p-2 text-sm rounded-lg border-none shadow-none"
-                        title="Mode"
-                      >
-                        {isDefaultToolsSelected ? (
-                          <>
-                            <SlidersVertical className="size-4 text-primary" />
-
-                            <span className="text-muted text-xs">Default</span>
-                          </>
-                        ) : toolsToUse[0] ? (
-                          <>
-                            {matchIcon(toolsToUse[0])}
-
-                            <span className="capitalize text-xs text-muted">
-                              {titleCase(toolsToUse[0].toLowerCase())}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <SlidersVertical className="size-4 text-primary" />
-
-                            <span>Mode</span>
-                          </>
-                        )}
-                      </DropdownMenuTrigger>
-
-                      <DropdownMenuContent align="start">
-                        {currentOrganization.all_tool_options.map((tool) => (
-                          <DropdownMenuCheckboxItem
-                            className="group focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                            onCheckedChange={() => handleClickOnTool(tool)}
-                            checked={toolsToUse.includes(tool)}
-                            key={tool}
-                          >
-                            {matchIcon(tool, "group-focus:stroke-accent-foreground")}
-
-                            <span className="capitalize">{titleCase(tool.toLowerCase())}</span>
-                          </DropdownMenuCheckboxItem>
-                        ))}
-
-                        <DropdownMenuCheckboxItem
-                          onCheckedChange={selectDefaultChatToolsToUse}
-                          checked={isDefaultToolsSelected}
-                        >
-                          Default
-                        </DropdownMenuCheckboxItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )
-                ) : null}
-              </div>
-
+            {true ? (
               <Tooltip>
                 <TooltipTrigger
                   className="flex aspect-square h-10 items-center justify-center rounded-lg bg-green-700 border-2 border-transparent hover:bg-green-600 active:bg-green-800 data-[is-streaming=true]:border-orange-400/80 data-[is-streaming=true]:hover:bg-destructive/60 data-[is-streaming=true]:active:bg-destructive/80 data-[is-streaming=true]:rounded-full data-[is-streaming=true]:bg-destructive mt-auto disabled:opacity-50"
@@ -651,7 +530,162 @@ export const MessageInput = memo(function MessageInput() {
                   </TooltipContent>
                 ) : null}
               </Tooltip>
-            </div>
+            ) : (
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    className="flex aspect-square h-10 items-center justify-center rounded-lg button-hover disabled:opacity-50"
+                    disabled={isStreaming || isSending}
+                    type="button"
+                    onClick={() =>
+                      isStreaming || isSending ? undefined : addFilesInputRef.current?.click()
+                    }
+                    title={
+                      isStreaming
+                        ? "Cannot upload files while streaming"
+                        : "Click to add CSV/PDF files"
+                    }
+                  >
+                    <Paperclip className="size-4" />
+
+                    <input
+                      onChange={handleShowFilesPreviewOnMessageInput}
+                      accept=".csv,.pdf,image/*"
+                      ref={addFilesInputRef}
+                      className="hidden"
+                      type="file"
+                      multiple
+                    />
+                  </button>
+
+                  {currentOrganization.all_tool_options && toolsToUse ? (
+                    toolSelectionType === ToolSelectionType.SINGLE_SELECT ? (
+                      <Select onValueChange={handleClickOnTool} value={toolsToUse[0]!}>
+                        <SelectTrigger
+                          className="flex items-center justify-center h-10 min-w-10 button-hover gap-2 p-2 text-sm rounded-lg border-none shadow-none"
+                          title="Mode"
+                        >
+                          {toolsToUse[0] ? (
+                            <>
+                              {matchIcon(toolsToUse[0])}
+
+                              <span className="capitalize text-xs text-muted">
+                                {titleCase(toolsToUse[0].toLowerCase())}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <SlidersVertical className="size-4 text-muted" />
+
+                              <span>Mode</span>
+                            </>
+                          )}
+                        </SelectTrigger>
+
+                        <SelectContent align="start">
+                          {currentOrganization.all_tool_options.map((tool) => (
+                            <SelectItem
+                              className="flex flex-row items-center gap-2 group"
+                              value={tool}
+                              key={tool}
+                            >
+                              <div className="flex flex-row items-center gap-2">
+                                {matchIcon(tool, "group-focus:stroke-accent-foreground")}
+
+                                <span className="capitalize">{titleCase(tool.toLowerCase())}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          className="flex items-center justify-center h-10 min-w-10 button-hover gap-2 p-2 text-sm rounded-lg border-none shadow-none"
+                          title="Mode"
+                        >
+                          {isDefaultToolsSelected ? (
+                            <>
+                              <SlidersVertical className="size-4 text-primary" />
+
+                              <span className="text-muted text-xs">Default</span>
+                            </>
+                          ) : toolsToUse[0] ? (
+                            <>
+                              {matchIcon(toolsToUse[0])}
+
+                              <span className="capitalize text-xs text-muted">
+                                {titleCase(toolsToUse[0].toLowerCase())}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <SlidersVertical className="size-4 text-primary" />
+
+                              <span>Mode</span>
+                            </>
+                          )}
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="start">
+                          {currentOrganization.all_tool_options.map((tool) => (
+                            <DropdownMenuCheckboxItem
+                              className="group focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                              onCheckedChange={() => handleClickOnTool(tool)}
+                              checked={toolsToUse.includes(tool)}
+                              key={tool}
+                            >
+                              {matchIcon(tool, "group-focus:stroke-accent-foreground")}
+
+                              <span className="capitalize">{titleCase(tool.toLowerCase())}</span>
+                            </DropdownMenuCheckboxItem>
+                          ))}
+
+                          <DropdownMenuCheckboxItem
+                            onCheckedChange={selectDefaultChatToolsToUse}
+                            checked={isDefaultToolsSelected}
+                          >
+                            Default
+                          </DropdownMenuCheckboxItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )
+                  ) : null}
+                </div>
+
+                <Tooltip>
+                  <TooltipTrigger
+                    className="flex aspect-square h-10 items-center justify-center rounded-lg bg-green-700 border-2 border-transparent hover:bg-green-600 active:bg-green-800 data-[is-streaming=true]:border-orange-400/80 data-[is-streaming=true]:hover:bg-destructive/60 data-[is-streaming=true]:active:bg-destructive/80 data-[is-streaming=true]:rounded-full data-[is-streaming=true]:bg-destructive mt-auto disabled:opacity-50"
+                    onClick={isStreaming ? handleStopStreaming : handleSendMessage}
+                    data-is-streaming={isStreaming}
+                    title={
+                      canSendMessage
+                        ? "Send message"
+                        : isStreaming
+                          ? "Please, wait for the bot to finish processing the previous message or click this to stop generating"
+                          : "Unable to send message for unknown reason"
+                    }
+                  >
+                    {isSending ? (
+                      <Loader className="size-4 border-t-white" />
+                    ) : isStreaming ? (
+                      <CircleStopIcon className="size-4 text-white" />
+                    ) : (
+                      <Send className="size-4 text-white" />
+                    )}
+                  </TooltipTrigger>
+
+                  {isStreaming ? (
+                    <TooltipContent
+                      className="w-fit max-h-28 simple-scrollbar text-primary"
+                      align="end"
+                    >
+                      Stop generation
+                    </TooltipContent>
+                  ) : null}
+                </Tooltip>
+              </div>
+            )}
           </div>
 
           {isSending ? (

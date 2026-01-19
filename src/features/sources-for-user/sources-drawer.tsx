@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { X } from "lucide-react";
+import { Building2, MapPin, X } from "lucide-react";
 import { Portal } from "radix-ui";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 
@@ -13,13 +13,19 @@ import { type SourceID, useSourceCitationContextStore } from "#/contexts/source-
 import { createUUID } from "#/helpers/utils";
 import { usePreviousPersistent } from "#/hooks/use-previous-persistent";
 import { matchIcon } from "#/icons/match-icon";
-import { SourceForUserType } from "#/types/chat";
+import { DocumentType, SourceForUserType } from "#/types/chat";
 import { SourcesForUserCtxProvider, useSourcesForUserCtx } from "./ctx";
 import { getExtraInfo } from "./get-extra-info";
 import { type SourceMainValues } from "./get-source-main-values";
 import type { NormalizedSource } from "./get-top-n-sources";
 import { searchNestedObject } from "./search-nested-object";
 import { DocumentSource } from "#/types/notebook";
+import { YpoProfileCard } from "#/components/msgs/ypo-profile-card";
+import { Card, CardContent } from "#/components/card";
+import { Avatar, AvatarFallback, AvatarImage } from "#/components/Avatar";
+import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
+import type { YpoProfileId } from "@/lib/types/ypo-profile";
 
 export type SourcesDrawerProps = {
   sourcesMainValues: Array<SourceMainValues<SourceForUserType, NormalizedSource["values_type"]>>;
@@ -39,7 +45,9 @@ export function SourcesDrawer({
 }) {
   const [isClearingFilters, startTransitionToClearFilters] = useTransition();
 
-  const [selectedTypesToFilter, setSelectedTypesToFilter] = useState<Array<string>>([]);
+  const [selectedTypesToFilter, setSelectedTypesToFilter] = useState<Array<string>>([
+    SourceForUserType.StandardDocument,
+  ]);
   const [matchedSource, setMatchedSource] = useState<SourceMainValues<
     SourceForUserType,
     NormalizedSource["values_type"]
@@ -306,7 +314,7 @@ export function SourcesDrawer({
   return isOpen ? (
     <Portal.Root>
       <section
-        className="fixed right-0 top-0 bottom-0 outline-none flex bg-popover border-l z-500 border-border-smooth shadow-lg shadow-black/40 p-0 overflow-hidden w-[min(60vw,500px)] group/drawer"
+        className="fixed right-0 top-0 bottom-0 outline-none flex bg-popover border-l z-500 border-border-smooth shadow-lg shadow-black/40 p-0 overflow-hidden w-[min(30vw,300px)] group/drawer"
         ref={drawerRef}
         data-is-drawer
       >
@@ -318,50 +326,17 @@ export function SourcesDrawer({
           ></div>
 
           <button
-            className="absolute left-2 top-4 p-1 button-hover rounded-lg"
+            className="absolute left-2 top-5 p-1 button-hover rounded-lg"
             onClick={handleClose}
             title="Close drawer"
           >
-            <X className="size-5" />
+            <X className="size-4" />
           </button>
 
           <header className="flex flex-col gap-6 flex-none items-center justify-center bg-popover min-h-16 py-2">
-            <h1 className="text-xl pt-2 whitespace-nowrap text-center">All sources</h1>
-
-            <search className="flex flex-wrap gap-2 w-full items-center px-3">
-              <input
-                className="focus:outline-offset-2 border border-border-smooth onfocus:border-white/40 rounded-md px-1.5 py-1"
-                onChange={handleFilterBySearchChange}
-                placeholder="Filter all sources..."
-                title="Filter all sources"
-                value={rawFilterString}
-                type="search"
-              />
-
-              <StringFilterCombobox
-                numberOfAvailableItemsForEachValue={numberOfAvailableItemsForEachValue}
-                setSelectedValuesToFilter={setSelectedTypesToFilter}
-                selectedValuesToFilter={selectedTypesToFilter}
-                allValuesToFilter={TYPES_TO_FILTER}
-                inputPlaceholder="Filter types..."
-                filterTitle="Type"
-              />
-
-              {isFiltered && (
-                <Button
-                  loaderClassNames="border-t-primary"
-                  isLoading={isClearingFilters}
-                  className="h-8 px-2 lg:px-3"
-                  onClick={handleClearFilter}
-                  title="Clear filters"
-                  variant="ghost"
-                >
-                  <span>Reset</span>
-
-                  <X className="ml-2 size-4" />
-                </Button>
-              )}
-            </search>
+            <h1 className="text-base font-bold pt-2 w-full whitespace-nowrap text-center">
+              All Profiles Referenced
+            </h1>
           </header>
 
           <SourcesForUserCtxProvider key={virtualListKey}>
@@ -393,6 +368,7 @@ function List({
   const showReferenceMetadata = generalContextStore.use.showReferenceMetadata();
   const clickupSourceIconUrl = generalContextStore.use.clickupSourceIconUrl();
   const sourcesForUserCtx = useSourcesForUserCtx();
+  const router = useRouter();
 
   const parentRef = useRef<HTMLDivElement | null>(null);
 
@@ -404,8 +380,8 @@ function List({
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer<HTMLElement, HTMLElement>({
-    estimateSize: () => (showReferenceMetadata ? 100 : 60),
     count: sourcesMainValues.length,
+    estimateSize: () => 300,
     overscan: 5,
     getScrollElement,
     measureElement,
@@ -455,6 +431,10 @@ function List({
     },
   });
 
+  function handleProfileClick(id: YpoProfileId) {
+    router.push(`/members/${id}`);
+  }
+
   return (
     <div ref={parentRef} className="w-full h-[83vh] simple-scrollbar px-3">
       <div
@@ -466,26 +446,122 @@ function List({
 
           if (!sourceMainValues) return null;
 
-          let icon = null;
+          // let icon = null;
+          // if (
+          //   // Check if sources is from ClickUp:
+          //   sourceMainValues.normalizedSource.source_type === SourceForUserType.StandardDocument &&
+          //   (("fields" in sourceMainValues.normalizedSource.values &&
+          //     sourceMainValues.normalizedSource.values.fields.document_source ===
+          //       DocumentSource.Clickup) ||
+          //     ("values" in sourceMainValues.normalizedSource &&
+          //       // @ts-expect-error => document_source is sometimes in values
+          //       sourceMainValues.normalizedSource.values.document_source ===
+          //         DocumentSource.Clickup))
+          // ) {
+          //   icon = clickupSourceIconUrl ? (
+          //     <img src={clickupSourceIconUrl} className="size-8 flex-none" />
+          //   ) : (
+          //     matchIcon(sourceMainValues.normalizedSource.source_type, "size-8")
+          //   );
+          // } else {
+          //   icon = matchIcon(sourceMainValues.normalizedSource.source_type, "size-8");
+          // }
+
           if (
-            // Check if sources is from ClickUp:
             sourceMainValues.normalizedSource.source_type === SourceForUserType.StandardDocument &&
-            (("fields" in sourceMainValues.normalizedSource.values &&
-              sourceMainValues.normalizedSource.values.fields.document_source ===
-                DocumentSource.Clickup) ||
-              ("values" in sourceMainValues.normalizedSource &&
-                // @ts-expect-error => document_source is sometimes in values
-                sourceMainValues.normalizedSource.values.document_source ===
-                  DocumentSource.Clickup))
+            "fields" in sourceMainValues.normalizedSource.values &&
+            sourceMainValues.normalizedSource.values.fields.document_type ===
+              DocumentType.YpoProfile
           ) {
-            icon = clickupSourceIconUrl ? (
-              <img src={clickupSourceIconUrl} className="size-8 flex-none" />
-            ) : (
-              matchIcon(sourceMainValues.normalizedSource.source_type, "size-8")
+            const values = sourceMainValues.normalizedSource.values.fields;
+
+            const name = values.string_string_hard_filter_map?.Name || "<Unnamed Profile>";
+            const position = values.string_string_hard_filter_map?.Position;
+            const currentCompanyName = values.string_string_hard_filter_map?.["Current Company"];
+            const city = values.string_string_hard_filter_map?.City;
+            const location = values.string_string_hard_filter_map?.Location;
+            const chapter = values.string_string_hard_filter_map?.Chapter;
+            const industry = values.string_string_hard_filter_map?.["Current Company Industry"];
+            const initials =
+              name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("") || "?";
+
+            return (
+              <article
+                className="top-0 left-0 absolute w-full translate-y-[attr(data-translate_px)] min-h-[attr(data-height_px)] py-4 flex flex-col gap-2 max-w-full select-text data-[selected=true]:bg-orange-400/20"
+                data-selected={matchedSource?.id === sourceMainValues.id}
+                title={sourceMainValues.normalizedSource.source_type}
+                ref={rowVirtualizer.measureElement}
+                data-translate={virtualRow.start}
+                data-height={virtualRow.size}
+                data-index={virtualRow.index}
+                key={sourceMainValues.id}
+              >
+                <Card className="h-fit">
+                  <CardContent className="p-2 flex flex-col gap-4">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-12 w-12 shrink-0">
+                        <AvatarFallback className="text-sm font-semibold bg-primary/10 text-primary">
+                          {initials}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{name}</p>
+                        {position && (
+                          <p className="text-xs text-muted-foreground truncate">{position}</p>
+                        )}
+
+                        {currentCompanyName && (
+                          <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
+                            <Building2 className="h-3 w-3 shrink-0" />
+
+                            {currentCompanyName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {(city || location) && (
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <MapPin className="h-3 w-3 shrink-0" />
+
+                        <span className="truncate">
+                          {city && location ? `${city}, ${location}` : city || location}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {chapter && (
+                        <Badge variant="default" className="text-xs">
+                          {chapter}
+                        </Badge>
+                      )}
+
+                      {industry && (
+                        <Badge variant="secondary" className="text-xs">
+                          {industry}
+                        </Badge>
+                      )}
+                    </div>
+
+                    <Button
+                      onClick={() => handleProfileClick(values.chunk_id as YpoProfileId)}
+                      className="w-full"
+                      size="sm"
+                    >
+                      View Profile
+                    </Button>
+                  </CardContent>
+                </Card>
+              </article>
             );
-          } else {
-            icon = matchIcon(sourceMainValues.normalizedSource.source_type, "size-8");
           }
+
+          return null;
 
           return (
             <article
@@ -497,19 +573,7 @@ function List({
               data-height={virtualRow.size}
               data-index={virtualRow.index}
               key={sourceMainValues.id}
-            >
-              <div className="flex items-center justify-start gap-4 max-w-full">
-                {icon}
-
-                {sourceMainValues.titleJSX}
-              </div>
-
-              <div className="w-full max-w-full flex flex-col gap-2 pl-12.5">
-                {showReferenceMetadata ? getExtraInfo(sourceMainValues) : null}
-
-                {showReferenceMetadata ? sourceMainValues.descriptionJSX : null}
-              </div>
-            </article>
+            ></article>
           );
         })}
       </div>

@@ -136,7 +136,7 @@ function handleNormalMessages(
   if (typeof window === "undefined") {
     return null;
   }
-  
+
   let msgNode = null;
 
   switch (message.message_type) {

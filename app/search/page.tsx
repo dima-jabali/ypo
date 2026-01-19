@@ -60,15 +60,13 @@ export default function SearchPage() {
     selectedContentTypes.length > 0;
 
   return (
-    <main className="container mx-auto p-6">
-      <div className="flex flex-col lg:flex-row gap-6">
-        <aside className="w-full lg:w-72 space-y-4 lg:sticky lg:top-6 lg:self-start">
-          <Card>
+    <div className="p-4 w-screen max-h-[calc(100vh-65px)] overflow-hidden flex flex-col lg:flex-row gap-4">
+          <Card className="max-h-[calc(100vh-65px-2rem)] simple-scrollbar w-full lg:w-52 flex flex-col gap-4 lg:self-start">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Filters</CardTitle>
 
-                {hasActiveFilters && (
+                {/* {hasActiveFilters && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -77,11 +75,11 @@ export default function SearchPage() {
                   >
                     Clear All
                   </Button>
-                )}
+                )} */}
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-6">
+            <CardContent className="flex flex-col gap-6">
               {/* Member Filters */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm flex items-center gap-2">
@@ -92,7 +90,7 @@ export default function SearchPage() {
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">Industry</Label>
 
-                  <div className="space-y-2 max-h-40 simple-scrollbar">
+                  <div className="space-y-2">
                     {uniqueIndustries.slice(0, 8).map((industry) => (
                       <div className="flex items-center space-x-2" key={industry}>
                         <Checkbox
@@ -117,7 +115,7 @@ export default function SearchPage() {
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">Location</Label>
 
-                  <div className="space-y-2 max-h-40 simple-scrollbar">
+                  <div className="space-y-2">
                     {uniqueCities.slice(0, 8).map((city) => (
                       <div key={city} className="flex items-center space-x-2">
                         <Checkbox
@@ -142,7 +140,7 @@ export default function SearchPage() {
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">Chapter</Label>
 
-                  <div className="space-y-2 max-h-40 simple-scrollbar">
+                  <div className="space-y-2">
                     {uniqueChapters.slice(0, 6).map((chapter) => (
                       <div key={chapter} className="flex items-center space-x-2">
                         <Checkbox
@@ -200,7 +198,7 @@ export default function SearchPage() {
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">City</Label>
 
-                  <div className="space-y-2 max-h-40 simple-scrollbar">
+                  <div className="space-y-2">
                     {eventCities.slice(0, 8).map((city) => (
                       <div key={city} className="flex items-center space-x-2">
                         <Checkbox
@@ -257,14 +255,12 @@ export default function SearchPage() {
               </div>
             </CardContent>
           </Card>
-        </aside>
 
-        <div className="flex-1 min-w-0 max-h-[80vh]">
+        <div className="flex flex-col min-w-0 max-h-full w-full">
           <WithOrganizationIdAndListBoundary failedText="Something went wrong at the main page!">
             <ChatOrNotebook />
           </WithOrganizationIdAndListBoundary>
         </div>
-      </div>
-    </main>
+    </div>
   );
 }
