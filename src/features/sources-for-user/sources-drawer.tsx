@@ -326,15 +326,15 @@ export function SourcesDrawer({
           ></div>
 
           <button
-            className="absolute left-2 top-5 p-1 button-hover rounded-lg"
+            className="absolute left-2 top-3 p-1 button-hover rounded-lg"
             onClick={handleClose}
             title="Close drawer"
           >
             <X className="size-4" />
           </button>
 
-          <header className="flex flex-col gap-6 flex-none items-center justify-center bg-popover min-h-16 py-2">
-            <h1 className="text-base font-bold pt-2 w-full whitespace-nowrap text-center">
+          <header className="flex flex-col gap-6 flex-none items-center justify-center bg-popover min-h-12 py-2">
+            <h1 className="text-base font-bold w-full whitespace-nowrap text-center">
               All Profiles Referenced
             </h1>
           </header>
@@ -381,7 +381,7 @@ function List({
   // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer<HTMLElement, HTMLElement>({
     count: sourcesMainValues.length,
-    estimateSize: () => 300,
+    estimateSize: () => 240,
     overscan: 5,
     getScrollElement,
     measureElement,
@@ -436,7 +436,7 @@ function List({
   }
 
   return (
-    <div ref={parentRef} className="w-full h-[83vh] simple-scrollbar px-3">
+    <div ref={parentRef} className="w-full h-[93vh] simple-scrollbar px-3">
       <div
         className="relative w-full h-[attr(data-height_px)]"
         data-height={rowVirtualizer.getTotalSize()}
@@ -490,7 +490,7 @@ function List({
 
             return (
               <article
-                className="top-0 left-0 absolute w-full translate-y-[attr(data-translate_px)] min-h-[attr(data-height_px)] py-4 flex flex-col gap-2 max-w-full select-text data-[selected=true]:bg-orange-400/20"
+                className="top-0 left-0 absolute w-full translate-y-[attr(data-translate_px)] min-h-[attr(data-height_px)] py-1 flex flex-col gap-2 max-w-full select-text data-[selected=true]:bg-orange-400/20 overflow-hidden"
                 data-selected={matchedSource?.id === sourceMainValues.id}
                 title={sourceMainValues.normalizedSource.source_type}
                 ref={rowVirtualizer.measureElement}
@@ -534,7 +534,7 @@ function List({
                       </div>
                     )}
 
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 whitespace-pre-wrap">
                       {chapter && (
                         <Badge variant="default" className="text-xs">
                           {chapter}

@@ -15,8 +15,8 @@ import { SourceCitationContextProvider } from "#/contexts/source-citation-contex
 import { SlashProvider } from "#/features/notebook/components/slash-plugin/ctx";
 import { CHAT_MESSAGE_LIST_HTML_ELEMENT_ID } from "#/helpers/utils";
 import {
-  useHasAnyMessage,
-  useNormalizedMessages,
+	useHasAnyMessage,
+	useNormalizedMessages,
 } from "#/hooks/fetch/use-fetch-bot-conversation-message-list-page";
 import { ClientOnly } from "@/components/client-only";
 import dynamic from "next/dynamic";
@@ -24,103 +24,101 @@ import { EmptyFallbackSuspense } from "#/components/empty-fallback-suspense";
 import { AllSourcesInChatSidebar } from "#/features/all-sources-in-chat-sidebar";
 
 const MessageInput = dynamic(
-  () => import("#/components/message-input").then((mod) => mod.MessageInput),
-  { ssr: false },
+	() => import("#/components/message-input").then((mod) => mod.MessageInput),
+	{ ssr: false },
 );
 
 export const ChatOrNotebook = memo(function ChatOrNotebook() {
-  if (typeof window === "undefined") {
-    return null;
-  }
+	if (typeof window === "undefined") {
+		return null;
+	}
 
-  return (
-    <ClientOnly>
-      <SourceCitationContextProvider>
-        <header className="@container flex items-center gap-4 justify-between w-full px-1 h-fit bg-transparent print:hidden">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center">
-              <EmptyFallbackSuspense>
-                <WithChatData>
-                  <AllSourcesInChatSidebar />
-                </WithChatData>
-              </EmptyFallbackSuspense>
-            </div>
-          </div>
-        </header>
+	return (
+		<ClientOnly>
+			<SourceCitationContextProvider>
+				<div className="absolute top-2 left-2 z-50">
+					<EmptyFallbackSuspense>
+						<WithChatData>
+							<AllSourcesInChatSidebar />
+						</WithChatData>
+					</EmptyFallbackSuspense>
+				</div>
 
-        <DefaultSuspenseAndErrorBoundary
-          failedText="Something went wrong"
-          fallbackFor="with-chat-data"
-        >
-          <WithChatData>
-            <ChatContextProvider>
-              <SlashProvider>
-                <Chat />
-              </SlashProvider>
-            </ChatContextProvider>
-          </WithChatData>
-        </DefaultSuspenseAndErrorBoundary>
-      </SourceCitationContextProvider>
-    </ClientOnly>
-  );
+				<DefaultSuspenseAndErrorBoundary
+					failedText="Something went wrong"
+					fallbackFor="with-chat-data"
+				>
+					<WithChatData>
+						<ChatContextProvider>
+							<SlashProvider>
+								<Chat />
+							</SlashProvider>
+						</ChatContextProvider>
+					</WithChatData>
+				</DefaultSuspenseAndErrorBoundary>
+			</SourceCitationContextProvider>
+		</ClientOnly>
+	);
 });
 
 function Chat() {
-  if (typeof window === "undefined") {
-    return null;
-  }
+	if (typeof window === "undefined") {
+		return null;
+	}
 
-  const hasAnyMessage = useHasAnyMessage();
-  const chatStore = useChatStore();
+	const hasAnyMessage = useHasAnyMessage();
+	const chatStore = useChatStore();
 
-  return (
-    // `group/chat chat` are used to style text blocks:
+	return (
+		// `group/chat chat` are used to style text blocks:
 
-    <div className="@container/chat relative flex h-full flex-col justify-between overflow-hidden group/chat w-full max-w-full">
-      {hasAnyMessage ? (
-        <ol
-          className="chat-sm-grid @3xl:chat-md-grid max-h-full h-fit w-full max-w-full simple-scrollbar scrollbar-stable"
-          ref={(ref) => chatStore.setState({ scrollContainer: ref })}
-          id={CHAT_MESSAGE_LIST_HTML_ELEMENT_ID}
-        >
-          <LoadMoreButton />
+		<div className="@container/chat relative flex h-full flex-col justify-between overflow-hidden group/chat w-full max-w-full">
+			{hasAnyMessage ? (
+				<ol
+					className="chat-sm-grid @3xl:chat-md-grid max-h-full h-fit w-full max-w-full simple-scrollbar scrollbar-stable"
+					ref={(ref) => chatStore.setState({ scrollContainer: ref })}
+					id={CHAT_MESSAGE_LIST_HTML_ELEMENT_ID}
+				>
+					<LoadMoreButton />
 
-          <Messages />
+					<div className="chat-content size-8"></div>
 
-          <AutoScrollIfOnBottom />
-        </ol>
-      ) : (
-        <EmptyData title="No messages" description="Start a conversation" />
-      )}
+					<Messages />
 
-      <div className="chat-sm-grid @3xl:chat-md-grid w-full relative pr-(--simple-scrollbar-width)">
-        {hasAnyMessage ? <ScrollToBottomButton /> : null}
+					<AutoScrollIfOnBottom />
+				</ol>
+			) : (
+				<EmptyData title="No messages" description="Start a conversation" />
+			)}
 
-        <ClientOnly>
-          <PlateController>
-            <ClientOnly>
-              <DefaultSuspenseAndErrorBoundary
-                failedText="Error in message input"
-                fallbackFor="message-input"
-              >
-                <ClientOnly>
-                  <MessageInput />
-                </ClientOnly>
-              </DefaultSuspenseAndErrorBoundary>
-            </ClientOnly>
-          </PlateController>
-        </ClientOnly>
-      </div>
-    </div>
-  );
+			<div className="chat-sm-grid @3xl:chat-md-grid w-full relative pr-(--simple-scrollbar-width)">
+				{hasAnyMessage ? <ScrollToBottomButton /> : null}
+
+				<ClientOnly>
+					<PlateController>
+						<ClientOnly>
+							<DefaultSuspenseAndErrorBoundary
+								failedText="Error in message input"
+								fallbackFor="message-input"
+							>
+								<ClientOnly>
+									<MessageInput />
+								</ClientOnly>
+							</DefaultSuspenseAndErrorBoundary>
+						</ClientOnly>
+					</PlateController>
+				</ClientOnly>
+			</div>
+		</div>
+	);
 }
 
 function Messages() {
-  if (typeof window === "undefined") {
-    return null;
-  }
+	if (typeof window === "undefined") {
+		return null;
+	}
 
-  const normalizedMsgs = useNormalizedMessages(true)!;
+	const normalizedMsgs = useNormalizedMessages(true)!;
 
-  return normalizedMsgs.map(renderBotConversationMessage);
+	return normalizedMsgs.map(renderBotConversationMessage);
 }
