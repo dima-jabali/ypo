@@ -1,3 +1,5 @@
+"use client";
+
 import { UserButton } from "@clerk/nextjs";
 import { Database, EllipsisVertical, MessageSquareText, PanelLeft, Table } from "lucide-react";
 import { Popover as PopoverPrimitive } from "radix-ui";
@@ -46,6 +48,10 @@ function handleGoToChats() {
 }
 
 export const Sidebar = memo(function Sidebar() {
+	  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationSelectorPlacement = generalContextStore.use.organizationSelectorPlacement();
   const brieflyKeepSidebarOpen = generalContextStore.use.brieflyKeepSidebarOpen();
   const keepSidebarOpen = generalContextStore.use.keepSidebarOpen();
@@ -58,7 +64,7 @@ export const Sidebar = memo(function Sidebar() {
   return (
     <>
       <div
-        className="w-14 h-screen data-[is-open=true]:w-(--open-sidebar-width) pointer-events-none [grid-area:aside] z-0"
+  				className="w-14 h-[calc(100vh-65px)] data-[is-open=true]:w-(--open-sidebar-width) pointer-events-none [grid-area:aside] z-0"
         data-is-open={keepSidebarOpen}
         data-placeholder-for-aside
         data-no-print
@@ -70,7 +76,7 @@ export const Sidebar = memo(function Sidebar() {
           case MainPage.Chats: {
             return (
               <aside
-                className="group fixed z-20 h-screen max-h-screen @container bg-aside w-14 hover:w-(--open-sidebar-width) transition-[width,opacity] duration-150 ease-out data-[is-open=true]:w-(--open-sidebar-width) flex flex-col gap-4 p-1 [box-shadow:0_0_10px_5px_#20202030]"
+      								className="group fixed z-20 h-[calc(100vh-65px)] max-h-[calc(100vh-65px)] @container bg-aside w-14 hover:w-(--open-sidebar-width) transition-[width,opacity] duration-150 ease-out data-[is-open=true]:w-(--open-sidebar-width) flex flex-col gap-4 p-1 [box-shadow:0_0_10px_5px_#20202030]"
                 data-is-open={keepSidebarOpen || brieflyKeepSidebarOpen}
                 data-no-print
               >
@@ -83,7 +89,7 @@ export const Sidebar = memo(function Sidebar() {
                     <PanelLeft className="size-5 stroke-1 text-muted-foreground" />
                   </button>
 
-                  {organizationSelectorPlacement === OrganizationSelectorPlacement.IN_SIDEBAR ? (
+                  {/*{organizationSelectorPlacement === OrganizationSelectorPlacement.IN_SIDEBAR ? (
                     <div className="@max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75">
                       <EmptyFallbackSuspense>
                         <WithOrganizationIdAndList>
@@ -91,7 +97,7 @@ export const Sidebar = memo(function Sidebar() {
                         </WithOrganizationIdAndList>
                       </EmptyFallbackSuspense>
                     </div>
-                  ) : null}
+                  ) : null}*/}
                 </div>
 
                 <div className="flex flex-col w-full h-full overflow-hidden">
@@ -102,7 +108,7 @@ export const Sidebar = memo(function Sidebar() {
                   </EmptyFallbackSuspense>
                 </div>
 
-                <ul className="flex w-full flex-col gap-2">
+                {/*<ul className="flex w-full flex-col gap-2">
                   <div className="flex w-12 gap-1 group-data-[is-open=true]:w-[calc(var(--open-sidebar-width)-8px)]">
                     <div className="w-12 h-9 flex-none">
                       {isValidNumber(notebookId) ? (
@@ -134,7 +140,7 @@ export const Sidebar = memo(function Sidebar() {
                   <li className="flex aspect-square w-12 items-center justify-center">
                     {isUsingClerk ? <UserButton /> : null}
                   </li>
-                </ul>
+                </ul>*/}
               </aside>
             );
           }

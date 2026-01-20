@@ -95,5 +95,9 @@ function selectHasNotebooksInList(data: FetchNotebookListPageInfiniteData) {
   return data.pages.some((page) => page.results.length > 0);
 }
 export function useHasNotebooksInList() {
+	  if (typeof window === "undefined") {
+    return null;
+  }
+
   return useFetchNotebookListPage(selectHasNotebooksInList)!.data;
 }

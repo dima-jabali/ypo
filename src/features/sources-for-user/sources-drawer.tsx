@@ -348,6 +348,12 @@ export function SourcesDrawer({
   ) : null;
 }
 
+function isYpoSource(sourceMainValues: SourceMainValues<SourceForUserType, NormalizedSource["values_type"]>) {
+  return sourceMainValues.normalizedSource.source_type === SourceForUserType.StandardDocument && (("fields" in sourceMainValues.normalizedSource.values &&
+            sourceMainValues.normalizedSource.values.fields.document_type ===
+              DocumentType.YpoProfile) || ("document_type" in sourceMainValues.normalizedSource.values && sourceMainValues.normalizedSource.values.document_type === DocumentType.YpoProfile) );
+}
+
 function List({
   sourcesMainValues,
   matchedSource,
@@ -356,6 +362,9 @@ function List({
   matchedSource: SourceMainValues<SourceForUserType, NormalizedSource["values_type"]> | null;
 }) {
   const [isMounted, setIsMounted] = useState(false);
+
+
+  const list = useMemo(() => sourcesMainValues.filter(isYpoSource), [sourcesMainValues])
 
   useEffect(() => {
     setIsMounted(true);
@@ -374,13 +383,13 @@ function List({
 
   const [{ getItemKey, getScrollElement, measureElement }] = useState({
     measureElement: (element: HTMLElement) => element.getBoundingClientRect().height,
-    getItemKey: (index: number) => sourcesMainValues[index]?.id ?? index,
+    getItemKey: (index: number) => list[index]?.id ?? index,
     getScrollElement: () => parentRef.current,
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer<HTMLElement, HTMLElement>({
-    count: sourcesMainValues.length,
+    count: list.length,
     estimateSize: () => 240,
     overscan: 5,
     getScrollElement,
@@ -409,13 +418,13 @@ function List({
     queryFn: () => {
       if (!isMounted || !matchedSource) return null;
 
-      const index = sourcesMainValues.findIndex(
+      const index = list.findIndex(
         (sourceMainValues) => sourceMainValues.id === matchedSource.id,
       );
 
       if (index === -1) {
-        console.log("Matched source not found in sourcesMainValues", {
-          sourcesMainValues,
+        console.log("Matched source not found in list", {
+          list,
           matchedSource,
         });
 
@@ -442,7 +451,7 @@ function List({
         data-height={rowVirtualizer.getTotalSize()}
       >
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-          const sourceMainValues = sourcesMainValues[virtualRow.index];
+          const sourceMainValues = list[virtualRow.index];
 
           if (!sourceMainValues) return null;
 
@@ -468,20 +477,18 @@ function List({
           // }
 
           if (
-            sourceMainValues.normalizedSource.source_type === SourceForUserType.StandardDocument &&
-            "fields" in sourceMainValues.normalizedSource.values &&
-            sourceMainValues.normalizedSource.values.fields.document_type ===
-              DocumentType.YpoProfile
+            true
           ) {
-            const values = sourceMainValues.normalizedSource.values.fields;
+            const values = "fields" in sourceMainValues.normalizedSource.values ? sourceMainValues.normalizedSource.values.fields.string_string_hard_filter_map :sourceMainValues.normalizedSource.values.metadata ;
+            const id = ("fields" in sourceMainValues.normalizedSource.values ? sourceMainValues.normalizedSource.values.fields.chunk_id : sourceMainValues.normalizedSource.values.id)  as YpoProfileId;
 
-            const name = values.string_string_hard_filter_map?.Name || "<Unnamed Profile>";
-            const position = values.string_string_hard_filter_map?.Position;
-            const currentCompanyName = values.string_string_hard_filter_map?.["Current Company"];
-            const city = values.string_string_hard_filter_map?.City;
-            const location = values.string_string_hard_filter_map?.Location;
-            const chapter = values.string_string_hard_filter_map?.Chapter;
-            const industry = values.string_string_hard_filter_map?.["Current Company Industry"];
+            const name = values?.Name || "<Unnamed Profile>";
+            const position = values?.Position;
+            const currentCompanyName = values?.["Current Company"];
+            const city = values?.City;
+            const location = values?.Location;
+            const chapter = values?.Chapter;
+            const industry = values?.["Current Company Industry"];
             const initials =
               name
                 ?.split(" ")
@@ -549,7 +556,7 @@ function List({
                     </div>
 
                     <Button
-                      onClick={() => handleProfileClick(values.chunk_id as YpoProfileId)}
+                      onClick={() => handleProfileClick(id)}
                       className="w-full"
                       size="sm"
                     >

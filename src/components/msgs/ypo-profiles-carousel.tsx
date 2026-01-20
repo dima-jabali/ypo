@@ -5,29 +5,33 @@ import { Loader2 } from "lucide-react";
 import { YpoProfileCard } from "./ypo-profile-card";
 
 interface YpoProfilesCarouselProps {
-	profileIds: number[];
+  profileIds: number[];
 }
 
 export function YpoProfilesCarousel({ profileIds }: YpoProfilesCarouselProps) {
-	const { profiles, isLoading, isError } = useYpoProfilesByIds(profileIds);
+			  if (typeof window === "undefined") {
+    return null;
+  }
 
-	if (profileIds.length === 0) {
-		return null;
-	}
+  const { profiles, isLoading, isError } = useYpoProfilesByIds(profileIds);
 
-	if (isLoading) {
-		return (
-			<div className="flex items-center gap-2 py-4 text-muted-foreground">
-				<Loader2 className="h-4 w-4 animate-spin" />
+  if (profileIds.length === 0) {
+    return null;
+  }
 
-				<span className="text-sm">Loading profiles...</span>
-			</div>
-		);
-	}
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2 py-4 text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
 
-	if (isError || profiles.length === 0) {
-		return null;
-	}
+        <span className="text-sm">Loading profiles...</span>
+      </div>
+    );
+  }
 
-	return profiles.map((profile) => <YpoProfileCard profile={profile} key={profile.id} />);
+  if (isError || profiles.length === 0) {
+    return null;
+  }
+
+  return profiles.map((profile, index) => <YpoProfileCard profile={profile} key={`${profile.id}-${index}`} />);
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { Plus } from "lucide-react";
 import { memo, useEffect, useRef } from "react";
 
@@ -67,6 +69,10 @@ function isGoingToFirstNotebookIfItIsEmpty(): boolean {
 }
 
 export const NotebookListTab = memo(function NotebookListTab() {
+		  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
   const notebookId = generalContextStore.use.notebookId();
   const isCreatingNotebook = useIsCreatingNotebook();

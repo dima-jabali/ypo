@@ -1,3 +1,5 @@
+"use client"
+
 import { memo, useEffect, useRef, useState } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
@@ -47,6 +49,10 @@ const getReflectionMessageExtraInfo = (message: Message) => {
 };
 
 export const ReflectionMessage = memo(function ReflectionMessage({ msg }: Props) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
 
   const detailsInitialProps = useState(isMessageComplete ? undefined : { open: true })[0];

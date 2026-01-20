@@ -1,3 +1,5 @@
+"use client"
+
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { memo, useState } from "react";
 
@@ -26,6 +28,10 @@ async function handleCopyMarkdown(
 }
 
 export const OptionsButtons = memo(function OptionsButtons({ message, text }: Props) {
+				  if (typeof window === "undefined") {
+    return null;
+  }
+
   const [hasCopiedMarkdownSuccessfully, setHasCopiedMarkdownSuccessfully] = useState<boolean>();
 
   const shouldShowThumbs = generalContextStore.use.showThumbsUpDown();
@@ -54,6 +60,10 @@ export const OptionsButtons = memo(function OptionsButtons({ message, text }: Pr
 });
 
 function Thumbs({ message }: { message: BotConversationMessage }) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const markGoodBadResponse = useMarkGoodBadResponse();
 
   const isGoodResponse = message.thumbs_up === true;

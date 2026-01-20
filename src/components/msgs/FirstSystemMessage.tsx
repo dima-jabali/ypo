@@ -1,3 +1,5 @@
+"use client"
+
 import { memo, useRef } from "react";
 
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
@@ -14,6 +16,10 @@ type Props = {
 };
 
 export const FirstSystemMessage = memo(function FirstSystemMessage({ msg }: Props) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const innerWrapperRef = useRef<HTMLDivElement>(null);
 
   const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);

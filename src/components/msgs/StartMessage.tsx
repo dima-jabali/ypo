@@ -1,3 +1,5 @@
+"use client"
+
 import { memo } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
@@ -14,6 +16,8 @@ type Message = BotConversationMessage & {
 };
 
 export const StartMessage = memo(function StartMessage({ msg }: Props) {
+    return null;
+
   const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);
 
   if (!msg.sources || msg.sources.length === 0) {

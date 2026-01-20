@@ -15,6 +15,10 @@ import { queryKeyFactory } from "./query-keys";
 type HasSetNotebookToFirst = boolean;
 
 export function useSetNotebookToFirst() {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
   const notebookMetadataList = useFetchNotebookListPage().data;
   const notebookId = generalContextStore.use.notebookId();

@@ -1,3 +1,5 @@
+"use client"
+
 import { memo, type PropsWithChildren } from "react";
 
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
@@ -15,6 +17,10 @@ type Props = {
 };
 
 export const NotebookBlockMessage = memo(function NotebookBlockMessage({ msg }: Props) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const notebookBlockUuid = msg.block?.uuid;
 
   if (!notebookBlockUuid) {
@@ -31,6 +37,10 @@ export const NotebookBlockMessage = memo(function NotebookBlockMessage({ msg }: 
 NotebookBlockMessage.whyDidYouRender = true;
 
 function Root({ notebookBlockUuid, msg }: Props & { notebookBlockUuid: NotebookBlockUuid }) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const { notebookBlock, render } = useNotebookBlock(notebookBlockUuid);
 
   if (!notebookBlock || !render) {
@@ -64,6 +74,10 @@ function Content({
   children,
   msg,
 }: PropsWithChildren<Props & { notebookBlock: NotebookBlock }>) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);
   const botName = generalContextStore.use.chatBotAgentName();
 

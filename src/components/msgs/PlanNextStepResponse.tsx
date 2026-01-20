@@ -1,3 +1,5 @@
+"use client"
+
 import { memo, useEffect, useRef, useState } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
@@ -25,6 +27,10 @@ type Message = BotConversationMessage & {
 };
 
 export const PlanNextStepResponse = memo(function PlanNextStepResponse({ msg }: Props) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
 
   const detailsInitialProps = useState(isMessageComplete ? undefined : { open: true })[0];

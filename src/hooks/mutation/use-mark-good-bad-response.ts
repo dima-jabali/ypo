@@ -1,3 +1,5 @@
+"use client";
+
 import { useMutation, type MutationObserverOptions, type QueryClient } from "@tanstack/react-query";
 
 import { clientAPI_V1 } from "#/api";
@@ -18,6 +20,10 @@ export type MarkResponseAsGoodOrBadResponse = BotConversationMessage;
 const mutationKey = queryKeyFactory.post["mark-good-bad-response"].queryKey;
 
 export function useMarkGoodBadResponse() {
+				  if (typeof window === "undefined") {
+    return null;
+  }
+
   return useMutation<MarkResponseAsGoodOrBadResponse, Error, MarkResponseAsGoodOrBadRequest>({
     mutationKey,
   });

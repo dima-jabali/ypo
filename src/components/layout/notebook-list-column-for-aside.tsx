@@ -1,3 +1,5 @@
+"use client";
+
 import { memo, useMemo } from "react";
 
 import { LOADER } from "#/components/Button";
@@ -14,6 +16,10 @@ import type { NotebookTag } from "#/types/notebook";
 const DEFAULT_TAGS: Array<NotebookTag> = [];
 
 export const NotebookListColumnForAside = memo(function NotebookListColumnForAside() {
+		  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
   const rerenderTree = useRerenderTreeStore().use.rerenderTree();
   const fetchNotebookListPageQuery = useFetchNotebookListPage();

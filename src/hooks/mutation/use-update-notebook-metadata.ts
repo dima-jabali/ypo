@@ -1,3 +1,5 @@
+"use client"
+
 import { useIsMutating, useMutation } from "@tanstack/react-query";
 
 import { clientAPI_V1 } from "#/api";
@@ -18,6 +20,10 @@ type UpdateNotebookResponse = Notebook;
 const mutationKey = queryKeyFactory.put["notebook"].queryKey;
 
 export function useUpdateNotebookMetadata() {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = generalContextStore.use.organizationId();
 
   return useMutation<

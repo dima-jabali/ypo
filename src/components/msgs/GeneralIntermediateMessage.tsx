@@ -1,3 +1,5 @@
+"use client"
+
 import { isPlainObject } from "es-toolkit";
 import { memo, useEffect, useRef, useState } from "react";
 import { titleCase } from "scule";
@@ -109,6 +111,10 @@ const getJsonInfoOfToolSelectionResponseJson = (message: BotConversationMessage)
 };
 
 export const GeneralIntermediateMessage = memo(function GeneralIntermediateMessage({ msg }: Props) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
   const reasoning =
     msg.json && "reasoning" in msg.json && typeof msg.json.reasoning === "string"

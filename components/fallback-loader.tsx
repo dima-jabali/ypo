@@ -1,5 +1,5 @@
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
-import { memo, Suspense, useState, type PropsWithChildren } from "react";
+import { memo, Suspense, useEffect, useState, type PropsWithChildren } from "react";
 import { ErrorBoundary, useErrorBoundary } from "react-error-boundary";
 
 import { cn } from "@/lib/utils";
@@ -54,7 +54,12 @@ export function LoadError({
 } & React.ComponentProps<"div">) {
   const { resetBoundary } = useErrorBoundary();
 
+  useEffect(() => {
+  if (error) {
   console.error("Error in", fallbackFor, error);
+
+  }
+  }, [error, fallbackFor])
 
   const isUnauthorizedError =
     error?.message.startsWith("Unauthorized") ||
@@ -130,9 +135,11 @@ export const DefaultSuspenseAndErrorBoundary = memo(function DefaultSuspenseAndE
 }>) {
   const [error, setError] = useState<Error | undefined>(undefined);
 
+    useEffect(() => {
   if (error) {
     console.error(error);
   }
+  }, [error])
 
   return (
     <Suspense

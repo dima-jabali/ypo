@@ -1,3 +1,5 @@
+"use client"
+
 import type { PropsWithChildren } from "react";
 import { ChevronRightIcon, Info } from "lucide-react";
 
@@ -15,6 +17,10 @@ type InfoProps = {
 };
 
 export const ReasoningPopover: React.FC<ReasongingProps> = ({ reasoning, defaultOpen }) => {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   return (
     <Popover defaultOpen={defaultOpen}>
       <PopoverTrigger
@@ -38,6 +44,10 @@ export const ReasoningPopover: React.FC<ReasongingProps> = ({ reasoning, default
 };
 
 export const InfoPopover: React.FC<PropsWithChildren<InfoProps>> = ({ children, defaultOpen }) => {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   return (
     <Popover defaultOpen={defaultOpen}>
       <PopoverTrigger
@@ -61,6 +71,10 @@ export const InfoPopover: React.FC<PropsWithChildren<InfoProps>> = ({ children, 
 };
 
 export const ExtraInfoPopover: React.FC<ReasongingProps> = ({ reasoning, defaultOpen }) => {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   return (
     <Popover defaultOpen={defaultOpen}>
       <PopoverTrigger

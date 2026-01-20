@@ -1,3 +1,5 @@
+"use client"
+
 import { memo, useEffect, useRef, useState } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
@@ -42,6 +44,10 @@ const getJsonInfoOfToolSelectionResponseJson = (message: BotConversationMessage)
 };
 
 export const RelevantUrlsMessage = memo(function RelevantUrlsMessage({ msg }: Props) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
   const reasoning =
     msg.json && "reasoning" in msg.json && typeof msg.json.reasoning === "string"

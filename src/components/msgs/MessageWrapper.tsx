@@ -1,3 +1,5 @@
+"use client"
+
 import type { ComponentProps, PropsWithChildren } from "react";
 
 import { classNames } from "#/helpers/class-names";
@@ -6,6 +8,10 @@ export function MessageWrapper({
   className,
   ...rest
 }: PropsWithChildren<ComponentProps<"li"> & { isParallelMessage?: boolean }>) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   return (
     <li
       className={classNames(

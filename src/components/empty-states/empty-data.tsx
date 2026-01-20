@@ -17,7 +17,7 @@ export function EmptyData({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 w-full h-full px-10 py-12">
+    <div className="flex flex-col items-center justify-center gap-4 w-full h-[calc(100vh-65px)] px-10 py-12">
       <section className="flex items-center justify-center gap-2">
         <div className="p-2 border border-border-smooth rounded-lg -rotate-12">
           <Bot className="size-6 stroke-primary stroke-1" />

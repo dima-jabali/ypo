@@ -1,3 +1,5 @@
+"use client"
+
 import { CheckCheck } from "lucide-react";
 import { memo, useRef } from "react";
 
@@ -20,6 +22,10 @@ type Props = {
 };
 
 export const DefaultMessageHandler = memo(function DefaultMessageHandler({ msg }: Props) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const innerWrapperRef = useRef<HTMLDivElement>(null);
 
   const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);

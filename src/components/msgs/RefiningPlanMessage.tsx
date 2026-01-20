@@ -1,3 +1,5 @@
+"use client"
+
 import { memo } from "react";
 
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
@@ -21,6 +23,10 @@ type Message = BotConversationMessage & {
 };
 
 export const RefiningPlanMessage = memo(function RefiningPlanMessage({ msg }: Props) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
 
   const showIntermediateMessage = generalContextStore.use.showIntermediateMessages();
