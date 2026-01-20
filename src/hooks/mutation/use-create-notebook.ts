@@ -1,3 +1,5 @@
+"use client"
+
 import { useMutation } from "@tanstack/react-query";
 
 import { clientAPI_V1 } from "#/api";
@@ -50,6 +52,10 @@ export type NewCreateProjectRequestBody = {
 type CreateNotebookResponse = Notebook;
 
 export function useCreateNotebook() {
+		  if (typeof window === "undefined") {
+    return null;
+  }
+
   const user = useFetchBetterbrainUser();
 
   return useMutation<CreateNotebookResponse | null, Error, NewCreateProjectRequestBody>({
