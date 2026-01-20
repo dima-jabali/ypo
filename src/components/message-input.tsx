@@ -51,7 +51,7 @@ import { useWithCurrentOrg } from "#/hooks/use-current-organization";
 import { useIsOnline } from "#/hooks/use-is-online";
 import { matchIcon } from "#/icons/match-icon";
 import type { Base64Image, BotConversationId } from "#/types/general";
-import { type ChatTools } from "#/types/notebook";
+import { ChatTools } from "#/types/notebook";
 import { WebsocketAction, type WebSocketStopGenerationPayload } from "#/types/websocket";
 import {
   DropdownMenu,
@@ -234,10 +234,10 @@ export const MessageInput = memo(function MessageInput() {
         }
 
         addBotConversationMessage.mutate({
+          tools_to_use: [ChatTools.ANSWER_QUESTION_BY_SEARCHING_ORGANIZATION_CONTEXT],
           uuid: createBotConversationMessageUuid(),
           messages: convertedMessages,
           botConversationId,
-          tools_to_use,
         });
       }
 
