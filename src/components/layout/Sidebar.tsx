@@ -5,7 +5,6 @@ import { Database, EllipsisVertical, MessageSquareText, PanelLeft, Table } from 
 import { Popover as PopoverPrimitive } from "radix-ui";
 import { memo, useState } from "react";
 
-import { NotebookListTab } from "#/components/layout/notebook-list-tab";
 import { authStore } from "#/contexts/auth/auth";
 import { dataManagerStore } from "#/contexts/data-manager";
 import {
@@ -24,6 +23,9 @@ import { WithOrganizationIdAndList } from "#/components/with-organization-id-and
 import { ChatUsageDashboardButton } from "#/components/layout/chat-usage-dashboard-button";
 import { ShareProjectModal } from "#/components/layout/share-project-modal";
 import { handleGoToSapien } from "#/components/layout/utils";
+import dynamic from "next/dynamic";
+
+const NotebookListTab = dynamic(() => import("#/components/layout/notebook-list-tab").then((module) => module.NotebookListTab));
 
 function handleToggleTabsOpened() {
   generalContextStore.setState((prev) => ({
