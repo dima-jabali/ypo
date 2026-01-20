@@ -343,7 +343,7 @@ const generalContextStoreBase = create(
         };
       },
       storage: createJSONStorage(() => localStorage),
-      name: "general-context",
+      name: "general-context-ypo",
       version: 0,
     },
   ),

@@ -102,10 +102,10 @@ import type {
 import type { BetterbrainUserId, PdfId } from "#/types/notebook";
 import { queryKeyFactory } from "#/hooks/query-keys";
 
-const BACKEND_API = process.env.NEXT_PUBLIC_PROD_BACKEND_URL;
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 if (!BACKEND_API) {
-  throw new Error("NEXT_PUBLIC_PROD_BACKEND_URL is not defined");
+  throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
 }
 
 export const clientAPI_V1 = axios.create({
