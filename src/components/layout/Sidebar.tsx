@@ -24,6 +24,7 @@ import { ChatUsageDashboardButton } from "#/components/layout/chat-usage-dashboa
 import { ShareProjectModal } from "#/components/layout/share-project-modal";
 import { handleGoToSapien } from "#/components/layout/utils";
 import dynamic from "next/dynamic";
+import { DefaultSuspenseAndErrorBoundary } from "@/components/fallback-loader";
 
 const NotebookListTab = dynamic(() => import("#/components/layout/notebook-list-tab").then((module) => module.NotebookListTab));
 
@@ -104,9 +105,12 @@ export const Sidebar = memo(function Sidebar() {
 
                 <div className="flex flex-col w-full h-full overflow-hidden">
                   <EmptyFallbackSuspense key={organizationId}>
+                  <DefaultSuspenseAndErrorBoundary failedText="Failed to render notebook list tab" fallbackFor="notebook list tab">
+
                     <WithOrganizationIdAndList>
                       <NotebookListTab />
                     </WithOrganizationIdAndList>
+                  </DefaultSuspenseAndErrorBoundary>
                   </EmptyFallbackSuspense>
                 </div>
 

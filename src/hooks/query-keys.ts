@@ -1,3 +1,5 @@
+"use client";
+
 import { createQueryKeyStore } from "@lukemorales/query-key-factory";
 
 import { api } from "#/api";

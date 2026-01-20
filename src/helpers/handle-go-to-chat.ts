@@ -11,6 +11,10 @@ export function handleGoToChat(
   notebookId: NotebookId,
   botConversationId: BotConversationId | null,
 ) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const { notebookId: notebookIdFromStore } = generalContextStore.getState();
 
   if (notebookId === notebookIdFromStore) {
@@ -28,6 +32,10 @@ export function handlePrefetchChat(
   botConversationId: BotConversationId | null,
   organizationId: OrganizationId,
 ) {
+			  if (typeof window === "undefined") {
+    return null;
+  }
+
   const isOptimisticNewNotebook = notebookId === OPTIMISTIC_NEW_NOTEBOOK_ID;
 
   if (!isOptimisticNewNotebook) {

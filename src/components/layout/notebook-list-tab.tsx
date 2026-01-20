@@ -3,7 +3,6 @@
 import { Plus } from "lucide-react";
 import { memo, useEffect, useRef } from "react";
 
-import { NotebookListColumnForAside } from "#/components/layout/notebook-list-column-for-aside";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import { handleGoToChat } from "#/helpers/handle-go-to-chat";
 import {
@@ -26,6 +25,10 @@ import { Loader } from "../Loader";
 import { toast } from "../Toast/useToast";
 import { WithOrganizationIdAndList } from "../with-organization-id-and-list";
 import { Separator } from "../separator";
+import dynamic from "next/dynamic";
+
+const NotebookListColumnForAside = dynamic(() => import("#/components/layout/notebook-list-column-for-aside").then((module) => module.NotebookListColumnForAside));
+
 
 function isGoingToFirstNotebookIfItIsEmpty(): boolean {
   const { getBotConversationMessageListPages, getNotebookListPages, organizationId } =
@@ -81,6 +84,10 @@ export const NotebookListTab = memo(function NotebookListTab() {
   const key = `${organizationId}-${notebookId}`;
 
   async function handleCreateChat(createAnyway?: boolean) {
+  		  if (typeof window === "undefined") {
+    return null;
+  }
+
     if (isCreatingNotebook) return;
 
     if (isGoingToFirstNotebookIfItIsEmpty() && !createAnyway) {

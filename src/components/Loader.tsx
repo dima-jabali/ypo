@@ -1,3 +1,5 @@
+"use client";
+
 import { classNames } from "#/helpers/class-names";
 
 type Props = {

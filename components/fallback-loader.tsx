@@ -1,3 +1,5 @@
+"use client"
+
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { memo, Suspense, useEffect, useState, type PropsWithChildren } from "react";
 import { ErrorBoundary, useErrorBoundary } from "react-error-boundary";
@@ -19,6 +21,10 @@ export function FallbackLoader({
   withLoader?: boolean | undefined;
   fallbackFor: string;
 }) {
+		  if (typeof window === "undefined") {
+    return null;
+  }
+
   return (
     <div
       className={cn("w-full h-full flex flex-col gap-2 items-center justify-center", className)}
@@ -52,6 +58,10 @@ export function LoadError({
   fallbackFor: string;
   failedText: string;
 } & React.ComponentProps<"div">) {
+		  if (typeof window === "undefined") {
+    return null;
+  }
+
   const { resetBoundary } = useErrorBoundary();
 
   useEffect(() => {
@@ -133,6 +143,10 @@ export const DefaultSuspenseAndErrorBoundary = memo(function DefaultSuspenseAndE
   fallbackFor: string;
   failedText: string;
 }>) {
+		  if (typeof window === "undefined") {
+    return null;
+  }
+
   const [error, setError] = useState<Error | undefined>(undefined);
 
     useEffect(() => {
