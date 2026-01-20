@@ -1,3 +1,5 @@
+"use client"
+
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import { queryClient } from "#/contexts/query-client";
 import { isValidNumber, noop, OPTIMISTIC_NEW_NOTEBOOK_ID } from "#/helpers/utils";

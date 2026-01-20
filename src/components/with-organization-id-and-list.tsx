@@ -1,3 +1,5 @@
+"use client"
+
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import { isValidNumber } from "#/helpers/utils";
 import { useSetOrgToFirst } from "#/hooks/use-set-org-to-first";

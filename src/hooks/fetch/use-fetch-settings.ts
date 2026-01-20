@@ -247,5 +247,9 @@ export function useFetchSettings<SelectedData = SettingsReturnType>(
 }
 
 export function useJustFetchSettings() {
+	  if (typeof window === "undefined") {
+    return null;
+  }
+
   return useFetchSettings(selectNothing);
 }

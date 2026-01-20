@@ -101,6 +101,10 @@ export function useOrgMember(enabled: boolean) {
 }
 
 export function useUserRoleInCurrOrg() {
+	  if (typeof window === "undefined") {
+    return null;
+  }
+
   const organizationId = useWithOrganizationId();
   const userId = useFetchBetterbrainUser()!.id;
 
