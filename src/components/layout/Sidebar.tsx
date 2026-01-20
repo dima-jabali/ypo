@@ -1,30 +1,16 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
-import { Database, EllipsisVertical, MessageSquareText, PanelLeft, Table } from "lucide-react";
-import { Popover as PopoverPrimitive } from "radix-ui";
-import { memo, useState } from "react";
+import { PanelLeft } from "lucide-react";
+import { memo } from "react";
 
-import { authStore } from "#/contexts/auth/auth";
-import { dataManagerStore } from "#/contexts/data-manager";
-import {
-  generalContextStore,
-  MainPage,
-  OrganizationSelectorPlacement,
-} from "#/contexts/general-ctx/general-context";
-import { GeneralSettingsModal } from "#/features/general-settings-modal/general-settings-modal";
-import { isValidNumber } from "#/helpers/utils";
 import { EmptyFallbackSuspense } from "#/components/empty-fallback-suspense";
-import { Popover, PopoverContent, PopoverTrigger } from "#/components/Popover";
-import { SetCurrentOrganizationPopover } from "#/components/set-current-organization-popover";
-import { ToggleDarkModeButton } from "#/components/toggle-dark-mode-button";
-import { WithChatData } from "#/components/with-chat-data";
 import { WithOrganizationIdAndList } from "#/components/with-organization-id-and-list";
-import { ChatUsageDashboardButton } from "#/components/layout/chat-usage-dashboard-button";
-import { ShareProjectModal } from "#/components/layout/share-project-modal";
-import { handleGoToSapien } from "#/components/layout/utils";
-import dynamic from "next/dynamic";
+import {
+    generalContextStore,
+    MainPage
+} from "#/contexts/general-ctx/general-context";
 import { DefaultSuspenseAndErrorBoundary } from "@/components/fallback-loader";
+import dynamic from "next/dynamic";
 
 const NotebookListTab = dynamic(() => import("#/components/layout/notebook-list-tab").then((module) => module.NotebookListTab));
 
@@ -34,34 +20,14 @@ function handleToggleTabsOpened() {
   }));
 }
 
-function handleGoToDataManager() {
-  generalContextStore.setState({
-    mainPage: MainPage.DataManager,
-  });
-
-  dataManagerStore.setState(dataManagerStore.getInitialState());
-}
-
-function handleGoToChats() {
-  generalContextStore.setState({
-    mainPage: MainPage.Chats,
-  });
-
-  dataManagerStore.setState(dataManagerStore.getInitialState());
-}
-
 export const Sidebar = memo(function Sidebar() {
 	  if (typeof window === "undefined") {
     return null;
   }
 
-  const organizationSelectorPlacement = generalContextStore.use.organizationSelectorPlacement();
   const brieflyKeepSidebarOpen = generalContextStore.use.brieflyKeepSidebarOpen();
   const keepSidebarOpen = generalContextStore.use.keepSidebarOpen();
   const organizationId = generalContextStore.use.organizationId();
-  const batchTableId = generalContextStore.use.batchTableId();
-  const notebookId = generalContextStore.use.notebookId();
-  const isUsingClerk = authStore.use.isUsingLocalClerk();
   const mainPage = generalContextStore.use.mainPage();
 
   return (
@@ -105,7 +71,7 @@ export const Sidebar = memo(function Sidebar() {
 
                 <div className="flex flex-col w-full h-full overflow-hidden">
                   <EmptyFallbackSuspense key={organizationId}>
-                  <DefaultSuspenseAndErrorBoundary failedText="Failed to render notebook list tab" fallbackFor="notebook list tab">
+                  <DefaultSuspenseAndErrorBoundary failedText="Failed to render notebook list tab" fallbackFor="notebook list tab" autoReset>
 
                     <WithOrganizationIdAndList>
                       <NotebookListTab />
@@ -151,157 +117,6 @@ export const Sidebar = memo(function Sidebar() {
             );
           }
 
-          case MainPage.DataManager: {
-            return (
-              <aside
-                className="group fixed z-10 h-screen max-h-screen @container bg-aside w-14 hover:w-(--open-sidebar-width) transition-[width,opacity] duration-150 ease-out data-[is-open=true]:w-(--open-sidebar-width) flex flex-col gap-4 py-3 px-1 [box-shadow:0_0_10px_5px_#20202030]"
-                data-is-open={keepSidebarOpen || brieflyKeepSidebarOpen}
-              >
-                <div className="flex gap-4 group-data-[is-open=true]:w-[calc(var(--open-sidebar-width)-8px)] items-center justify-between">
-                  <div className="h-9"></div>
-
-                  <div className="@max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75">
-                    <EmptyFallbackSuspense>
-                      <WithOrganizationIdAndList>
-                        <SetCurrentOrganizationPopover />
-                      </WithOrganizationIdAndList>
-                    </EmptyFallbackSuspense>
-                  </div>
-                </div>
-
-                <div className="h-full"></div>
-
-                <ul className="flex w-full flex-col gap-2">
-                  <button
-                    className="flex items-center justify-center button-hover rounded-lg @max-[14rem]:w-12 w-fit gap-1 p-2"
-                    onClick={handleGoToChats}
-                    title="Go to chats"
-                  >
-                    <div className="flex items-center justify-center w-[calc(3rem-1rem)] flex-none">
-                      <MessageSquareText className="size-5 stroke-1 flex-none text-muted-foreground" />
-                    </div>
-
-                    <span className="@max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75 text-sm text-muted flex-none">
-                      Go to Chats
-                    </span>
-                  </button>
-
-                  <li className="flex aspect-square w-12 items-center justify-center">
-                    {isUsingClerk ? <UserButton /> : null}
-                  </li>
-                </ul>
-              </aside>
-            );
-          }
-
-          case MainPage.ChatUsageDashboard: {
-            return (
-              <aside
-                className="group fixed z-10 h-screen max-h-screen @container bg-aside w-14 hover:w-(--open-sidebar-width) transition-[width,opacity] duration-150 ease-out data-[is-open=true]:w-(--open-sidebar-width) flex flex-col gap-4 py-3 px-1 [box-shadow:0_0_10px_5px_#20202030]"
-                data-is-open={keepSidebarOpen || brieflyKeepSidebarOpen}
-              >
-                <div className="flex gap-4 group-data-[is-open=true]:w-[calc(var(--open-sidebar-width)-8px)] items-center justify-between">
-                  <div className="h-9"></div>
-
-                  <div className="@max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75">
-                    <EmptyFallbackSuspense>
-                      <WithOrganizationIdAndList>
-                        <SetCurrentOrganizationPopover />
-                      </WithOrganizationIdAndList>
-                    </EmptyFallbackSuspense>
-                  </div>
-                </div>
-
-                <div className="h-full"></div>
-
-                <ul className="flex w-full flex-col gap-2">
-                  <button
-                    className="flex items-center justify-center button-hover rounded-lg @max-[14rem]:w-12 w-fit gap-1 p-2"
-                    onClick={handleGoToChats}
-                    title="Go to chats"
-                  >
-                    <div className="flex items-center justify-center w-[calc(3rem-1rem)] flex-none">
-                      <MessageSquareText className="size-5 stroke-1 flex-none text-muted-foreground" />
-                    </div>
-
-                    <span className="@max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75 text-sm text-muted flex-none">
-                      Go to Chats
-                    </span>
-                  </button>
-
-                  <li className="flex aspect-square w-12 items-center justify-center">
-                    {isUsingClerk ? <UserButton /> : null}
-                  </li>
-                </ul>
-              </aside>
-            );
-          }
-
-          case MainPage.Sapien: {
-            return (
-              <aside
-                className="group fixed z-10 h-screen max-h-screen @container bg-aside w-14 hover:w-(--open-sidebar-width) transition-[width,opacity] duration-150 ease-out data-[is-open=true]:w-(--open-sidebar-width) flex flex-col gap-4 py-3 px-1 [box-shadow:0_0_10px_5px_#20202030]"
-                data-is-open={keepSidebarOpen}
-              >
-                <div className="flex gap-4 group-data-[is-open=true]:w-[calc(var(--open-sidebar-width)-8px)] items-center justify-between">
-                  <div className="h-9"></div>
-
-                  <div className="@max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75">
-                    <EmptyFallbackSuspense>
-                      <WithOrganizationIdAndList>
-                        <SetCurrentOrganizationPopover />
-                      </WithOrganizationIdAndList>
-                    </EmptyFallbackSuspense>
-                  </div>
-                </div>
-
-                <div className="h-full"></div>
-
-                <ul className="flex w-full flex-col gap-2">
-                  {isValidNumber(batchTableId) ? (
-                    <button
-                      className="flex items-center justify-center button-hover rounded-lg @max-[14rem]:w-12 w-fit gap-1 p-2"
-                      onClick={handleGoToSapien}
-                      title="Go to Sapien"
-                    >
-                      <div className="flex items-center justify-center w-[calc(3rem-1rem)] flex-none">
-                        <Table className="size-5 stroke-1 flex-none text-muted-foreground" />
-                      </div>
-
-                      <span className="@max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75 text-sm text-muted flex-none">
-                        Go to Sapien
-                      </span>
-                    </button>
-                  ) : null}
-
-                  <div className="w-12 h-9 flex-none">
-                    <EmptyFallbackSuspense>
-                      <ToggleDarkModeButton />
-                    </EmptyFallbackSuspense>
-                  </div>
-
-                  <button
-                    className="flex items-center justify-center button-hover rounded-lg @max-[14rem]:w-12 w-fit gap-1 p-2"
-                    onClick={handleGoToChats}
-                    title="Go to chats"
-                  >
-                    <div className="flex items-center justify-center w-[calc(3rem-1rem)] flex-none">
-                      <MessageSquareText className="size-5 stroke-1 flex-none text-muted-foreground" />
-                    </div>
-
-                    <span className="@max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75 text-sm text-muted flex-none">
-                      Go to Chats
-                    </span>
-                  </button>
-
-                  <li className="flex aspect-square w-12 items-center justify-center">
-                    {isUsingClerk ? <UserButton /> : null}
-                  </li>
-                </ul>
-              </aside>
-            );
-          }
-
           default: {
             console.error("Sidebar: Unknown main page:", mainPage);
 
@@ -312,51 +127,3 @@ export const Sidebar = memo(function Sidebar() {
     </>
   );
 });
-
-function MoreOptionsPopover() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const notebookId = generalContextStore.use.notebookId();
-
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverPrimitive.Portal>
-        <PopoverPrimitive.Anchor className="fixed bottom-[68px] left-[193px] size-3.5" />
-      </PopoverPrimitive.Portal>
-
-      <PopoverTrigger className="flex items-center justify-center button-hover rounded-lg w-12 p-2 h-9 flex-none @max-[14rem]:hidden @max-[15rem]:opacity-0 transition-[opacity] duration-75 data-[state=open]:bg-button-active">
-        <EllipsisVertical className="w-5 stroke-muted-foreground/70" />
-      </PopoverTrigger>
-
-      {isOpen ? (
-        <PopoverContent side="right" align="end">
-          <button
-            className="flex items-center justify-start button-hover rounded w-full py-2 px-3 gap-3 text-sm text-muted-foreground"
-            onClick={handleGoToDataManager}
-            title="Data manager"
-          >
-            <Database className="w-5 stroke-1 stroke-muted-foreground" />
-
-            <span>Go to Data Manager</span>
-          </button>
-
-          <button
-            className="flex items-center justify-start button-hover rounded w-full py-2 px-3 gap-3 text-sm text-muted-foreground"
-            onClick={handleGoToSapien}
-            title="Sapien"
-          >
-            <Table className="w-5 stroke-1 stroke-muted-foreground" />
-
-            <span>Go to Sapien</span>
-          </button>
-
-          <EmptyFallbackSuspense key={notebookId}>
-            <WithOrganizationIdAndList>
-              <ChatUsageDashboardButton />
-            </WithOrganizationIdAndList>
-          </EmptyFallbackSuspense>
-        </PopoverContent>
-      ) : null}
-    </Popover>
-  );
-}

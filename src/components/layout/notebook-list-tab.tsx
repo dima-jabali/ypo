@@ -26,6 +26,7 @@ import { toast } from "../Toast/useToast";
 import { WithOrganizationIdAndList } from "../with-organization-id-and-list";
 import { Separator } from "../separator";
 import dynamic from "next/dynamic";
+import { ClientOnly } from "@/components/client-only";
 
 const NotebookListColumnForAside = dynamic(() => import("#/components/layout/notebook-list-column-for-aside").then((module) => module.NotebookListColumnForAside));
 
@@ -147,7 +148,7 @@ export const NotebookListTab = memo(function NotebookListTab() {
   }, []);
 
   return (
-    <>
+    <ClientOnly>
       <button
         className="flex gap-2 p-2 pl-3.5 items-center justify-between button-hover text-sm rounded-lg text-muted-foreground w-full"
         onClick={() => handleCreateChat()}
@@ -192,8 +193,6 @@ export const NotebookListTab = memo(function NotebookListTab() {
       </div>
 
       <div className="size-1 flex-none"></div>
-    </>
+    </ClientOnly>
   );
 });
-
-NotebookListTab.whyDidYouRender = true;

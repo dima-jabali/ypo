@@ -133,6 +133,7 @@ export const DefaultSuspenseAndErrorBoundary = memo(function DefaultSuspenseAndE
   fallbackFor,
   failedText,
   withLoader,
+  autoReset,
   children,
 }: PropsWithChildren<{
   fallbackTextClassName?: string | undefined;
@@ -142,6 +143,7 @@ export const DefaultSuspenseAndErrorBoundary = memo(function DefaultSuspenseAndE
   withLoader?: boolean | undefined;
   fallbackFor: string;
   failedText: string;
+  autoReset?: boolean;
 }>) {
 		  if (typeof window === "undefined") {
     return null;
@@ -178,7 +180,7 @@ export const DefaultSuspenseAndErrorBoundary = memo(function DefaultSuspenseAndE
                 error={error}
               />
             }
-            onError={(error) => setError(error)}
+            onError={(error) => {setError(error); if (autoReset) {reset();}}}
             onReset={reset}
           >
             {children}
