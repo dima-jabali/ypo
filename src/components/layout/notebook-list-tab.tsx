@@ -28,8 +28,11 @@ import { Separator } from "../separator";
 import dynamic from "next/dynamic";
 import { ClientOnly } from "@/components/client-only";
 
-const NotebookListColumnForAside = dynamic(() => import("#/components/layout/notebook-list-column-for-aside").then((module) => module.NotebookListColumnForAside));
-
+const NotebookListColumnForAside = dynamic(() =>
+  import("#/components/layout/notebook-list-column-for-aside").then(
+    (module) => module.NotebookListColumnForAside,
+  ),
+);
 
 function isGoingToFirstNotebookIfItIsEmpty(): boolean {
   const { getBotConversationMessageListPages, getNotebookListPages, organizationId } =
@@ -73,7 +76,7 @@ function isGoingToFirstNotebookIfItIsEmpty(): boolean {
 }
 
 export const NotebookListTab = memo(function NotebookListTab() {
-		  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -85,9 +88,9 @@ export const NotebookListTab = memo(function NotebookListTab() {
   const key = `${organizationId}-${notebookId}`;
 
   async function handleCreateChat(createAnyway?: boolean) {
-  		  if (typeof window === "undefined") {
-    return null;
-  }
+    if (typeof window === "undefined") {
+      return null;
+    }
 
     if (isCreatingNotebook) return;
 

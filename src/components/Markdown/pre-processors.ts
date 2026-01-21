@@ -72,6 +72,8 @@ export function getReferencedSources(content: string) {
     }
   }
 
+  // console.log("Referenced Sources:", {ids, content});
+
   return ids;
 }
 

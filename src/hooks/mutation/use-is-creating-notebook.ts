@@ -5,7 +5,7 @@ import { useIsMutating } from "@tanstack/react-query";
 import { queryKeyFactory } from "#/hooks/query-keys";
 
 export function useIsCreatingNotebook() {
-		  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

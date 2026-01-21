@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { memo, useRef } from "react";
 
@@ -16,7 +16,7 @@ type Props = {
 };
 
 export const FirstSystemMessage = memo(function FirstSystemMessage({ msg }: Props) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { memo, useState } from "react";
@@ -28,7 +28,7 @@ async function handleCopyMarkdown(
 }
 
 export const OptionsButtons = memo(function OptionsButtons({ message, text }: Props) {
-				  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -60,7 +60,7 @@ export const OptionsButtons = memo(function OptionsButtons({ message, text }: Pr
 });
 
 function Thumbs({ message }: { message: BotConversationMessage }) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

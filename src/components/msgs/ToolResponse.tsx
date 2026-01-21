@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { memo, useEffect, useRef, useState } from "react";
 
@@ -26,7 +26,7 @@ type Message = BotConversationMessage & {
 };
 
 export const ToolResponse = memo(function ToolResponse({ msg }: Props) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

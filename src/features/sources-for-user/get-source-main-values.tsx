@@ -8,6 +8,7 @@ import {
   SourceForUserType,
   StandardDocumentContentType,
   StandardDocumentSourceType,
+  YpoProfileSource,
   type AffinityNote,
   type AffinityOrganization,
   type AffinityPerson,

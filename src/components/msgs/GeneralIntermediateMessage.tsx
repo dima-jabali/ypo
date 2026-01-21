@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { isPlainObject } from "es-toolkit";
 import { memo, useEffect, useRef, useState } from "react";
@@ -111,7 +111,7 @@ const getJsonInfoOfToolSelectionResponseJson = (message: BotConversationMessage)
 };
 
 export const GeneralIntermediateMessage = memo(function GeneralIntermediateMessage({ msg }: Props) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

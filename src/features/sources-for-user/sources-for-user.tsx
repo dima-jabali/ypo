@@ -72,9 +72,7 @@ function Sources({ shouldShow, sources }: { sources: Array<SourceForUser>; shoul
     lastCitationNumber: state.lastCitationNumber,
   });
 
-  if (!shouldShow) {
     return null;
-  }
 
   return (
     <DefaultSuspenseAndErrorBoundary

@@ -6,9 +6,6 @@ import { Providers } from "@/providers";
 import "./globals.css";
 import { Suspense } from "react";
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
   title: "YPO Unified Member Brain - Demo",
   description:
@@ -34,11 +31,9 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: React.PropsWithChildren) {
-
-
   return (
     <html lang="en">
-      <body className="font-sans antialiased simple-scrollbar min-h-screen min-w-screen">
+      <body className="font-sans antialiased overflow-hidden h-screen w-screen">
         <Suspense fallback={null}>
           <Providers>{children}</Providers>
         </Suspense>

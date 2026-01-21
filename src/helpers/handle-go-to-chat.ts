@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import { queryClient } from "#/contexts/query-client";
@@ -11,7 +11,7 @@ export function handleGoToChat(
   notebookId: NotebookId,
   botConversationId: BotConversationId | null,
 ) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -32,7 +32,7 @@ export function handlePrefetchChat(
   botConversationId: BotConversationId | null,
   organizationId: OrganizationId,
 ) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

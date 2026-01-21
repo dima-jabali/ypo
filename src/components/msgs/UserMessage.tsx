@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { CheckCheck, UserRound } from "lucide-react";
 import { memo, useState } from "react";
@@ -33,7 +33,7 @@ const USER_IMG_FALLBACK = (
 );
 
 export const UserMessage = memo(function UserMessage({ msg }: Props) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

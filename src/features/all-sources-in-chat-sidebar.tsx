@@ -42,7 +42,7 @@ function WhenNotStreaming() {
     <FilterRegexProvider>
       <Tooltip>
         <TooltipTrigger
-          className="absolute top-2 left-20 flex bg-notebook items-center justify-center rounded-full border border-border-smooth button-hover size-6 @3xl:size-7"
+          className="absolute top-2 left-3 flex bg-notebook items-center justify-center rounded-full border border-border-smooth button-hover size-6 @3xl:size-7 z-50"
           title="All profiles referenced in this chat"
           onClick={() => setIsOpenOrToggle()}
         >

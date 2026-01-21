@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { CheckCheck } from "lucide-react";
 import { memo, useRef } from "react";
@@ -22,7 +22,7 @@ type Props = {
 };
 
 export const DefaultMessageHandler = memo(function DefaultMessageHandler({ msg }: Props) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

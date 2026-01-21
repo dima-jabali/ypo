@@ -22,7 +22,7 @@ type Message = BotConversationMessage & {
 };
 
 export const SourcesMessage = memo(function SourcesMessage({ msg }: Props) {
-  return null;
+  return <SourcesForUser sources={msg.sources} shouldShow={false} />;
 
   if (typeof window === "undefined") {
     return null;

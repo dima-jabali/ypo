@@ -5,14 +5,13 @@ import { memo } from "react";
 
 import { EmptyFallbackSuspense } from "#/components/empty-fallback-suspense";
 import { WithOrganizationIdAndList } from "#/components/with-organization-id-and-list";
-import {
-    generalContextStore,
-    MainPage
-} from "#/contexts/general-ctx/general-context";
+import { generalContextStore, MainPage } from "#/contexts/general-ctx/general-context";
 import { DefaultSuspenseAndErrorBoundary } from "@/components/fallback-loader";
 import dynamic from "next/dynamic";
 
-const NotebookListTab = dynamic(() => import("#/components/layout/notebook-list-tab").then((module) => module.NotebookListTab));
+const NotebookListTab = dynamic(() =>
+  import("#/components/layout/notebook-list-tab").then((module) => module.NotebookListTab),
+);
 
 function handleToggleTabsOpened() {
   generalContextStore.setState((prev) => ({
@@ -21,7 +20,7 @@ function handleToggleTabsOpened() {
 }
 
 export const Sidebar = memo(function Sidebar() {
-	  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -33,7 +32,7 @@ export const Sidebar = memo(function Sidebar() {
   return (
     <>
       <div
-  				className="w-14 h-[calc(100vh-65px)] data-[is-open=true]:w-(--open-sidebar-width) pointer-events-none [grid-area:aside] z-0"
+        className="w-14 h-[calc(100vh-65px)] data-[is-open=true]:w-(--open-sidebar-width) pointer-events-none [grid-area:aside] z-0"
         data-is-open={keepSidebarOpen}
         data-placeholder-for-aside
         data-no-print
@@ -45,7 +44,7 @@ export const Sidebar = memo(function Sidebar() {
           case MainPage.Chats: {
             return (
               <aside
-      								className="group fixed z-20 h-[calc(100vh-65px)] max-h-[calc(100vh-65px)] @container bg-aside w-14 hover:w-(--open-sidebar-width) transition-[width,opacity] duration-150 ease-out data-[is-open=true]:w-(--open-sidebar-width) flex flex-col gap-4 p-1 [box-shadow:0_0_10px_5px_#20202030]"
+                className="group fixed z-20 h-[calc(100vh-65px)] max-h-[calc(100vh-65px)] @container bg-aside w-14 hover:w-(--open-sidebar-width) transition-[width,opacity] duration-150 ease-out data-[is-open=true]:w-(--open-sidebar-width) flex flex-col gap-4 p-1 [box-shadow:0_0_10px_5px_#20202030]"
                 data-is-open={keepSidebarOpen || brieflyKeepSidebarOpen}
                 data-no-print
               >
@@ -71,12 +70,15 @@ export const Sidebar = memo(function Sidebar() {
 
                 <div className="flex flex-col w-full h-full overflow-hidden">
                   <EmptyFallbackSuspense key={organizationId}>
-                  <DefaultSuspenseAndErrorBoundary failedText="Failed to render notebook list tab" fallbackFor="notebook list tab" autoReset>
-
-                    <WithOrganizationIdAndList>
-                      <NotebookListTab />
-                    </WithOrganizationIdAndList>
-                  </DefaultSuspenseAndErrorBoundary>
+                    <DefaultSuspenseAndErrorBoundary
+                      failedText="Failed to render notebook list tab"
+                      fallbackFor="notebook list tab"
+                      autoReset
+                    >
+                      <WithOrganizationIdAndList>
+                        <NotebookListTab />
+                      </WithOrganizationIdAndList>
+                    </DefaultSuspenseAndErrorBoundary>
                   </EmptyFallbackSuspense>
                 </div>
 

@@ -59,6 +59,10 @@ export const ToolSelectionResponse = memo(function ToolSelectionResponse({ msg }
     }
   }, [isMessageComplete]);
 
+  if (isMessageComplete) {
+    return <SourcesForUser sources={msg.sources} shouldShow={false} />;
+  }
+
   const reasoning = typeof msg.json?.reasoning === "string" ? msg.json.reasoning : "";
   const isParallelMsg = isValidNumber(msg.parallel_conversation_id);
   const extraInfo = getJsonInfoOfToolResponseJson(msg);
@@ -70,7 +74,11 @@ export const ToolSelectionResponse = memo(function ToolSelectionResponse({ msg }
       data-tool-selection-response
       data-id={msg.id}
     >
-      {showIntermediateMessage ? (
+      {SELECTING_TOOL}
+
+<SourcesForUser sources={msg.sources} shouldShow={false} />
+
+      {/*{showIntermediateMessage ? (
         <details className="w-full group text-xs" {...detailsInitialProps} ref={detailsRef}>
           <summary className="z-10 @[450px]:ml-[25%] w-fit flex px-0 select-none cursor-pointer">
             <div
@@ -103,7 +111,7 @@ export const ToolSelectionResponse = memo(function ToolSelectionResponse({ msg }
         SELECTING_TOOL
       )}
 
-      <SourcesForUser sources={msg.sources} shouldShow={shouldShowSources} />
+      <SourcesForUser sources={msg.sources} shouldShow={shouldShowSources} />*/}
     </MessageWrapper>
   );
 });

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { ClipboardIcon } from "lucide-react";
 import { titleCase } from "scule";

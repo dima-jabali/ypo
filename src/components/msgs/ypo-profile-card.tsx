@@ -13,7 +13,7 @@ interface YpoProfileCardProps {
 }
 
 export function YpoProfileCard({ profile }: YpoProfileCardProps) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -29,8 +29,9 @@ export function YpoProfileCard({ profile }: YpoProfileCardProps) {
       .map((n) => n[0])
       .join("") || "?";
 
+
   return (
-    <Card className="h-fit p-0">
+    <Card className="h-fit p-0 transition-colors" id={profile.id}>
       <CardContent className="p-4 space-y-3">
         <div className="flex items-start gap-3">
           <Avatar className="h-12 w-12 shrink-0">

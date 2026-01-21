@@ -348,10 +348,16 @@ export function SourcesDrawer({
   ) : null;
 }
 
-function isYpoSource(sourceMainValues: SourceMainValues<SourceForUserType, NormalizedSource["values_type"]>) {
-  return sourceMainValues.normalizedSource.source_type === SourceForUserType.StandardDocument && (("fields" in sourceMainValues.normalizedSource.values &&
-            sourceMainValues.normalizedSource.values.fields.document_type ===
-              DocumentType.YpoProfile) || ("document_type" in sourceMainValues.normalizedSource.values && sourceMainValues.normalizedSource.values.document_type === DocumentType.YpoProfile) );
+function isYpoSource(
+  sourceMainValues: SourceMainValues<SourceForUserType, NormalizedSource["values_type"]>,
+) {
+  return (
+    sourceMainValues.normalizedSource.source_type === SourceForUserType.StandardDocument &&
+    (("fields" in sourceMainValues.normalizedSource.values &&
+      sourceMainValues.normalizedSource.values.fields.document_type === DocumentType.YpoProfile) ||
+      ("document_type" in sourceMainValues.normalizedSource.values &&
+        sourceMainValues.normalizedSource.values.document_type === DocumentType.YpoProfile))
+  );
 }
 
 function List({
@@ -363,8 +369,7 @@ function List({
 }) {
   const [isMounted, setIsMounted] = useState(false);
 
-
-  const list = useMemo(() => sourcesMainValues.filter(isYpoSource), [sourcesMainValues])
+  const list = useMemo(() => sourcesMainValues.filter(isYpoSource), [sourcesMainValues]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -418,9 +423,7 @@ function List({
     queryFn: () => {
       if (!isMounted || !matchedSource) return null;
 
-      const index = list.findIndex(
-        (sourceMainValues) => sourceMainValues.id === matchedSource.id,
-      );
+      const index = list.findIndex((sourceMainValues) => sourceMainValues.id === matchedSource.id);
 
       if (index === -1) {
         console.log("Matched source not found in list", {
@@ -476,11 +479,16 @@ function List({
           //   icon = matchIcon(sourceMainValues.normalizedSource.source_type, "size-8");
           // }
 
-          if (
-            true
-          ) {
-            const values = "fields" in sourceMainValues.normalizedSource.values ? sourceMainValues.normalizedSource.values.fields.string_string_hard_filter_map :sourceMainValues.normalizedSource.values.metadata ;
-            const id = ("fields" in sourceMainValues.normalizedSource.values ? sourceMainValues.normalizedSource.values.fields.chunk_id : sourceMainValues.normalizedSource.values.id)  as YpoProfileId;
+          if (true) {
+            const values =
+              "fields" in sourceMainValues.normalizedSource.values
+                ? sourceMainValues.normalizedSource.values.fields.string_string_hard_filter_map
+                : sourceMainValues.normalizedSource.values.metadata;
+            const id = (
+              "fields" in sourceMainValues.normalizedSource.values
+                ? sourceMainValues.normalizedSource.values.fields.chunk_id
+                : sourceMainValues.normalizedSource.values.id
+            ) as YpoProfileId;
 
             const name = values?.Name || "<Unnamed Profile>";
             const position = values?.Position;
@@ -555,11 +563,7 @@ function List({
                       )}
                     </div>
 
-                    <Button
-                      onClick={() => handleProfileClick(id)}
-                      className="w-full"
-                      size="sm"
-                    >
+                    <Button onClick={() => handleProfileClick(id)} className="w-full" size="sm">
                       View Profile
                     </Button>
                   </CardContent>

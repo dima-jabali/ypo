@@ -20,7 +20,7 @@ export type MarkResponseAsGoodOrBadResponse = BotConversationMessage;
 const mutationKey = queryKeyFactory.post["mark-good-bad-response"].queryKey;
 
 export function useMarkGoodBadResponse() {
-				  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

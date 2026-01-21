@@ -139,7 +139,7 @@ export function stringifyUnknown(value: unknown, jsonSpace = 2): string {
   }
 }
 
-export const isDev = process.env.DEV;
+export const isDev = process.env.NODE_ENV === "development";
 
 export const isRecord = (obj: unknown): obj is Record<string, unknown> =>
   typeof obj === "object" && obj !== null;

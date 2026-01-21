@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useIsMutating, useMutation } from "@tanstack/react-query";
 
@@ -20,7 +20,7 @@ type UpdateNotebookResponse = Notebook;
 const mutationKey = queryKeyFactory.put["notebook"].queryKey;
 
 export function useUpdateNotebookMetadata() {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

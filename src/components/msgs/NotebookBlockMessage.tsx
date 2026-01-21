@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { memo, type PropsWithChildren } from "react";
 
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export const NotebookBlockMessage = memo(function NotebookBlockMessage({ msg }: Props) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -37,7 +37,7 @@ export const NotebookBlockMessage = memo(function NotebookBlockMessage({ msg }: 
 NotebookBlockMessage.whyDidYouRender = true;
 
 function Root({ notebookBlockUuid, msg }: Props & { notebookBlockUuid: NotebookBlockUuid }) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -74,7 +74,7 @@ function Content({
   children,
   msg,
 }: PropsWithChildren<Props & { notebookBlock: NotebookBlock }>) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

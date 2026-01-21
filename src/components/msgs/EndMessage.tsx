@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { memo } from "react";
 
@@ -16,7 +16,7 @@ type Message = BotConversationMessage & {
 };
 
 export const EndMessage = memo(function EndMessage({ msg }: Props) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

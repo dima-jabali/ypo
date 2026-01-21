@@ -16,7 +16,7 @@ import type { NotebookTag } from "#/types/notebook";
 const DEFAULT_TAGS: Array<NotebookTag> = [];
 
 export const NotebookListColumnForAside = memo(function NotebookListColumnForAside() {
-		  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

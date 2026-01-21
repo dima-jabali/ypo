@@ -141,7 +141,7 @@ type BooleanKeys = CamelCase<BooleanSettingsToBeSet>;
 const STRING_SETTINGS_TO_BE_SET = [
   SettingsKey.ORGANIZATION_SELECTOR_PLACEMENT,
   SettingsKey.CLICKUP_SOURCE_ICON_URL,
-  SettingsKey.CHAT_BOT_AGENT_NAME,
+  // SettingsKey.CHAT_BOT_AGENT_NAME,
   SettingsKey.TOOL_SELECTION_TYPE,
 ] as const;
 type StringSettingsToBeSet = (typeof STRING_SETTINGS_TO_BE_SET)[number];
@@ -247,7 +247,7 @@ export function useFetchSettings<SelectedData = SettingsReturnType>(
 }
 
 export function useJustFetchSettings() {
-	  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useMutation } from "@tanstack/react-query";
 
@@ -52,7 +52,7 @@ export type NewCreateProjectRequestBody = {
 type CreateNotebookResponse = Notebook;
 
 export function useCreateNotebook() {
-		  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

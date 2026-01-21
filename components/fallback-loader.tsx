@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { memo, Suspense, useEffect, useState, type PropsWithChildren } from "react";
@@ -21,7 +21,7 @@ export function FallbackLoader({
   withLoader?: boolean | undefined;
   fallbackFor: string;
 }) {
-		  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -58,18 +58,17 @@ export function LoadError({
   fallbackFor: string;
   failedText: string;
 } & React.ComponentProps<"div">) {
-		  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
   const { resetBoundary } = useErrorBoundary();
 
   useEffect(() => {
-  if (error) {
-  console.error("Error in", fallbackFor, error);
-
-  }
-  }, [error, fallbackFor])
+    if (error) {
+      console.error("Error in", fallbackFor, error);
+    }
+  }, [error, fallbackFor]);
 
   const isUnauthorizedError =
     error?.message.startsWith("Unauthorized") ||
@@ -145,17 +144,17 @@ export const DefaultSuspenseAndErrorBoundary = memo(function DefaultSuspenseAndE
   failedText: string;
   autoReset?: boolean;
 }>) {
-		  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
   const [error, setError] = useState<Error | undefined>(undefined);
 
-    useEffect(() => {
-  if (error) {
-    console.error(error);
-  }
-  }, [error])
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
 
   return (
     <Suspense
@@ -180,7 +179,12 @@ export const DefaultSuspenseAndErrorBoundary = memo(function DefaultSuspenseAndE
                 error={error}
               />
             }
-            onError={(error) => {setError(error); if (autoReset) {reset();}}}
+            onError={(error) => {
+              setError(error);
+              if (autoReset) {
+                reset();
+              }
+            }}
             onReset={reset}
           >
             {children}

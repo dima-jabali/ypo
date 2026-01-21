@@ -30,7 +30,7 @@ type Message = BotConversationMessage & {
 };
 
 export const AIResponse = memo(function AIResponse({ msg }: Props) {
-		  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

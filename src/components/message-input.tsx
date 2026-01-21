@@ -436,7 +436,7 @@ export const MessageInput = memo(function MessageInput() {
 
   return (
     <div
-      className="relative flex flex-col chat-content gap-2 py-1 overflow-hidden w-full"
+      className="relative flex flex-col chat-content gap-2 py-1 pb-4 overflow-hidden w-full"
       data-no-print
     >
       <div
@@ -718,7 +718,7 @@ function trimWhitespace(str: string): string {
 
 const MARKDOWN_IMAGE_REGEX = /!\[.*?\]\((data:image\/[^;]+;base64,[A-Z0-9+/=]+)\)/gi;
 
-function convertMarkdownToMessages(markdown: string): Array<Message> {
+export function convertMarkdownToMessages(markdown: string): Array<Message> {
   MARKDOWN_IMAGE_REGEX.lastIndex = 0;
 
   const splitText = markdown.split(MARKDOWN_IMAGE_REGEX);

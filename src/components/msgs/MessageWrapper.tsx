@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import type { ComponentProps, PropsWithChildren } from "react";
 
@@ -8,7 +8,7 @@ export function MessageWrapper({
   className,
   ...rest
 }: PropsWithChildren<ComponentProps<"li"> & { isParallelMessage?: boolean }>) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 

@@ -230,7 +230,7 @@ const generalContextStoreBase = create(
           onlyShowUsedReferences: false,
           showReferenceMetadata: false,
           showEditProjectStatus: false,
-          chatBotAgentName: "Sapien",
+          chatBotAgentName: "YPO Member Search AI",
           showEditProjectTags: false,
           showInLineCitations: true,
           clickupSourceIconUrl: "",

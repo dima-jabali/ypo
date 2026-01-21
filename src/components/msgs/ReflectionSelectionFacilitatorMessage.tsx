@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { memo, useEffect, useRef, useState } from "react";
 
@@ -18,9 +18,9 @@ type Props = {
 
 export const ReflectionSelectionFacilitatorMessage = memo(
   function ReflectionSelectionFacilitatorMessage({ msg }: Props) {
-  		  if (typeof window === "undefined") {
-    return null;
-  }
+    if (typeof window === "undefined") {
+      return null;
+    }
 
     const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
 

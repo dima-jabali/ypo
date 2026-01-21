@@ -1,4 +1,4 @@
-]import { MagicRegExpTransformPlugin } from "magic-regexp/transform";
+import { MagicRegExpTransformPlugin } from "magic-regexp/transform";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -8,9 +8,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  reactCompiler: false,
   bundlePagesRouterDependencies: false,
-  cacheComponents: false,
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
   webpack(config) {

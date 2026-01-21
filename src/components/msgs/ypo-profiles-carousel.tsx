@@ -9,7 +9,7 @@ interface YpoProfilesCarouselProps {
 }
 
 export function YpoProfilesCarousel({ profileIds }: YpoProfilesCarouselProps) {
-			  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -33,5 +33,7 @@ export function YpoProfilesCarousel({ profileIds }: YpoProfilesCarouselProps) {
     return null;
   }
 
-  return profiles.map((profile, index) => <YpoProfileCard profile={profile} key={`${profile.id}-${index}`} />);
+  return profiles.map((profile, index) => (
+    <YpoProfileCard profile={profile} key={`${profile.id}-${index}`} />
+  ));
 }

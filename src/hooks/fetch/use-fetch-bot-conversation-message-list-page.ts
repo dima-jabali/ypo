@@ -28,6 +28,8 @@ import type {
 import type { BotConversationId } from "#/types/general";
 import { useFetchBotConversation } from "./use-fetch-bot-conversation";
 
+import "client-only"
+
 export type GetBotConversationMessagesPageRequest = {
   /** If not present, will be as 'true'. */
   botConversationId: BotConversationId;
@@ -55,10 +57,6 @@ export function useFetchBotConversationMessageListPage<
     SelectedData
   >,
 ) {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   useFetchBotConversation();
 
   const botConversationId = generalContextStore.use.botConversationId();
@@ -132,9 +130,6 @@ export function selectHasAnyBotConversationMessage(
 }
 
 export function useHasAnyMessage() {
-  if (typeof window === "undefined") {
-    return null;
-  }
 
   return useFetchBotConversationMessageListPage(selectHasAnyBotConversationMessage).data;
 }
@@ -215,10 +210,6 @@ export function selectNormalizedMessages(
 }
 
 export function useNormalizedMessages(withNotebookBlocks: boolean) {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const toggleHideParallelAnswers = generalContextStore.use.toggleHideParallelAnswers();
 
   const msgs = useFetchBotConversationMessageListPage(
@@ -248,7 +239,6 @@ function selectAllChatSourcesMainValues(
   >();
   const referencedSources: Set<SourceID> = new Set();
 
-  if (onlyShowUsedReferences) {
     for (const page of data.pages) {
       for (const msg of page.results) {
         if (msg.text) {
@@ -277,21 +267,7 @@ function selectAllChatSourcesMainValues(
         }
       }
     }
-  } else {
-    for (const page of data.pages) {
-      for (const msg of page.results) {
-        if (msg.sources && msg.sources.length > 0) {
-          const normalizedSources = normalizeSources(msg.sources);
 
-          for (const source of normalizedSources) {
-            const mainValues = getSourceMainValues(source);
-
-            map.set(mainValues.id, mainValues);
-          }
-        }
-      }
-    }
-  }
 
   const arr = Array.from(map.values());
 
@@ -310,10 +286,6 @@ function selectAllChatSourcesMainValues(
   return arr;
 }
 export function useAllChatSourcesMainValues() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const onlyShowUsedReferences = generalContextStore.use.onlyShowUsedReferences();
 
   const select = useCallback(

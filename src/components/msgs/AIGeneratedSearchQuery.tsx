@@ -43,6 +43,11 @@ export const AIGeneratedSearchQuery = memo(function AIGeneratedSearchQuery({ msg
     }
   }, [isMessageComplete]);
 
+  if (isMessageComplete) {
+    return       <SourcesForUser sources={msg.sources} shouldShow={shoudShowSources} />
+;
+  }
+
   const isParallelMsg = isValidNumber(msg.parallel_conversation_id);
 
   const extraInfo = getJsonInfoOfToolResponseJson(msg);
@@ -54,7 +59,11 @@ export const AIGeneratedSearchQuery = memo(function AIGeneratedSearchQuery({ msg
       data-ai-generated-search-query
       data-id={msg.id}
     >
-      {isParallelMsg ? (
+      {THINKING_SPAN}
+
+      <SourcesForUser sources={msg.sources} shouldShow={shoudShowSources} />
+
+      {/*{isParallelMsg ? (
         <p className="whitespace-nowrap text-primary font-semibold text-2xl text-center mb-6 w-full">
           Internal Search
         </p>
@@ -83,7 +92,7 @@ export const AIGeneratedSearchQuery = memo(function AIGeneratedSearchQuery({ msg
         THINKING_SPAN
       )}
 
-      <SourcesForUser sources={msg.sources} shouldShow={shoudShowSources} />
+      <SourcesForUser sources={msg.sources} shouldShow={shoudShowSources} />*/}
     </MessageWrapper>
   );
 });

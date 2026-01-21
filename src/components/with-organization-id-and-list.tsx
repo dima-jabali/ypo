@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import { isValidNumber } from "#/helpers/utils";

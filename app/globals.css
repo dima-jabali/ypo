@@ -83,6 +83,23 @@
   }
 }
 
+@utility animate-highlight {
+  animation: highlight 4s ease-in-out forwards;
+}
+
+@keyframes highlight {
+  0% {
+
+  background-color: transparent;
+  }
+  50% {
+  background-color: oklch(98% 0.016 73.684);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
 @utility base-ring {
   @apply ring-offset-popover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 aria-invalid:ring-destructive/20;
 }
@@ -391,8 +408,7 @@
 }
 
 @theme {
-    --open-sidebar-width: 250px;
-
+  --open-sidebar-width: 250px;
 
   --color-button-active: rgb(0 0 0 / 20%);
   --color-button-hover: rgb(0 0 0 / 10%);

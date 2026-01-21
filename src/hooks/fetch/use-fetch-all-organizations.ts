@@ -101,7 +101,7 @@ export function useOrgMember(enabled: boolean) {
 }
 
 export function useUserRoleInCurrOrg() {
-	  if (typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return null;
   }
 
