@@ -2,38 +2,28 @@ import { useQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Building2, MapPin, X } from "lucide-react";
 import { Portal } from "radix-ui";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import { Avatar, AvatarFallback } from "#/components/Avatar";
 import { Button } from "#/components/Button";
+import { Card, CardContent } from "#/components/card";
 import { URL_TEXT_SEARCH, WEBSITE_PREFIX } from "#/components/Markdown/pre-processors";
-import { StringFilterCombobox } from "#/components/string-filter-combobox";
 import { useFilterRegexStore } from "#/contexts/filter-regex";
-import { generalContextStore } from "#/contexts/general-ctx/general-context";
 import { type SourceID, useSourceCitationContextStore } from "#/contexts/source-citation-context";
 import { createUUID } from "#/helpers/utils";
 import { usePreviousPersistent } from "#/hooks/use-previous-persistent";
-import { matchIcon } from "#/icons/match-icon";
 import { DocumentType, SourceForUserType } from "#/types/chat";
+import { Badge } from "@/components/ui/badge";
+import type { YpoProfileId } from "@/lib/types/ypo-profile";
+import { useRouter } from "next/navigation";
 import { SourcesForUserCtxProvider, useSourcesForUserCtx } from "./ctx";
-import { getExtraInfo } from "./get-extra-info";
 import { type SourceMainValues } from "./get-source-main-values";
 import type { NormalizedSource } from "./get-top-n-sources";
 import { searchNestedObject } from "./search-nested-object";
-import { DocumentSource } from "#/types/notebook";
-import { YpoProfileCard } from "#/components/msgs/ypo-profile-card";
-import { Card, CardContent } from "#/components/card";
-import { Avatar, AvatarFallback, AvatarImage } from "#/components/Avatar";
-import { Badge } from "@/components/ui/badge";
-import { useRouter } from "next/navigation";
-import type { YpoProfileId } from "@/lib/types/ypo-profile";
 
 export type SourcesDrawerProps = {
   sourcesMainValues: Array<SourceMainValues<SourceForUserType, NormalizedSource["values_type"]>>;
 };
-
-const TYPES_TO_FILTER = Object.values(SourceForUserType);
-const ESCAPE_REGEX = /[-[\]{}()*+?.,\\^$|]/g;
-const TIME_TO_SEARCH = 500; // ms
 
 export function SourcesDrawer({
   sourcesMainValues,
@@ -43,39 +33,15 @@ export function SourcesDrawer({
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
 }) {
-  const [isClearingFilters, startTransitionToClearFilters] = useTransition();
-
-  const [selectedTypesToFilter, setSelectedTypesToFilter] = useState<Array<string>>([
-    SourceForUserType.StandardDocument,
-  ]);
+  const [selectedTypesToFilter] = useState<Array<string>>([SourceForUserType.StandardDocument]);
   const [matchedSource, setMatchedSource] = useState<SourceMainValues<
     SourceForUserType,
     NormalizedSource["values_type"]
   > | null>(null);
   const [virtualListKey, setVirtualListKey] = useState(createUUID());
   const [handler, setHandler] = useState<HTMLElement | null>(null);
-  const [rawFilterString, setRawFilterString] = useState("");
 
   const drawerRef = useRef<HTMLDivElement>(null);
-
-  const numberOfAvailableItemsForEachValue = useMemo(() => {
-    const numberOfAvailableItemsForEachValue = new Map<string, number>();
-
-    TYPES_TO_FILTER.forEach((sourceType) => {
-      numberOfAvailableItemsForEachValue.set(sourceType, 0);
-    });
-
-    sourcesMainValues.forEach((source) => {
-      const sourceType = source.normalizedSource.source_type;
-      const prevNumber = numberOfAvailableItemsForEachValue.get(sourceType) as number;
-
-      numberOfAvailableItemsForEachValue.set(sourceType, prevNumber + 1);
-    });
-
-    return numberOfAvailableItemsForEachValue;
-  }, [sourcesMainValues]);
-
-  const timerToFilter = useRef<NodeJS.Timeout>(undefined);
 
   const sourceCitationsStore = useSourceCitationContextStore();
   const currentSourceId = sourceCitationsStore.use.currentSourceId();
@@ -88,42 +54,6 @@ export function SourcesDrawer({
   function handleClose() {
     setMatchedSource(null);
     setIsOpen(false);
-  }
-
-  function handleClearFilter() {
-    startTransitionToClearFilters(() => {
-      filterRegexStore.setState({ filterRegex: undefined });
-      setSelectedTypesToFilter([]);
-      setRawFilterString("");
-    });
-  }
-
-  function handleFilterBySearchChange(e: React.ChangeEvent<HTMLInputElement>) {
-    clearTimeout(timerToFilter.current);
-
-    setRawFilterString(() => {
-      clearTimeout(timerToFilter.current);
-
-      const next = e.target.value;
-
-      timerToFilter.current = setTimeout(() => {
-        ESCAPE_REGEX.lastIndex = 0;
-
-        const trimmedAndEscapedFilterString = next.trim().replaceAll(ESCAPE_REGEX, "\\$&");
-
-        if (trimmedAndEscapedFilterString) {
-          // We must first set it to undefined, otherwise, it will look like there was no change:
-
-          filterRegexStore.setState({
-            filterRegex: new RegExp(trimmedAndEscapedFilterString, "gi"),
-          });
-        } else {
-          filterRegexStore.setState({ filterRegex: undefined });
-        }
-      }, TIME_TO_SEARCH);
-
-      return next;
-    });
   }
 
   useQuery({
@@ -335,7 +265,7 @@ export function SourcesDrawer({
 
           <header className="flex flex-col gap-6 flex-none items-center justify-center bg-popover min-h-12 py-2">
             <h1 className="text-base font-bold w-full whitespace-nowrap text-center">
-              All Profiles Referenced
+              All Profiles Searched
             </h1>
           </header>
 
@@ -379,8 +309,8 @@ function List({
     };
   }, []);
 
-  const showReferenceMetadata = generalContextStore.use.showReferenceMetadata();
-  const clickupSourceIconUrl = generalContextStore.use.clickupSourceIconUrl();
+  console.log({ list, sourcesMainValues });
+
   const sourcesForUserCtx = useSourcesForUserCtx();
   const router = useRouter();
 
@@ -479,98 +409,96 @@ function List({
           //   icon = matchIcon(sourceMainValues.normalizedSource.source_type, "size-8");
           // }
 
-          if (true) {
-            const values =
-              "fields" in sourceMainValues.normalizedSource.values
-                ? sourceMainValues.normalizedSource.values.fields.string_string_hard_filter_map
-                : sourceMainValues.normalizedSource.values.metadata;
-            const id = (
-              "fields" in sourceMainValues.normalizedSource.values
-                ? sourceMainValues.normalizedSource.values.fields.chunk_id
-                : sourceMainValues.normalizedSource.values.id
-            ) as YpoProfileId;
+          const values =
+            "fields" in sourceMainValues.normalizedSource.values
+              ? sourceMainValues.normalizedSource.values.fields.string_string_hard_filter_map
+              : sourceMainValues.normalizedSource.values.metadata;
+          const id = (
+            "fields" in sourceMainValues.normalizedSource.values
+              ? sourceMainValues.normalizedSource.values.fields.chunk_id
+              : sourceMainValues.normalizedSource.values.id
+          ) as YpoProfileId;
 
-            const name = values?.Name || "<Unnamed Profile>";
-            const position = values?.Position;
-            const currentCompanyName = values?.["Current Company"];
-            const city = values?.City;
-            const location = values?.Location;
-            const chapter = values?.Chapter;
-            const industry = values?.["Current Company Industry"];
-            const initials =
-              name
-                ?.split(" ")
-                .map((n) => n[0])
-                .join("") || "?";
+          const name = values?.Name || "<Unnamed Profile>";
+          const position = values?.Position;
+          const currentCompanyName = values?.["Current Company"];
+          const city = values?.City;
+          const location = values?.Location;
+          const chapter = values?.Chapter;
+          const industry = values?.["Current Company Industry"];
+          const initials =
+            name
+              ?.split(" ")
+              .map((n) => n[0])
+              .join("") || "?";
 
-            return (
-              <article
-                className="top-0 left-0 absolute w-full translate-y-[attr(data-translate_px)] min-h-[attr(data-height_px)] py-1 flex flex-col gap-2 max-w-full select-text data-[selected=true]:bg-orange-400/20 overflow-hidden"
-                data-selected={matchedSource?.id === sourceMainValues.id}
-                title={sourceMainValues.normalizedSource.source_type}
-                ref={rowVirtualizer.measureElement}
-                data-translate={virtualRow.start}
-                data-height={virtualRow.size}
-                data-index={virtualRow.index}
-                key={sourceMainValues.id}
-              >
-                <Card className="h-fit">
-                  <CardContent className="p-2 flex flex-col gap-4">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="h-12 w-12 shrink-0">
-                        <AvatarFallback className="text-sm font-semibold bg-primary/10 text-primary">
-                          {initials}
-                        </AvatarFallback>
-                      </Avatar>
+          return (
+            <article
+              className="top-0 left-0 absolute w-full translate-y-[attr(data-translate_px)] min-h-[attr(data-height_px)] py-1 flex flex-col gap-2 max-w-full select-text data-[selected=true]:bg-orange-400/20 overflow-hidden"
+              data-selected={matchedSource?.id === sourceMainValues.id}
+              title={sourceMainValues.normalizedSource.source_type}
+              ref={rowVirtualizer.measureElement}
+              data-translate={virtualRow.start}
+              data-height={virtualRow.size}
+              data-index={virtualRow.index}
+              key={sourceMainValues.id}
+            >
+              <Card className="h-fit">
+                <CardContent className="p-2 flex flex-col gap-4">
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-12 w-12 shrink-0">
+                      <AvatarFallback className="text-sm font-semibold bg-primary/10 text-primary">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
 
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{name}</p>
-                        {position && (
-                          <p className="text-xs text-muted-foreground truncate">{position}</p>
-                        )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate">{name}</p>
+                      {position && (
+                        <p className="text-xs text-muted-foreground truncate">{position}</p>
+                      )}
 
-                        {currentCompanyName && (
-                          <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
-                            <Building2 className="h-3 w-3 shrink-0" />
+                      {currentCompanyName && (
+                        <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
+                          <Building2 className="h-3 w-3 shrink-0" />
 
-                            {currentCompanyName}
-                          </p>
-                        )}
-                      </div>
+                          {currentCompanyName}
+                        </p>
+                      )}
                     </div>
+                  </div>
 
-                    {(city || location) && (
-                      <div className="text-xs text-muted-foreground flex items-center gap-1">
-                        <MapPin className="h-3 w-3 shrink-0" />
+                  {(city || location) && (
+                    <div className="text-xs text-muted-foreground flex items-center gap-1">
+                      <MapPin className="h-3 w-3 shrink-0" />
 
-                        <span className="truncate">
-                          {city && location ? `${city}, ${location}` : city || location}
-                        </span>
-                      </div>
+                      <span className="truncate">
+                        {city && location ? `${city}, ${location}` : city || location}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-1.5 whitespace-pre-wrap">
+                    {chapter && (
+                      <Badge variant="default" className="text-xs">
+                        {chapter}
+                      </Badge>
                     )}
 
-                    <div className="flex flex-wrap gap-1.5 whitespace-pre-wrap">
-                      {chapter && (
-                        <Badge variant="default" className="text-xs">
-                          {chapter}
-                        </Badge>
-                      )}
+                    {industry && (
+                      <Badge variant="secondary" className="text-xs">
+                        {industry}
+                      </Badge>
+                    )}
+                  </div>
 
-                      {industry && (
-                        <Badge variant="secondary" className="text-xs">
-                          {industry}
-                        </Badge>
-                      )}
-                    </div>
-
-                    <Button onClick={() => handleProfileClick(id)} className="w-full" size="sm">
-                      View Profile
-                    </Button>
-                  </CardContent>
-                </Card>
-              </article>
-            );
-          }
+                  <Button onClick={() => handleProfileClick(id)} className="w-full" size="sm">
+                    View Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            </article>
+          );
 
           return null;
 

@@ -2,23 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
 
-import { Button } from "@/components/ui/button";
-import { useStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
 import { ProfileSelector } from "@/components/profile-selector";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function Header() {
   const pathname = usePathname();
-  const { setSearchQuery } = useStore();
 
   const navItems = [
     { href: "/", label: "Dashboard" },
@@ -31,12 +21,11 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border backdrop-blur bg-brand-3 text-white">
       <div className="container mx-auto flex h-16 items-center gap-4 lg:gap-6 px-4">
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
-            Y
-          </div>
+          <img src="/ypo-logo-white.png" alt="YPO Brain Logo" className="size-10" />
+
           <span className="font-bold text-xl hidden sm:inline">YPO Brain</span>
         </Link>
 
@@ -56,19 +45,6 @@ export function Header() {
         <div className="flex-1 flex items-center justify-end gap-2">
           <ProfileSelector />
         </div>
-
-        <SignedOut>
-          <SignInButton />
-
-          <SignUpButton>
-            <button
-              className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer"
-              type={"button"}
-            >
-              Sign Up
-            </button>
-          </SignUpButton>
-        </SignedOut>
       </div>
     </header>
   );

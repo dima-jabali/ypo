@@ -44,8 +44,7 @@ export const AIGeneratedSearchQuery = memo(function AIGeneratedSearchQuery({ msg
   }, [isMessageComplete]);
 
   if (isMessageComplete) {
-    return       <SourcesForUser sources={msg.sources} shouldShow={shoudShowSources} />
-;
+    return <SourcesForUser sources={msg.sources} shouldShow={shoudShowSources} />;
   }
 
   const isParallelMsg = isValidNumber(msg.parallel_conversation_id);

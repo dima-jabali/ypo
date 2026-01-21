@@ -28,7 +28,7 @@ import type {
 import type { BotConversationId } from "#/types/general";
 import { useFetchBotConversation } from "./use-fetch-bot-conversation";
 
-import "client-only"
+import "client-only";
 
 export type GetBotConversationMessagesPageRequest = {
   /** If not present, will be as 'true'. */
@@ -130,7 +130,6 @@ export function selectHasAnyBotConversationMessage(
 }
 
 export function useHasAnyMessage() {
-
   return useFetchBotConversationMessageListPage(selectHasAnyBotConversationMessage).data;
 }
 
@@ -239,35 +238,34 @@ function selectAllChatSourcesMainValues(
   >();
   const referencedSources: Set<SourceID> = new Set();
 
-    for (const page of data.pages) {
-      for (const msg of page.results) {
-        if (msg.text) {
-          const sourcesReferencedInThisMsg = getReferencedSources(msg.text);
+  for (const page of data.pages) {
+    for (const msg of page.results) {
+      if (msg.text) {
+        const sourcesReferencedInThisMsg = getReferencedSources(msg.text);
 
-          for (const ref of sourcesReferencedInThisMsg) {
-            referencedSources.add(ref);
-          }
+        for (const ref of sourcesReferencedInThisMsg) {
+          referencedSources.add(ref);
         }
+      }
 
-        if (msg.sources && msg.sources.length > 0) {
-          const normalizedSources = normalizeSources(msg.sources);
+      if (msg.sources && msg.sources.length > 0) {
+        const normalizedSources = normalizeSources(msg.sources);
 
-          for (const source of normalizedSources) {
-            const mainValues = getSourceMainValues(source);
+        for (const source of normalizedSources) {
+          const mainValues = getSourceMainValues(source);
 
-            if (
-              referencedSources.has(mainValues.id) ||
-              referencedSources.has(
-                mainValues.id.replace(WEBSITE_PREFIX, "").replace(URL_TEXT_SEARCH, "") as SourceID,
-              )
-            ) {
-              map.set(mainValues.id, mainValues);
-            }
+          if (
+            referencedSources.has(mainValues.id) ||
+            referencedSources.has(
+              mainValues.id.replace(WEBSITE_PREFIX, "").replace(URL_TEXT_SEARCH, "") as SourceID,
+            )
+          ) {
+            map.set(mainValues.id, mainValues);
           }
         }
       }
     }
-
+  }
 
   const arr = Array.from(map.values());
 

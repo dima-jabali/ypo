@@ -1,32 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import type React from "react";
 
 import { Providers } from "@/providers";
+
 import "./globals.css";
-import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "YPO Unified Member Brain - Demo",
   description:
     "Intelligent platform powering world-class member connection, search, and AI experiences for 38,000 global executives",
-  generator: "v0.app",
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
+        url: "/ypo-favicon.png",
+        type: "image/png",
       },
     ],
-    apple: "/apple-icon.png",
   },
 };
 

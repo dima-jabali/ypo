@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
 import { useShouldShowSources } from "#/hooks/use-should-show-sources";
@@ -12,6 +12,7 @@ import {
 import { ANIMATED_DOTS, DOUBLE_CHECK, SEARCHING_CTX } from "./icons";
 import { MessageWrapper } from "./MessageWrapper";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
+import { CustomWindowEvents } from "#/contexts/window-events";
 
 type Props = {
   msg: Message;
@@ -22,6 +23,18 @@ type Message = BotConversationMessage & {
 };
 
 export const SourcesMessage = memo(function SourcesMessage({ msg }: Props) {
+  const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent(
+        isMessageComplete
+          ? CustomWindowEvents.CloseSourcesDrawer
+          : CustomWindowEvents.OpenSourcesDrawer,
+      ),
+    );
+  }, [isMessageComplete]);
+
   return <SourcesForUser sources={msg.sources} shouldShow={false} />;
 
   if (typeof window === "undefined") {
@@ -30,8 +43,6 @@ export const SourcesMessage = memo(function SourcesMessage({ msg }: Props) {
 
   const showIntermediateMessage = generalContextStore.use.showIntermediateMessages();
   const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);
-
-  const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
 
   return (
     <MessageWrapper

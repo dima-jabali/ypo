@@ -76,7 +76,7 @@ export const ToolSelectionResponse = memo(function ToolSelectionResponse({ msg }
     >
       {SELECTING_TOOL}
 
-<SourcesForUser sources={msg.sources} shouldShow={false} />
+      <SourcesForUser sources={msg.sources} shouldShow={false} />
 
       {/*{showIntermediateMessage ? (
         <details className="w-full group text-xs" {...detailsInitialProps} ref={detailsRef}>

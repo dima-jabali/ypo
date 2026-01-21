@@ -1,7 +1,7 @@
 "use client";
 
 import { FileSearch } from "lucide-react";
-import { memo, useState, useTransition } from "react";
+import { memo, useEffect, useState, useTransition } from "react";
 
 import { Loader } from "#/components/Loader";
 import { FilterRegexProvider } from "#/contexts/filter-regex";
@@ -10,23 +10,17 @@ import { useIsStreaming } from "#/hooks/fetch/use-fetch-bot-conversation";
 import { useAllChatSourcesMainValues } from "#/hooks/fetch/use-fetch-bot-conversation-message-list-page";
 import { SourcesDrawer } from "./sources-for-user/sources-drawer";
 import { Tooltip, TooltipContent, TooltipTrigger } from "#/components/Tooltip";
+import { CustomWindowEvents } from "#/contexts/window-events";
+
+import "client-only";
 
 export const AllSourcesInChatSidebar = memo(function AllSourcesInChatSidebar() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const shouldShowSidebar = generalContextStore.use.showSourcesSidebar();
-  const isStreaming = useIsStreaming();
 
-  return isStreaming || !shouldShowSidebar ? null : <WhenNotStreaming />;
+  return !shouldShowSidebar ? null : <WhenNotStreaming />;
 });
 
 function WhenNotStreaming() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen_] = useState(false);
 
@@ -36,7 +30,34 @@ function WhenNotStreaming() {
     startTransition(() => setIsOpen_(nextValue ?? ((prev) => !prev)));
   }
 
-  // console.log({sourcesMainValues})
+  useEffect(() => {
+    const abortController = new AbortController();
+    const options = { signal: abortController.signal };
+
+    function setIsOpenOrToggle(nextValue?: boolean | ((prev: boolean) => boolean)) {
+      startTransition(() => setIsOpen_(nextValue ?? ((prev) => !prev)));
+    }
+
+    window.addEventListener(
+      CustomWindowEvents.CloseSourcesDrawer,
+      () => {
+        setIsOpenOrToggle(false);
+      },
+      options,
+    );
+
+    window.addEventListener(
+      CustomWindowEvents.OpenSourcesDrawer,
+      () => {
+        setIsOpenOrToggle(true);
+      },
+      options,
+    );
+
+    return () => {
+      abortController.abort();
+    };
+  }, []);
 
   return (
     <FilterRegexProvider>

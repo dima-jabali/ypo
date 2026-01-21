@@ -16,6 +16,8 @@ type Message = BotConversationMessage & {
 };
 
 export const StartMessage = memo(function StartMessage({ msg }: Props) {
+  console.log("StartMessage render", { msg });
+
   return <SourcesForUser sources={msg.sources} shouldShow={false} />;
 
   const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);
@@ -35,5 +37,3 @@ export const StartMessage = memo(function StartMessage({ msg }: Props) {
     </MessageWrapper>
   );
 });
-
-StartMessage.whyDidYouRender = true;

@@ -28,6 +28,8 @@ import {
 } from "#/types/notebook";
 import { useFetchBetterbrainUser } from "../fetch/use-fetch-betterbrain-user";
 
+import "client-only";
+
 const mutationKey = queryKeyFactory.post["notebook"].queryKey;
 
 export type InifiteQueryResponseOfFetchNotebookListPageResponse = {
@@ -52,10 +54,6 @@ export type NewCreateProjectRequestBody = {
 type CreateNotebookResponse = Notebook;
 
 export function useCreateNotebook() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const user = useFetchBetterbrainUser();
 
   return useMutation<CreateNotebookResponse | null, Error, NewCreateProjectRequestBody>({

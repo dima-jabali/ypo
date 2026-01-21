@@ -119,182 +119,190 @@ function Connections() {
   };
 
   return (
-    <main className="container px-auto w-screen p-6 space-y-8 h-[calc(100vh-65px)] simple-scrollbar">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Recommended Connections</h1>
-        <p className="text-muted-foreground">
-          Discover YPO members you should connect with based on AI-powered recommendations
-        </p>
-      </div>
+    <div className="flex flex-col items-center justify-center simple-scrollbar h-[calc(100vh-65px)] w-screen">
+      <main className="space-y-8 h-full container mx-auto">
+        <div className="flex flex-none size-0"></div>
 
-      {/* AI Insights Card */}
-      <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-background border-primary/20">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <CardTitle>AI-Powered Connections</CardTitle>
-          </div>
-          <CardDescription>
-            Our unified member brain analyzes your profile, interests, expertise, and activity to
-            surface the most valuable connections for you.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm mb-1">Similar Leadership DNA</p>
-                <p className="text-xs text-muted-foreground">
-                  Members who share your leadership traits
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <TrendingUp className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm mb-1">Complementary Expertise</p>
-                <p className="text-xs text-muted-foreground">Skills that complement yours</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <MapPin className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm mb-1">Proximity-Based</p>
-                <p className="text-xs text-muted-foreground">
-                  Members in your area or destinations
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Heart className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-semibold text-sm mb-1">Lifestyle Match</p>
-                <p className="text-xs text-muted-foreground">Similar wellness and hobbies</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-bold">Top Recommendations For You</h2>
-            <p className="text-sm text-muted-foreground">
-              Highest match scores based on multiple factors
-            </p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Recommended Connections</h1>
+          <p className="text-muted-foreground">
+            Discover YPO members you should connect with based on AI-powered recommendations
+          </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {topRecommendations.map((rec) => (
-            <ConnectionCard key={rec.member.id} recommendation={rec} />
-          ))}
-        </div>
-      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Browse by Connection Type</CardTitle>
-          <CardDescription>
-            Explore recommendations categorized by what you have in common
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="interests" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="interests">Interests</TabsTrigger>
-              <TabsTrigger value="industry">Industry</TabsTrigger>
-              <TabsTrigger value="location">Location</TabsTrigger>
-              <TabsTrigger value="lifestyle">Lifestyle</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="interests" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {interestBased.map((rec) => (
-                  <ConnectionCard key={rec.member.id} recommendation={rec} />
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="industry" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {industryBased.map((rec) => (
-                  <ConnectionCard key={rec.member.id} recommendation={rec} />
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="location" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {locationBased.map((rec) => (
-                  <ConnectionCard key={rec.member.id} recommendation={rec} />
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="lifestyle" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {lifestyleBased.map((rec) => (
-                  <ConnectionCard key={rec.member.id} recommendation={rec} />
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* Event-Based Recommendations */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
-            <CardTitle>Event-Based Connections</CardTitle>
-          </div>
-          <CardDescription>Connect with members attending the same upcoming events</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {events.slice(0, 3).map((event) => {
-              const eventRecommendations = allRecommendations
-                .filter((r) => r.reasons.some((reason) => reason.type === "event"))
-                .slice(0, 3);
-
-              return (
-                <div key={event.id} className="p-4 rounded-lg border border-border">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h4 className="font-semibold">{event.title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {event.city} • {new Date(event.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <Badge>{event.attendees.toLocaleString()} attending</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    You have {eventRecommendations.length} recommended connections attending this
-                    event
-                  </p>
-                  <Link href={`/events/${event.id}`}>
-                    <Button variant="outline" size="sm">
-                      View Attendees
-                    </Button>
-                  </Link>
+        {/* AI Insights Card */}
+        <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-background border-primary/20">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <CardTitle>AI-Powered Connections</CardTitle>
+            </div>
+            <CardDescription>
+              Our unified member brain analyzes your profile, interests, expertise, and activity to
+              surface the most valuable connections for you.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Users className="h-5 w-5 text-primary" />
                 </div>
-              );
-            })}
+                <div>
+                  <p className="font-semibold text-sm mb-1">Similar Leadership DNA</p>
+                  <p className="text-xs text-muted-foreground">
+                    Members who share your leadership traits
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm mb-1">Complementary Expertise</p>
+                  <p className="text-xs text-muted-foreground">Skills that complement yours</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm mb-1">Proximity-Based</p>
+                  <p className="text-xs text-muted-foreground">
+                    Members in your area or destinations
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Heart className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm mb-1">Lifestyle Match</p>
+                  <p className="text-xs text-muted-foreground">Similar wellness and hobbies</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-bold">Top Recommendations For You</h2>
+              <p className="text-sm text-muted-foreground">
+                Highest match scores based on multiple factors
+              </p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    </main>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {topRecommendations.map((rec) => (
+              <ConnectionCard key={rec.member.id} recommendation={rec} />
+            ))}
+          </div>
+        </section>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Browse by Connection Type</CardTitle>
+            <CardDescription>
+              Explore recommendations categorized by what you have in common
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="interests" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="interests">Interests</TabsTrigger>
+                <TabsTrigger value="industry">Industry</TabsTrigger>
+                <TabsTrigger value="location">Location</TabsTrigger>
+                <TabsTrigger value="lifestyle">Lifestyle</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="interests" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {interestBased.map((rec) => (
+                    <ConnectionCard key={rec.member.id} recommendation={rec} />
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="industry" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {industryBased.map((rec) => (
+                    <ConnectionCard key={rec.member.id} recommendation={rec} />
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="location" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {locationBased.map((rec) => (
+                    <ConnectionCard key={rec.member.id} recommendation={rec} />
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="lifestyle" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {lifestyleBased.map((rec) => (
+                    <ConnectionCard key={rec.member.id} recommendation={rec} />
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        {/* Event-Based Recommendations */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              <CardTitle>Event-Based Connections</CardTitle>
+            </div>
+            <CardDescription>
+              Connect with members attending the same upcoming events
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {events.slice(0, 3).map((event) => {
+                const eventRecommendations = allRecommendations
+                  .filter((r) => r.reasons.some((reason) => reason.type === "event"))
+                  .slice(0, 3);
+
+                return (
+                  <div key={event.id} className="p-4 rounded-lg border border-border">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h4 className="font-semibold">{event.title}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {event.city} • {new Date(event.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Badge>{event.attendees.toLocaleString()} attending</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      You have {eventRecommendations.length} recommended connections attending this
+                      event
+                    </p>
+                    <Link href={`/events/${event.id}`}>
+                      <Button variant="outline" size="sm">
+                        View Attendees
+                      </Button>
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-none size-0"></div>
+      </main>
+    </div>
   );
 }
 

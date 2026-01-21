@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader } from "@/components/Loader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,20 +8,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { YpoProfile } from "@/lib/types/ypo-profile";
 import { Building2, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 interface YpoProfileCardProps {
   profile: YpoProfile;
 }
 
 export function YpoProfileCard({ profile }: YpoProfileCardProps) {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const handleProfileClick = () => {
-    router.push(`/members/${profile.id}`);
+    startTransition(() => {
+      router.push(`/members/${profile.id}`);
+    });
   };
 
   const initials =
@@ -28,7 +29,6 @@ export function YpoProfileCard({ profile }: YpoProfileCardProps) {
       ?.split(" ")
       .map((n) => n[0])
       .join("") || "?";
-
 
   return (
     <Card className="h-fit p-0 transition-colors" id={profile.id}>
@@ -90,6 +90,7 @@ export function YpoProfileCard({ profile }: YpoProfileCardProps) {
         </div>
 
         <Button className="w-full" size="sm" onClick={handleProfileClick}>
+          {isPending ? <Loader /> : null}
           View Profile
         </Button>
       </CardContent>

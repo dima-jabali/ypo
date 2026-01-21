@@ -61,7 +61,7 @@ export function ProfileSelector() {
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 bg-transparent"
+          className="gap-2 bg-transparent rounded-sm"
           aria-label="Select profile"
         >
           <User className="h-4 w-4" />
@@ -70,7 +70,7 @@ export function ProfileSelector() {
           ) : (
             <span>Select Profile</span>
           )}
-          <ChevronDown className="h-4 w-4 opacity-50" />
+          <ChevronDown className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-2" align="end">
@@ -86,7 +86,7 @@ export function ProfileSelector() {
               className="h-8"
             />
           </div>
-          <div ref={parentRef} className="h-[400px] overflow-y-auto">
+          <div ref={parentRef} className="h-[400px] simple-scrollbar">
             {filteredProfiles.length > 0 ? (
               <div
                 style={{

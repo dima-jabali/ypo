@@ -55,25 +55,25 @@ export const SourceCitation = memo(function SourceCitation({ text }: { text: str
     const el = document.getElementById(id);
 
     if (el) {
-        el.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
+      el.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
 
-        // Remove the class if it exists to reset the animation
+      // Remove the class if it exists to reset the animation
+      el.classList.remove("animate-highlight");
+
+      // Force a reflow to ensure the browser registers the removal
+      // void el.offsetWidth;
+
+      // Add the animation class
+      el.classList.add("animate-highlight");
+
+      // Optional: Clean up the class after animation finishes
+      setTimeout(() => {
         el.classList.remove("animate-highlight");
-
-        // Force a reflow to ensure the browser registers the removal
-        // void el.offsetWidth;
-
-        // Add the animation class
-        el.classList.add("animate-highlight");
-
-        // Optional: Clean up the class after animation finishes
-        setTimeout(() => {
-          el.classList.remove("animate-highlight");
-        }, 4000);
-      }
+      }, 4000);
+    }
 
     // sourceCitationStore.setState({ currentSourceId: parsedId });
   }

@@ -125,7 +125,6 @@ export const ChatOrNotebook = memo(function ChatOrNotebook() {
           <SourceCitationContextProvider>
             <EmptyFallbackSuspense>
               <WithChatData>
-
                 <Sidebar />
               </WithChatData>
             </EmptyFallbackSuspense>
@@ -138,7 +137,7 @@ export const ChatOrNotebook = memo(function ChatOrNotebook() {
                 <ChatContextProvider>
                   <SlashProvider>
                     <main className="max-w-full h-[calc(100vh-65px)] max-h-[calc(100vh-65px)] relative overflow-hidden [grid-area:main] bg-transparent">
-                <AllSourcesInChatSidebar />
+                      <AllSourcesInChatSidebar />
 
                       <Chat />
                     </main>

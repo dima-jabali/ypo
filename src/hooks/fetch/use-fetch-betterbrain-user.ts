@@ -7,13 +7,11 @@ import { queryKeyFactory } from "#/hooks/query-keys";
 import type { BetterbrainUser } from "#/types/notebook";
 import { authStore } from "#/contexts/auth/auth";
 
+import "client-only";
+
 export type FetchBetterbrainUserResponse = BetterbrainUser;
 
 export function useFetchBetterbrainUser() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const isUsingLocalClerk = authStore.use.isUsingLocalClerk();
   const clerkApiToken = authStore.use.token();
   const token = authStore.use.token();

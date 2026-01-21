@@ -79,7 +79,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-black;
   }
 }
 
@@ -89,11 +89,10 @@
 
 @keyframes highlight {
   0% {
-
-  background-color: transparent;
+    background-color: transparent;
   }
   50% {
-  background-color: oklch(98% 0.016 73.684);
+    background-color: oklch(98% 0.016 73.684);
   }
   100% {
     background-color: transparent;
@@ -123,6 +122,18 @@
     [content-end] var(--parallel) [parallel-two-end] var(--full) [full-end];
 }
 
+@utility grid-main {
+  --side-space: minmax(0, 0.2fr);
+  --gap: 0;
+  --content: calc(((min(48rem, 100% - var(--gap) * 4)) / 2) - (var(--gap) / 2));
+
+  display: grid;
+
+  grid-template-columns: var(--side-space) [content-start] var(--content) [content-end] var(
+      --side-space
+    );
+}
+
 @utility chat-sm-grid {
   --gap: 9px;
   --full: minmax(0, 1fr);
@@ -136,6 +147,10 @@
     [content-start] var(--content) [parallel-one-end gap-start] var(--gap)
     [gap-end parallel-two-start] var(--content)
     [content-end] var(--parallel) [parallel-two-end] var(--full) [full-end];
+}
+
+@utility main-content {
+  grid-column: content-start / content-end;
 }
 
 @utility chat-content {
@@ -410,6 +425,10 @@
 @theme {
   --open-sidebar-width: 250px;
 
+  --color-brand-1: rgb(70, 128, 194);
+  --color-brand-2: rgb(169, 184, 195);
+  --color-brand-3: rgb(6, 30, 62);
+
   --color-button-active: rgb(0 0 0 / 20%);
   --color-button-hover: rgb(0 0 0 / 10%);
 
@@ -454,28 +473,17 @@
   --simple-scrollbar-active-thumb-color: #7e7e7e;
   --simple-scrollbar-thumb-color: #a4a4a4;
 
-  /* [START] Sapien */
-
-  /* The header background color when its column contains the selected cell: */
-  --color-bg-header-has-focus: rgb(200 200 200);
-  /* The header background color when it is hovered: */
-  --color-bg-header-hovered: rgb(220 220 220);
-  /* The header text color: */
-  --color-text-header-color: rgb(50 50 50);
-
-  /* [END] Sapien */
-
   --background: oklch(1 0 0);
   --foreground: oklch(0.098 0 0);
   --card: oklch(0.99 0 0);
   --card-foreground: oklch(0.098 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.098 0 0);
-  --primary: oklch(0.286 0.067 265.755);
+  --primary: var(--color-brand-1);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.953 0.008 265.755);
   --secondary-foreground: oklch(0.286 0.067 265.755);
-  --muted: oklch(37.53% 0.00004 271.152);
+  --muted: oklch(56.584% 0.00006 271.152);
   --muted-foreground: oklch(0.533 0.015 265.755);
   --accent: oklch(0.953 0.008 265.755);
   --accent-foreground: oklch(0.286 0.067 265.755);
@@ -563,7 +571,7 @@ body {
   width: 100%;
 
   ::selection {
-    background-color: var(--color-accent);
+    background-color: var(--color-brand-1);
     color: #fff;
   }
 
