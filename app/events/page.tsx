@@ -40,7 +40,7 @@ export default function EventsPage() {
   const eventTypes = ["GLC", "Forum", "Network", "Regional", "Chapter"];
 
   return (
-    <main className="container mx-auto p-6 space-y-6">
+    <main className="container mx-auto p-6 space-y-6 h-[calc(100vh-65px)] simple-scrollbar">
       <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-3xl font-bold mb-2">Events</h1>
