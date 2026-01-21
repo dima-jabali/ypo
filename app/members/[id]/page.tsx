@@ -62,7 +62,7 @@ export default function MemberDetailPage() {
   }
 
   return (
-    <main className="container mx-auto p-6 flex flex-col gap-4 h-[calc(100vh-65px)] simple-scrollbar">
+    <main className="container px-auto p-6 flex flex-col gap-4 h-[calc(100vh-65px)] simple-scrollbar">
       {/* Back Button */}
       <Link href="/members">
         <Button variant="ghost" size="sm">

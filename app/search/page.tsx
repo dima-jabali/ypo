@@ -9,7 +9,7 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="relative py- w-screen max-h-[calc(100vh-65px)] h-[calc(100vh-65px)] overflow-hidden flex flex-col items-center justify-center">
+    <div className="relative w-screen max-h-[calc(100vh-65px)] h-[calc(100vh-65px)] overflow-hidden flex flex-col items-center justify-center">
       <WithOrganizationIdAndListBoundary failedText="Something went wrong at the main page!">
         <ChatOrNotebook />
       </WithOrganizationIdAndListBoundary>
