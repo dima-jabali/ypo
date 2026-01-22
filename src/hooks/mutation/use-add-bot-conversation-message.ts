@@ -58,10 +58,6 @@ type Ctx = {
 const mutationKey = queryKeyFactory.post["bot-conversation-message"].queryKey;
 
 export function useAddBotConversationMessage() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const betterbrainUser = useFetchBetterbrainUser();
   const organizationId = useWithOrganizationId();
 

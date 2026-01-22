@@ -240,28 +240,13 @@ function selectAllChatSourcesMainValues(
 
   for (const page of data.pages) {
     for (const msg of page.results) {
-      if (msg.text) {
-        const sourcesReferencedInThisMsg = getReferencedSources(msg.text);
-
-        for (const ref of sourcesReferencedInThisMsg) {
-          referencedSources.add(ref);
-        }
-      }
-
       if (msg.sources && msg.sources.length > 0) {
         const normalizedSources = normalizeSources(msg.sources);
 
         for (const source of normalizedSources) {
           const mainValues = getSourceMainValues(source);
 
-          if (
-            referencedSources.has(mainValues.id) ||
-            referencedSources.has(
-              mainValues.id.replace(WEBSITE_PREFIX, "").replace(URL_TEXT_SEARCH, "") as SourceID,
-            )
-          ) {
-            map.set(mainValues.id, mainValues);
-          }
+          map.set(mainValues.id, mainValues);
         }
       }
     }

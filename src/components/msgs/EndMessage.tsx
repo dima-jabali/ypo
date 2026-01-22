@@ -1,11 +1,16 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
-import { useShouldShowSources } from "#/hooks/use-should-show-sources";
-import type { BotConversationMessage, BotConversationMessageType } from "#/types/chat";
+import {
+  BotConversationMessageStatus,
+  type BotConversationMessage,
+  type BotConversationMessageType,
+} from "#/types/chat";
 import { MessageWrapper } from "./MessageWrapper";
+import { ANIMATED_DOTS, SEARCHING_YPO } from "./icons";
+import { BrainCircuit } from "lucide-react";
 
 type Props = {
   msg: Message;
@@ -16,21 +21,44 @@ type Message = BotConversationMessage & {
 };
 
 export const EndMessage = memo(function EndMessage({ msg }: Props) {
-  if (typeof window === "undefined") {
-    return null;
-  }
+  const [showOnlySources, setShowOnlySources] = useState(false);
 
-  const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);
+  const timerRef = useRef<NodeJS.Timeout>(undefined);
 
-  if (!msg.sources || msg.sources.length === 0) {
-    return null;
+  const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
+
+  useEffect(() => {
+    clearTimeout(timerRef.current);
+
+    if (isMessageComplete) {
+      timerRef.current = setTimeout(() => {
+        setShowOnlySources(true);
+      }, 5_000);
+    }
+
+    return () => {
+      clearTimeout(timerRef.current);
+    };
+  }, [isMessageComplete]);
+
+  if (showOnlySources) {
+    return <SourcesForUser sources={msg.sources} shouldShow={false} />;
   }
 
   return (
     <MessageWrapper title="Sources (End group of messages)" data-start-message data-id={msg.id}>
-      <SourcesForUser sources={msg.sources} shouldShow={shouldShowSources} />
+      <span
+        className="flex font-semibold z-10 items-center justify-start w-full text-xs text-muted"
+        title="To show more, set 'Show intermediate messages' to true on settings"
+      >
+        <BrainCircuit className="stroke-muted-foreground size-3" />
+
+        <span>&nbsp;Gathering more data</span>
+
+        {ANIMATED_DOTS}
+      </span>
+
+      <SourcesForUser sources={msg.sources} shouldShow={false} />
     </MessageWrapper>
   );
 });
-
-EndMessage.whyDidYouRender = true;

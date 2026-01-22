@@ -10,10 +10,6 @@ import { useSetOrgToFirst } from "./use-set-org-to-first";
 import { generalContextStore } from "#/contexts/general-ctx/general-context";
 
 export function useCurrentOrganization() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const urlOrgId = generalContextStore.use.organizationId();
 
   useSetOrgToFirst();
@@ -29,10 +25,6 @@ export function useCurrentOrganization() {
 }
 
 export function useDownloadedOrganizationId() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   return useCurrentOrganization()?.id;
 }
 

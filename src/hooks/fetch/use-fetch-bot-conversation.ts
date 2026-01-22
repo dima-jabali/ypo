@@ -13,10 +13,6 @@ export type GetBotConversationByIdResponse = BotConversation;
 export function useFetchBotConversation<SelectedData = BotConversation>(
   select: (data: BotConversation) => SelectedData = identity<BotConversation, SelectedData>,
 ) {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const botConversationId = generalContextStore.use.botConversationId();
 
   if (!isValidNumber(botConversationId)) {
@@ -39,9 +35,5 @@ export function useFetchBotConversation<SelectedData = BotConversation>(
 
 const selectIsStreaming = (data: BotConversation) => data.is_streaming;
 export function useIsStreaming() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   return useFetchBotConversation(selectIsStreaming);
 }

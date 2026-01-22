@@ -12,7 +12,7 @@ import {
 
 export const BOT_IMG = (
   <div className="size-8 rounded-full bg-indigo-800 p-1.5">
-    <Bot className="size-5 text-white" />
+    <img src="/ypo-logo-white.png" alt="YPO Member Search AI" className="" />
   </div>
 );
 

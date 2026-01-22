@@ -19,6 +19,9 @@ export const ypoQueryKeys = {
 export function useYpoProfiles(searchParams?: ProfileSearchParams) {
   return useQuery({
     queryKey: ypoQueryKeys.profiles(searchParams),
+    staleTime: Infinity,
+    gcTime: Infinity,
+
     queryFn: async () => {
       const params = new URLSearchParams();
 
@@ -61,6 +64,8 @@ export function useYpoProfilesInfinite() {
       offset: 0,
     },
     queryKey: ypoQueryKeys.profiles(),
+    staleTime: Infinity,
+    gcTime: Infinity,
     queryFn: async ({ pageParam }) => {
       const searchParams = new URLSearchParams(
         pageParam as unknown as Record<string, string>,
@@ -98,6 +103,8 @@ export function useYpoProfilesInfinite() {
 export function useYpoProfile(id: YpoProfileId) {
   return useQuery({
     queryKey: ypoQueryKeys.profile(id),
+    staleTime: Infinity,
+    gcTime: Infinity,
     queryFn: async () => {
       const response = await axiosClient.get<YpoProfile>(
         `/api/v1/ypo/profile?ypo_profile_id=${id}`,

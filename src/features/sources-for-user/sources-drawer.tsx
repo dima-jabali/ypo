@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { Building2, MapPin, X } from "lucide-react";
+import { Building2, ExternalLink, MapPin, X } from "lucide-react";
 import { Portal } from "radix-ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -20,6 +20,7 @@ import { SourcesForUserCtxProvider, useSourcesForUserCtx } from "./ctx";
 import { type SourceMainValues } from "./get-source-main-values";
 import type { NormalizedSource } from "./get-top-n-sources";
 import { searchNestedObject } from "./search-nested-object";
+import Link from "next/link";
 
 export type SourcesDrawerProps = {
   sourcesMainValues: Array<SourceMainValues<SourceForUserType, NormalizedSource["values_type"]>>;
@@ -373,10 +374,6 @@ function List({
     },
   });
 
-  function handleProfileClick(id: YpoProfileId) {
-    router.push(`/members/${id}`);
-  }
-
   return (
     <div ref={parentRef} className="w-full h-[93vh] simple-scrollbar px-3">
       <div
@@ -419,7 +416,7 @@ function List({
               : sourceMainValues.normalizedSource.values.id
           ) as YpoProfileId;
 
-          const name = values?.Name || "<Unnamed Profile>";
+          const name = (values?.Name as string | undefined) || "<Unnamed Profile>";
           const position = values?.Position;
           const currentCompanyName = values?.["Current Company"];
           const city = values?.City;
@@ -492,27 +489,18 @@ function List({
                     )}
                   </div>
 
-                  <Button onClick={() => handleProfileClick(id)} className="w-full" size="sm">
-                    View Profile
-                  </Button>
+                  <Link
+                    href={`/members/${id}`}
+                    target="_blank"
+                    className="w-full rounded-md bg-brand-3 text-white hover:bg-brand-3/70 active:bg-brand-1 p-2 text-sm flex items-center justify-center gap-2"
+                  >
+                    <ExternalLink className="size-4 flex-none text-white" />
+
+                    <span>View Profile</span>
+                  </Link>
                 </CardContent>
               </Card>
             </article>
-          );
-
-          return null;
-
-          return (
-            <article
-              className="top-0 left-0 absolute w-full translate-y-[attr(data-translate_px)] min-h-[attr(data-height_px)] py-4 flex flex-col gap-2 max-w-full select-text data-[selected=true]:bg-orange-400/20"
-              data-selected={matchedSource?.id === sourceMainValues.id}
-              title={sourceMainValues.normalizedSource.source_type}
-              ref={rowVirtualizer.measureElement}
-              data-translate={virtualRow.start}
-              data-height={virtualRow.size}
-              data-index={virtualRow.index}
-              key={sourceMainValues.id}
-            ></article>
           );
         })}
       </div>

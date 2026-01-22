@@ -13,6 +13,8 @@ export function useYpoProfilesByIds(ids: number[]) {
   const queries = useQueries({
     queries: ids.map((id) => ({
       queryKey: ypoQueryKeys.profile(id as unknown as string),
+      staleTime: Infinity,
+      gcTime: Infinity,
       queryFn: async () => {
         const response = await axiosClient.get<YpoProfile>(
           `/api/v1/ypo/profile?ypo_profile_id=${id}`,

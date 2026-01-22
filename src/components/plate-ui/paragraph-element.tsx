@@ -12,7 +12,7 @@ export function ParagraphElementForChatInput(props: PlateElementProps) {
     <PlateElement {...props} className={cn(props.attributes.className, PARAGRAPH_CLASSNAME)}>
       {isTheOnlyChildOfEditorAndIsEmpty ? (
         <span
-          className="opacity-50 pointer-events-none absolute inset-0 py-2"
+          className="opacity-70 text-muted pointer-events-none absolute inset-0 py-2"
           contentEditable={false}
         >
           Type a question...

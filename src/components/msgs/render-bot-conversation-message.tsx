@@ -101,12 +101,7 @@ function handleParallelMessages(
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 const ParallelMsgDetails = memo(function ParallelMsgDetails({ children }: React.PropsWithChildren) {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const isStreaming = useIsStreaming();
 
   return (

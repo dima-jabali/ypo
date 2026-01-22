@@ -1,11 +1,15 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { SourcesForUser } from "#/features/sources-for-user/sources-for-user";
-import { useShouldShowSources } from "#/hooks/use-should-show-sources";
-import type { BotConversationMessage, BotConversationMessageType } from "#/types/chat";
+import {
+  BotConversationMessageStatus,
+  type BotConversationMessage,
+  type BotConversationMessageType,
+} from "#/types/chat";
 import { MessageWrapper } from "./MessageWrapper";
+import { SEARCHING_YPO } from "./icons";
 
 type Props = {
   msg: Message;
@@ -16,14 +20,28 @@ type Message = BotConversationMessage & {
 };
 
 export const StartMessage = memo(function StartMessage({ msg }: Props) {
-  console.log("StartMessage render", { msg });
+  const [showOnlySources, setShowOnlySources] = useState(false);
 
-  return <SourcesForUser sources={msg.sources} shouldShow={false} />;
+  const timerRef = useRef<NodeJS.Timeout>(undefined);
 
-  const shouldShowSources = useShouldShowSources(msg.parallel_conversation_id);
+  const isMessageComplete = msg.message_status === BotConversationMessageStatus.Complete;
 
-  if (!msg.sources || msg.sources.length === 0) {
-    return null;
+  useEffect(() => {
+    clearTimeout(timerRef.current);
+
+    if (isMessageComplete) {
+      timerRef.current = setTimeout(() => {
+        setShowOnlySources(true);
+      }, 7_000);
+    }
+
+    return () => {
+      clearTimeout(timerRef.current);
+    };
+  }, [isMessageComplete]);
+
+  if (showOnlySources) {
+    return <SourcesForUser sources={msg.sources} shouldShow={false} />;
   }
 
   return (
@@ -33,7 +51,9 @@ export const StartMessage = memo(function StartMessage({ msg }: Props) {
       data-start-message
       data-id={msg.id}
     >
-      <SourcesForUser sources={msg.sources} shouldShow={shouldShowSources} />
+      {SEARCHING_YPO}
+
+      <SourcesForUser sources={msg.sources} shouldShow={false} />
     </MessageWrapper>
   );
 });

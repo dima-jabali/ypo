@@ -16,8 +16,9 @@ import "client-only";
 
 export const AllSourcesInChatSidebar = memo(function AllSourcesInChatSidebar() {
   const shouldShowSidebar = generalContextStore.use.showSourcesSidebar();
+  const isStreaming = useIsStreaming();
 
-  return !shouldShowSidebar ? null : <WhenNotStreaming />;
+  return !shouldShowSidebar || isStreaming ? null : <WhenNotStreaming />;
 });
 
 function WhenNotStreaming() {
@@ -63,7 +64,7 @@ function WhenNotStreaming() {
     <FilterRegexProvider>
       <Tooltip>
         <TooltipTrigger
-          className="absolute top-2 left-3 flex bg-notebook items-center justify-center rounded-full border border-border-smooth button-hover size-6 @3xl:size-7 z-50"
+          className="absolute top-2 left-3 flex bg-notebook items-center justify-center rounded-full border border-border-smooth button-hover size-6 @3xl:size-7 z-1"
           title="All profiles referenced in this chat"
           onClick={() => setIsOpenOrToggle()}
         >
@@ -76,7 +77,8 @@ function WhenNotStreaming() {
 
         <TooltipContent
           className="w-fit max-h-28 simple-scrollbar text-primary text-xs"
-          align="center"
+          align="start"
+          side="bottom"
         >
           All profiles referenced in this chat
         </TooltipContent>

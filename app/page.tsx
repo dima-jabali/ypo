@@ -63,12 +63,12 @@ function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center simple-scrollbar h-[calc(100vh-65px)] w-screen py-14">
-      <main className="space-y-8 h-full container mx-auto">
+    <div className="flex flex-col items-center justify-center simple-scrollbar h-[calc(100vh-65px)] w-screen">
+      <main className="flex flex-col gap-8 h-full container mx-auto">
         <div className="flex flex-none size-0"></div>
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 md:p-12 border border-primary/20">
+        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 md:p-12 border border-primary/20 h-fit flex-none">
           <div className="relative z-10">
             <Badge className="mb-4 bg-primary/20 text-primary border-primary/30">
               YPO for Enterprise
@@ -462,7 +462,7 @@ function Home() {
           </Card>
         </section>
 
-        <div className="flex flex-none size-0"></div>
+        <div className="flex flex-none size-[1px]"></div>
       </main>
     </div>
   );

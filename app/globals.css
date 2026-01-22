@@ -92,7 +92,7 @@
     background-color: transparent;
   }
   50% {
-    background-color: oklch(98% 0.016 73.684);
+    background-color: color-mix(in srgb, var(--color-brand-2), transparent 40%);
   }
   100% {
     background-color: transparent;
@@ -479,11 +479,11 @@
   --card-foreground: oklch(0.098 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.098 0 0);
-  --primary: var(--color-brand-1);
+  --primary: var(--color-brand-3);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.953 0.008 265.755);
   --secondary-foreground: oklch(0.286 0.067 265.755);
-  --muted: oklch(56.584% 0.00006 271.152);
+  --muted: oklch(48.906% 0.00006 271.152);
   --muted-foreground: oklch(0.533 0.015 265.755);
   --accent: oklch(0.953 0.008 265.755);
   --accent-foreground: oklch(0.286 0.067 265.755);
@@ -566,12 +566,12 @@ body {
     --open-sidebar-width: 300px;
   }
 
-  color: var(--color-primary);
+  color: var(--color-brand-3);
   height: 100%;
   width: 100%;
 
   ::selection {
-    background-color: var(--color-brand-1);
+    background-color: var(--color-brand-3);
     color: #fff;
   }
 
@@ -664,7 +664,7 @@ body {
 }
 
 @utility button-hover-accent {
-  @apply hover:bg-accent hover:text-accent-foreground hover:stroke-accent-foreground active:bg-accent-strong disabled:opacity-50;
+  @apply hover:bg-brand-2 hover:text-white active:bg-brand-1 disabled:opacity-50;
 }
 
 /* [START] For Sapien */

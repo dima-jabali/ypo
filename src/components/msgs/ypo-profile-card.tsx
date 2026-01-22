@@ -89,9 +89,10 @@ export function YpoProfileCard({ profile }: YpoProfileCardProps) {
           )}
         </div>
 
-        <Button className="w-full" size="sm" onClick={handleProfileClick}>
-          {isPending ? <Loader /> : null}
-          View Profile
+        <Button className="w-full gap-4" size="sm" onClick={handleProfileClick}>
+          {isPending ? <Loader className="border-t-white" /> : null}
+
+          <span>View Profile</span>
         </Button>
       </CardContent>
     </Card>

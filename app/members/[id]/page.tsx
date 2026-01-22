@@ -25,10 +25,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import type { YpoProfileId } from "@/lib/types/ypo-profile";
 
 export default function MemberDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { isLoading, error, data: member } = useYpoProfile(Number.parseInt(id));
+  const {
+    isLoading,
+    error,
+    data: member,
+  } = useYpoProfile(Number.parseInt(id) as unknown as YpoProfileId);
   const currentUserId = useStore(useImpersonatedProfileId);
 
   if (isLoading) {
@@ -61,9 +66,17 @@ export default function MemberDetailPage() {
     );
   }
 
+  function handleOpenMemberLinkedin() {
+    if (member && member.linkedin_id) {
+      const linkedinUrl = `https://www.linkedin.com/in/${member.linkedin_id}`;
+
+      window.open(linkedinUrl, "_blank");
+    }
+  }
+
   return (
     <div className="flex flex-col items-center justify-center simple-scrollbar h-[calc(100vh-65px)] w-screen">
-      <main className="space-y-8 h-full container mx-auto">
+      <main className="flex flex-col gap-8 h-full container mx-auto">
         <div className="flex flex-none size-0"></div>
 
         {/* Back Button */}
@@ -105,14 +118,14 @@ export default function MemberDetailPage() {
                       </p>
 
                       {member.linkedin_id && (
-                        <div className="mt-3 p-3 bg-accent/30 rounded-lg border border-accent/50">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Linkedin className="h-4 w-4 text-primary" />
-                            <span className="text-xs font-semibold text-muted-foreground">
-                              LinkedIn
-                            </span>
-                          </div>
-                        </div>
+                        <button
+                          onClick={handleOpenMemberLinkedin}
+                          className="mt-3 flex items-center gap-3 p-3 bg-accent/30 rounded-lg border border-accent/50 button-hover"
+                        >
+                          <Linkedin className="h-4 w-4 text-primary" />
+
+                          <span className="text-xs font-semibold text-muted">LinkedIn</span>
+                        </button>
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -437,7 +450,7 @@ export default function MemberDetailPage() {
           </div>
         </div>
 
-        <div className="flex flex-none size-0"></div>
+        <div className="flex flex-none size-[1px]"></div>
       </main>
     </div>
   );

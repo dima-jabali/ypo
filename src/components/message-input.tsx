@@ -88,10 +88,6 @@ const MESSAGE_INPUT_EDITOR_OPTIONS = {
 } as const;
 
 export const MessageInput = memo(function MessageInput() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const [files, setFiles] = useState<Array<File>>([]);
   const [isSending, setIsSending] = useState(false);
 
@@ -443,7 +439,7 @@ export const MessageInput = memo(function MessageInput() {
         className="flex h-full items-center overflow-clip rounded-xl border-[1.5px] border-gray-600 data-[is-streaming=true]:border-none data-[is-streaming=true]:p-[1.5px] data-[is-streaming=true]:animate-background bg-gradient-to-r from-green-300 via-blue-600 to-red-300 bg-[length:_400%_400%]"
         data-is-streaming={isStreaming}
       >
-        <div className="relative flex flex-col w-full h-full bg-secondary rounded-[calc(var(--radius-2xl)-6px)] p-2">
+        <div className="relative flex flex-col w-full h-full bg-secondary rounded-[calc(var(--radius-2xl)-4px)] p-2">
           <div className="flex items-center justify-between gap-2 w-full">
             <PlateMessageInput editor={messageInputEditor} onKeyDown={handleOnKeyDown} />
 

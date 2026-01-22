@@ -132,10 +132,6 @@ export function useCreateNotebook() {
           if (!cachedNotebookListPageInfiniteQueryResponse) {
             log(
               "[onMutate] No cachedNotebookListPageInfiniteQueryResponse! Not inserting optimist project metadata in projects list at useCreateNotebook! Creating a new cache instead.",
-              {
-                organizationId: dataOfNotebookToBeCreated.organizationId,
-                optimisticProject,
-              },
             );
 
             const newCache: FetchNotebookListPageInfiniteData = {
@@ -164,10 +160,10 @@ export function useCreateNotebook() {
               );
 
               if (cachedProjects.some(({ uuid }) => uuid === notebookUuid)) {
-                log("[onMutate] The new project is already in the list. No need to add it again!", {
-                  cachedNotebookListPageInfiniteQueryResponse,
-                  optimisticProject,
-                });
+                log(
+                  "[onMutate] The new project is already in the list. No need to add it again!",
+                  {},
+                );
 
                 return cachedNotebookListPageInfiniteQueryResponse;
               }
@@ -190,11 +186,6 @@ export function useCreateNotebook() {
                 pages: cachedNotebookListPageInfiniteQueryResponse.pages.with(0, newFirstPage),
                 pageParams: cachedNotebookListPageInfiniteQueryResponse.pageParams,
               };
-
-            log({
-              newCachedProjectsInfiniteQueryResponse,
-              optimisticProject,
-            });
 
             return newCachedProjectsInfiniteQueryResponse;
           }
@@ -269,20 +260,11 @@ export function useCreateNotebook() {
       setNotebookListPages(
         requestVariables.organizationId,
         (cachedProjectsInfiniteQueryResponse) => {
-          log("[onSuccess] replacing optimist project metadata in projects infinite list", {
-            cachedProjectsInfiniteQueryResponse,
-            projectFromResponse,
-            requestVariables,
-            context,
-          });
+          log("[onSuccess] replacing optimist project metadata in projects infinite list", {});
 
           if (!cachedProjectsInfiniteQueryResponse) {
             log(
               "[onSuccess] No cachedProjectsPage or response! Not replacing optimist project metadata in projects infinite list!",
-              {
-                cachedProjectsInfiniteQueryResponse,
-                projectFromResponse,
-              },
             );
 
             return cachedProjectsInfiniteQueryResponse;
@@ -359,10 +341,7 @@ export function useCreateNotebook() {
               pages: newPages,
             };
 
-          log("[onSuccess] replaced optimist project metadata in projects infinite list", {
-            newCachedProjectsInfiniteQueryResponse,
-            projectFromResponse,
-          });
+          log("[onSuccess] replaced optimist project metadata in projects infinite list", {});
 
           return newCachedProjectsInfiniteQueryResponse;
         },

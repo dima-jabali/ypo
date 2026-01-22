@@ -16,6 +16,8 @@ export const similarityQueryKeys = {
 export function useProfileSimilarity(profileId1: number | null, profileId2: number | null) {
   return useQuery({
     queryKey: similarityQueryKeys.pair(profileId1 || 0, profileId2 || 0),
+    staleTime: Infinity,
+    gcTime: Infinity,
     queryFn: async () => {
       if (!profileId1 || !profileId2) {
         throw new Error("Both profile IDs are required");

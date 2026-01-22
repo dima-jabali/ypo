@@ -29,7 +29,7 @@ export const X_ICON = <X className="size-4 stroke-destructive" />;
 
 export const THINKING_SPAN = (
   <span
-    className="flex font-semibold z-10 items-center justify-start w-full text-xs"
+    className="flex font-semibold z-10 items-center justify-start w-full text-xs text-muted"
     title="To show more, set 'Show intermediate messages' to true on settings"
   >
     <BrainCircuit className="stroke-muted-foreground size-3" />
@@ -42,7 +42,7 @@ export const THINKING_SPAN = (
 
 export const SEARCHING_CTX = (
   <span
-    className="flex font-semibold z-10 items-center justify-start w-full text-xs"
+    className="flex font-semibold z-10 items-center justify-start w-full text-xs text-muted"
     title="To show more, set 'Show intermediate messages' to true"
   >
     <ScanSearch className="stroke-muted-foreground size-3" />
@@ -55,12 +55,25 @@ export const SEARCHING_CTX = (
 
 export const SELECTING_TOOL = (
   <span
-    className="flex font-semibold z-10 items-center justify-start w-full text-xs"
+    className="flex font-semibold z-10 items-center justify-start w-full text-xs text-muted"
     title="To show more, set 'Show intermediate messages' to true"
   >
     <Wrench className="stroke-muted-foreground size-3" />
 
     <span>&nbsp;Selecting tool</span>
+
+    {ANIMATED_DOTS}
+  </span>
+);
+
+export const SEARCHING_YPO = (
+  <span
+    className="flex font-semibold z-10 items-center justify-start w-full text-xs text-muted"
+    title="To show more, set 'Show intermediate messages' to true"
+  >
+    <Wrench className="stroke-muted-foreground size-3" />
+
+    <span>&nbsp;Searching through the YPO network</span>
 
     {ANIMATED_DOTS}
   </span>
