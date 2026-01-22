@@ -38,7 +38,7 @@ export const StartMessage = memo(function StartMessage({ msg }: Props) {
     if (isMessageComplete) {
       timerRef.current = setTimeout(() => {
         setShowOnlySources(true);
-      }, 7_000);
+      }, 9_000);
     }
 
     return () => {
