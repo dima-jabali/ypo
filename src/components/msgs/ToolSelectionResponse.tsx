@@ -10,6 +10,7 @@ import {
 } from "#/types/chat";
 import { SELECTING_TOOL } from "./icons";
 import { MessageWrapper } from "./MessageWrapper";
+import { useIsStreaming } from "#/hooks/fetch/use-fetch-bot-conversation";
 
 type Props = {
   msg: ToolSelectionResponseMessage;
@@ -20,7 +21,12 @@ export type ToolSelectionResponseMessage = BotConversationMessage & {
 };
 
 export const ToolSelectionResponse = memo(function ToolSelectionResponse({ msg }: Props) {
-  const [showOnlySources, setShowOnlySources] = useState(false);
+  const isStreaming = useIsStreaming();
+
+  const [initialIsMessageComplete] = useState(
+    isStreaming ? false : msg.message_status === BotConversationMessageStatus.Complete,
+  );
+  const [showOnlySources, setShowOnlySources] = useState(initialIsMessageComplete);
 
   const timerRef = useRef<NodeJS.Timeout>(undefined);
 

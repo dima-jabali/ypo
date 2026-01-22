@@ -122,7 +122,7 @@ export default function ContentDetailPage({ params }: { params: Promise<{ id: st
                 <Separator />
 
                 {/* Placeholder for video/audio player */}
-                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+                <div className="aspect-video bg-muted/5 rounded-lg flex items-center justify-center">
                   <div className="text-center space-y-3">
                     {getTypeIcon(item.type)}
                     <p className="text-sm text-muted-foreground">

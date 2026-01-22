@@ -10,6 +10,7 @@ import {
 import { ANIMATED_DOTS, THINKING_SPAN } from "./icons";
 import { MessageWrapper } from "./MessageWrapper";
 import { BrainCircuit } from "lucide-react";
+import { useIsStreaming } from "#/hooks/fetch/use-fetch-bot-conversation";
 
 type Props = {
   msg: Message;
@@ -20,7 +21,12 @@ type Message = BotConversationMessage & {
 };
 
 export const AIGeneratedSearchQuery = memo(function AIGeneratedSearchQuery({ msg }: Props) {
-  const [showOnlySources, setShowOnlySources] = useState(false);
+  const isStreaming = useIsStreaming();
+
+  const [initialIsMessageComplete] = useState(
+    isStreaming ? false : msg.message_status === BotConversationMessageStatus.Complete,
+  );
+  const [showOnlySources, setShowOnlySources] = useState(initialIsMessageComplete);
 
   const timerRef = useRef<NodeJS.Timeout>(undefined);
 

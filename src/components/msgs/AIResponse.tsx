@@ -45,7 +45,7 @@ export const AIResponse = memo(function AIResponse({ msg }: Props) {
   const ypoProfileIds = extractYpoProfileIds(msg.text ?? "");
 
   return (
-    <MessageWrapper title="AI Response" data-ai-response data-id={msg.id}>
+    <MessageWrapper title="AI Response" className="my-4" data-ai-response data-id={msg.id}>
       <div className="flex w-full flex-col gap-1 max-w-full simple-scrollbar">
         <section className="flex items-center gap-2">
           {BOT_IMG}

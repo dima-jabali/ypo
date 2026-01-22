@@ -25,7 +25,7 @@ export function FallbackLoader({
   return (
     <div
       className={classNames(
-        "w-full h-full flex flex-col gap-2 items-center justify-center",
+        "w-full h-full flex flex-col gap-2 items-center justify-center col-span-2",
         className,
       )}
       data-fallback-for={fallbackFor}

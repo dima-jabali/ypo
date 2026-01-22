@@ -192,7 +192,7 @@ function EdgeInfoCard({
         {sourceNode && (
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">Member 1</p>
-            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
                 {sourceNode.name
                   ?.split(" ")
@@ -220,7 +220,7 @@ function EdgeInfoCard({
         {targetNode && (
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground">Member 2</p>
-            <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
                 {targetNode.name
                   ?.split(" ")

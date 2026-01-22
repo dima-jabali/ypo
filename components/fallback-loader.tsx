@@ -27,7 +27,10 @@ export function FallbackLoader({
 
   return (
     <div
-      className={cn("w-full h-full flex flex-col gap-2 items-center justify-center", className)}
+      className={cn(
+        "w-full h-full flex flex-col gap-2 items-center justify-center col-span-2",
+        className,
+      )}
       data-fallback-for={fallbackFor}
       contentEditable={false}
       title="Loading..."
